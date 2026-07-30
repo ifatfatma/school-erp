@@ -1,0 +1,230 @@
+export default [
+    {
+        title: "Dashboard",
+        icon: "bi bi-speedometer2",
+        route: "/dashboard",
+    },
+
+    {
+        title: "School Management",
+        icon: "bi bi-building",
+        children: [
+            {
+                title: "School",
+                icon: "bi bi-building-fill",
+                route: "/school",
+                permission: "school.view",
+            },
+            {
+                title: "Academic Sessions",
+                icon: "bi bi-calendar3",
+                route: "/academic-sessions",
+                permission: "academic_session.view",
+            },
+        ],
+    },
+
+    {
+        title: "Academic",
+        icon: "bi bi-book",
+        children: [
+            {
+                title: "Classes",
+                route: "/classes",
+                permission: "class.view",
+            },
+            {
+                title: "Sections",
+                route: "/sections",
+                permission: "section.view",
+            },
+            {
+                title: "Subjects",
+                route: "/subjects",
+                permission: "subject.view",
+            },
+            {
+                title: "Timetables",
+                route: "/timetables",
+                permission: "timetable.view",
+            },
+        ],
+    },
+
+    {
+        title: "Students",
+        icon: "bi bi-mortarboard",
+        children: [
+            {
+                title: "Students",
+                route: "/students",
+                permission: "student.view",
+            },
+            {
+                title: "Attendance",
+                route: "/student-attendance",
+                permission: "attendance.view",
+            },
+            {
+                title: "Guardians",
+                route: "/guardians",
+                permission: "guardian.view",
+            },
+            {
+                title: "Promotions",
+                route: "/student-promotions",
+                permission: "promotion.view",
+            },
+        ],
+    },
+
+    {
+        title: "Teachers",
+        icon: "bi bi-person-workspace",
+        children: [
+            {
+                title: "Teachers",
+                route: "/teachers",
+                permission: "teacher.view",
+            },
+            {
+                title: "Leave Requests",
+                route: "/teacher-leaves",
+                permission: "leave.view",
+            },
+        ],
+    },
+
+    {
+        title: "Examinations",
+        icon: "bi bi-pencil-square",
+        children: [
+            {
+                title: "Exams",
+                route: "/exams",
+                permission: "exam.view",
+            },
+            {
+                title: "Grades",
+                route: "/grades",
+                permission: "grade.view",
+            },
+            {
+                title: "Report Cards",
+                route: "/report-cards",
+                permission: "report_card.view",
+            },
+        ],
+    },
+
+    {
+        title: "Fees & Accounts",
+        icon: "bi bi-cash-stack",
+        children: [
+            {
+                title: "Fee Collection",
+                route: "/fees",
+                permission: "fee.view",
+            },
+            {
+                title: "Expenses",
+                route: "/expenses",
+                permission: "expense.view",
+            },
+            {
+                title: "Income",
+                route: "/income",
+                permission: "income.view",
+            },
+        ],
+    },
+
+    {
+        title: "Library",
+        icon: "bi bi-journal-bookmark",
+        children: [
+            {
+                title: "Books",
+                route: "/library/books",
+                permission: "library.view",
+            },
+            {
+                title: "Categories",
+                route: "/library/categories",
+                permission: "book_category.view",
+            },
+        ],
+    },
+
+    {
+        title: "Inventory",
+        icon: "bi bi-box-seam",
+        children: [
+            {
+                title: "Items",
+                route: "/inventory/items",
+                permission: "inventory.view",
+            },
+            {
+                title: "Suppliers",
+                route: "/inventory/suppliers",
+                permission: "supplier.view",
+            },
+            {
+                title: "Purchases",
+                route: "/inventory/purchases",
+                permission: "purchase.view",
+            },
+        ],
+    },
+
+    {
+        title: "Transport",
+        icon: "bi bi-bus-front",
+        route: "/transport",
+        permission: "transport.view",
+    },
+
+    {
+        title: "Hostel",
+        icon: "bi bi-house-door",
+        route: "/hostels",
+        permission: "hostel.view",
+    },
+
+    {
+        title: "Reports",
+        icon: "bi bi-graph-up",
+        route: "/reports",
+        permission: "report.view",
+    },
+
+    {
+        title: "Administration",
+        icon: "bi bi-shield-lock",
+        children: [
+            {
+                title: "Users",
+                route: "/users",
+                permission: "user.view",
+            },
+            {
+                title: "Roles",
+                route: "/roles",
+                permission: "role.view",
+            },
+            {
+                title: "Permissions",
+                route: "/permissions",
+                permission: "permission.view",
+            },
+        ],
+    },
+
+    {
+        title: "Settings",
+        icon: "bi bi-gear",
+        route: "/settings",
+        permission: "settings.view",
+    },
+];
