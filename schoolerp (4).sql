@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 30, 2026 at 06:15 PM
+-- Generation Time: Jul 30, 2026 at 06:41 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -227,6 +227,27 @@ CREATE TABLE `leave_requests` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `leave_types`
+--
+
+CREATE TABLE `leave_types` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `max_days` int(11) NOT NULL DEFAULT 0,
+  `is_paid` tinyint(1) NOT NULL DEFAULT 1,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `migrations`
 --
 
@@ -256,7 +277,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (13, '2026_07_30_044443_create_sections_table', 5),
 (14, '2026_07_30_081755_add_school_id_to_classes_table', 6),
 (21, '2026_07_30_120637_create_teachers_table', 8),
-(22, '2026_07_30_120640_create_timetables_table', 9);
+(22, '2026_07_30_120640_create_timetables_table', 9),
+(23, '2026_07_30_161001_create_leave_types_table', 10),
+(24, '2026_07_30_160602_create_leave_requests_table', 11);
 
 -- --------------------------------------------------------
 
@@ -365,7 +388,7 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (1, 'App\\Models\\User', 1, 'admin', 'f4b40075eff10238f58d9db42e19cf7b815f9dec963ae7985cc2aecfc7a83c87', '[\"*\"]', '2026-07-28 07:10:16', NULL, '2026-07-28 06:47:02', '2026-07-28 07:10:16'),
 (19, 'App\\Models\\User', 1, 'admin', '5c655de360071321bb783541c3caf518bc31405473d596d0b1c7d442e4f8b93c', '[\"*\"]', '2026-07-28 10:43:09', NULL, '2026-07-28 10:40:46', '2026-07-28 10:43:09'),
 (33, 'App\\Models\\User', 1, 'admin', 'c282496b06ffff0a9507e6436af75b3e9b78fa626cf1fb0e923fa9a4783d304d', '[\"*\"]', '2026-07-30 03:04:08', NULL, '2026-07-29 07:29:44', '2026-07-30 03:04:08'),
-(69, 'App\\Models\\User', 1, 'admin', '5f63486f1943c19bfec9a60961fff8e4ec0ab9ea93f4d9a8ec1abfdd042c0480', '[\"*\"]', '2026-07-30 10:32:24', NULL, '2026-07-30 10:03:15', '2026-07-30 10:32:24');
+(69, 'App\\Models\\User', 1, 'admin', '5f63486f1943c19bfec9a60961fff8e4ec0ab9ea93f4d9a8ec1abfdd042c0480', '[\"*\"]', '2026-07-30 10:49:24', NULL, '2026-07-30 10:03:15', '2026-07-30 10:49:24');
 
 -- --------------------------------------------------------
 
@@ -507,7 +530,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('2cF2i7G5cwlkkNiLZjsSpDCigh1m3Ff1TLHppqxI', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRklsY3hOeXlFOU5JV09wNFFXbTVFdVBEQkxBSFNHOTVhZzB5VjBYdSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1785427221);
+('2cF2i7G5cwlkkNiLZjsSpDCigh1m3Ff1TLHppqxI', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRklsY3hOeXlFOU5JV09wNFFXbTVFdVBEQkxBSFNHOTVhZzB5VjBYdSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1785428363);
 
 -- --------------------------------------------------------
 
@@ -705,8 +728,23 @@ ALTER TABLE `job_batches`
 --
 ALTER TABLE `leave_requests`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `leave_requests_school_id_foreign` (`school_id`),
-  ADD KEY `leave_requests_teacher_id_foreign` (`teacher_id`);
+  ADD KEY `leave_requests_teacher_id_foreign` (`teacher_id`),
+  ADD KEY `leave_requests_approved_by_foreign` (`approved_by`),
+  ADD KEY `leave_requests_created_by_foreign` (`created_by`),
+  ADD KEY `leave_requests_updated_by_foreign` (`updated_by`),
+  ADD KEY `leave_requests_school_id_teacher_id_index` (`school_id`,`teacher_id`),
+  ADD KEY `leave_requests_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `leave_requests_leave_type_id_index` (`leave_type_id`),
+  ADD KEY `leave_requests_from_date_to_date_index` (`from_date`,`to_date`);
+
+--
+-- Indexes for table `leave_types`
+--
+ALTER TABLE `leave_types`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `leave_types_school_id_foreign` (`school_id`),
+  ADD KEY `leave_types_created_by_foreign` (`created_by`),
+  ADD KEY `leave_types_updated_by_foreign` (`updated_by`);
 
 --
 -- Indexes for table `migrations`
@@ -870,10 +908,16 @@ ALTER TABLE `leave_requests`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `leave_types`
+--
+ALTER TABLE `leave_types`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -949,8 +993,20 @@ ALTER TABLE `classes`
 -- Constraints for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
+  ADD CONSTRAINT `leave_requests_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `leave_requests_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `leave_requests_leave_type_id_foreign` FOREIGN KEY (`leave_type_id`) REFERENCES `leave_types` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `leave_requests_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `leave_requests_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `leave_requests_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `leave_requests_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `leave_types`
+--
+ALTER TABLE `leave_types`
+  ADD CONSTRAINT `leave_types_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `leave_types_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `leave_types_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `model_has_permissions`
