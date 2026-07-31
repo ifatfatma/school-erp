@@ -11,12 +11,13 @@ use App\Http\Controllers\API\SubjectController;
 use App\Http\Controllers\API\SectionController;
 use App\Http\Controllers\API\TimetableController;
 use App\Http\Controllers\API\TeacherController;
+use App\Http\Controllers\API\LeaveTypeController;
+use App\Http\Controllers\API\LeaveRequestController;
+use App\Http\Controllers\Api\TeacherAttendanceController;
 
 
 Route::post('/login', [AuthController::class, 'login']);
-
 Route::middleware('auth:sanctum')->group(function () {
-
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -31,6 +32,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('sections', SectionController::class);
     Route::apiResource('schools', SchoolController::class);
     Route::apiResource('teachers', TeacherController::class);
+    Route::apiResource('leave-types', LeaveTypeController::class);  
+    Route::apiResource('teacher-leaves', LeaveRequestController::class);
+    Route::post('teacher-leaves/{id}/approve',[LeaveRequestController::class, 'approve']);
+    Route::post('teacher-leaves/{id}/reject',[LeaveRequestController::class, 'reject']);
+    Route::apiResource('teacher-attendances',TeacherAttendanceController::class);
     // Optional restore route
     Route::post('schools/{id}/restore', [SchoolController::class, 'restore'])->name('schools.restore');
 });

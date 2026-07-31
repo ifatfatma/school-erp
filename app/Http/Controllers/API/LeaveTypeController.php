@@ -3,47 +3,82 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreLeaveTypeRequest;
+use App\Http\Requests\UpdateLeaveTypeRequest;
+use App\Http\Resources\LeaveTypeResource;
+use App\Services\LeaveTypeService;
 use Illuminate\Http\Request;
 
 class LeaveTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected LeaveTypeService $service;
+
+    public function __construct(LeaveTypeService $service)
     {
-        //
+        $this->service = $service;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display a listing.
      */
-    public function store(Request $request)
+    public function index(Request $request)
     {
-        //
+        $leaveTypes = $this->service->paginate($request->all());
+
+        return LeaveTypeResource::collection($leaveTypes);
+    }
+
+    /**
+     * Store a newly created resource.
+     */
+    public function store(StoreLeaveTypeRequest $request)
+    {
+        $leaveType = $this->service->store($request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Leave Type created successfully.',
+            'data' => new LeaveTypeResource($leaveType),
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
-        //
+        $leaveType = $this->service->find($id);
+
+        return new LeaveTypeResource($leaveType);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateLeaveTypeRequest $request, int $id)
     {
-        //
+        $leaveType = $this->service->update(
+            $id,
+            $request->validated()
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Leave Type updated successfully.',
+            'data' => new LeaveTypeResource($leaveType),
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource.
      */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
-        //
+        $this->service->delete($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Leave Type deleted successfully.',
+        ]);
     }
 }

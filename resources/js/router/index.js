@@ -167,6 +167,99 @@ const routes = [
                         component: () => import("@/pages/teachers/Edit.vue"),
                     },
                 ],
+            },
+            {
+                path: "/leave-types",
+                children: [
+                    {
+                        path: "/leave-types",
+                        name: "leave-types.index",
+                        component: () => import("@/pages/leave-types/Index.vue"),
+                    },
+
+                    {
+                        path: "/leave-types/create",
+                        name: "leave-types.create",
+                        component: () => import("@/pages/leave-types/Create.vue"),
+                    },
+
+                    {
+                        path: "/leave-types/:id",
+                        name: "leave-types.show",
+                        component: () => import("@/pages/leave-types/Show.vue"),
+                        props: true,
+                    },
+
+                    {
+                        path: "/leave-types/:id/edit",
+                        name: "leave-types.edit",
+                        component: () => import("@/pages/leave-types/Edit.vue"),
+                        props: true,
+                    },
+
+                ],
+            },
+            {
+                path: "/teacher-leaves",
+                children: [
+                    {
+                        path: "/teacher-leaves",
+                        name: "teacher-leaves.index",
+                        component: () => import("@/pages/teacher-leaves/Index.vue"),
+                    },
+
+                    {
+                        path: "/teacher-leaves/create",
+                        name: "teacher-leaves.create",
+                        component: () => import("@/pages/teacher-leaves/Create.vue"),
+                    },
+
+                    {
+                        path: "/teacher-leaves/:id",
+                        name: "teacher-leaves.show",
+                        component: () => import("@/pages/teacher-leaves/Show.vue"),
+                        props: true,
+                    },
+
+                    {
+                        path: "/teacher-leaves/:id/edit",
+                        name: "teacher-leaves.edit",
+                        component: () => import("@/pages/teacher-leaves/Edit.vue"),
+                        props: true,
+                    },
+
+                ],
+            },
+            {
+                path: "/teacher-attendances",
+                children: [
+                    {
+                        path: "/teacher-attendances",
+                        name: "teacher-attendances.index",
+                        component: () => import("@/pages/teacher-attendances/Index.vue"),
+                    },
+
+                    {
+                        path: "/teacher-attendances/create",
+                        name: "teacher-attendances.create",
+                        component: () => import("@/pages/teacher-attendances/Create.vue"),
+                    },
+
+                    {
+                        path: "/teacher-attendances/:id",
+                        name: "teacher-attendances.show",
+                        component: () => import("@/pages/teacher-attendances/Show.vue"),
+                        props: true,
+                    },
+
+                    {
+                        path: "/teacher-attendances/:id/edit",
+                        name: "teacher-attendances.edit",
+                        component: () => import("@/pages/teacher-attendances/Edit.vue"),
+                        props: true,
+                    },
+
+                ],
             }
         ],
     },

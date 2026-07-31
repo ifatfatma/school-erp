@@ -25,17 +25,13 @@ return new class extends Migration
             $table->date('from_date');
             $table->date('to_date');
 
-            $table->decimal('days', 5, 2);
+            $table->decimal('total_days', 5, 2);
 
             $table->text('reason');
 
             $table->string('attachment')->nullable();
 
-            $table->enum('status', [
-                'Pending',
-                'Approved',
-                'Rejected'
-            ])->default('Pending');
+            $table->tinyInteger('status')->default(0);
 
             $table->foreignId('approved_by')
                 ->nullable()

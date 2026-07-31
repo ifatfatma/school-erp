@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 30, 2026 at 06:41 PM
+-- Generation Time: Jul 31, 2026 at 05:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -210,10 +210,10 @@ CREATE TABLE `leave_requests` (
   `leave_type_id` bigint(20) UNSIGNED NOT NULL,
   `from_date` date NOT NULL,
   `to_date` date NOT NULL,
-  `days` decimal(5,2) NOT NULL,
+  `total_days` decimal(5,2) NOT NULL,
   `reason` text NOT NULL,
   `attachment` varchar(255) DEFAULT NULL,
-  `status` enum('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
+  `status` tinyint(10) NOT NULL DEFAULT 0,
   `approved_by` bigint(20) UNSIGNED DEFAULT NULL,
   `approved_at` timestamp NULL DEFAULT NULL,
   `remarks` text DEFAULT NULL,
@@ -223,6 +223,13 @@ CREATE TABLE `leave_requests` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `leave_requests`
+--
+
+INSERT INTO `leave_requests` (`id`, `school_id`, `teacher_id`, `leave_type_id`, `from_date`, `to_date`, `total_days`, `reason`, `attachment`, `status`, `approved_by`, `approved_at`, `remarks`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 1, '2026-07-31', '2026-08-09', 10.00, 'tewst', 'teacher-leaves/juL7wdTx9SdQ57FAoG2JLhGXTYnm5tyzCxApvW9e.pdf', 1, 1, '2026-07-31 08:15:49', NULL, 1, 1, NULL, '2026-07-31 08:10:31', '2026-07-31 08:37:11');
 
 -- --------------------------------------------------------
 
@@ -244,6 +251,13 @@ CREATE TABLE `leave_types` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `leave_types`
+--
+
+INSERT INTO `leave_types` (`id`, `school_id`, `name`, `description`, `max_days`, `is_paid`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Anual Leave', 'This is anual leave for all staff', 10, 1, 1, 1, 1, NULL, '2026-07-31 07:19:18', '2026-07-31 07:19:45');
 
 -- --------------------------------------------------------
 
@@ -279,7 +293,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (21, '2026_07_30_120637_create_teachers_table', 8),
 (22, '2026_07_30_120640_create_timetables_table', 9),
 (23, '2026_07_30_161001_create_leave_types_table', 10),
-(24, '2026_07_30_160602_create_leave_requests_table', 11);
+(24, '2026_07_30_160602_create_leave_requests_table', 11),
+(25, '2026_07_31_142124_create_teacher_attendances_table', 12);
 
 -- --------------------------------------------------------
 
@@ -388,7 +403,7 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (1, 'App\\Models\\User', 1, 'admin', 'f4b40075eff10238f58d9db42e19cf7b815f9dec963ae7985cc2aecfc7a83c87', '[\"*\"]', '2026-07-28 07:10:16', NULL, '2026-07-28 06:47:02', '2026-07-28 07:10:16'),
 (19, 'App\\Models\\User', 1, 'admin', '5c655de360071321bb783541c3caf518bc31405473d596d0b1c7d442e4f8b93c', '[\"*\"]', '2026-07-28 10:43:09', NULL, '2026-07-28 10:40:46', '2026-07-28 10:43:09'),
 (33, 'App\\Models\\User', 1, 'admin', 'c282496b06ffff0a9507e6436af75b3e9b78fa626cf1fb0e923fa9a4783d304d', '[\"*\"]', '2026-07-30 03:04:08', NULL, '2026-07-29 07:29:44', '2026-07-30 03:04:08'),
-(69, 'App\\Models\\User', 1, 'admin', '5f63486f1943c19bfec9a60961fff8e4ec0ab9ea93f4d9a8ec1abfdd042c0480', '[\"*\"]', '2026-07-30 10:49:24', NULL, '2026-07-30 10:03:15', '2026-07-30 10:49:24');
+(71, 'App\\Models\\User', 1, 'admin', '256b126937029a028ce921d2df4a68cfd3bae4d5bfc321dbd02ffa4097864022', '[\"*\"]', '2026-07-31 09:44:10', NULL, '2026-07-31 07:54:20', '2026-07-31 09:44:10');
 
 -- --------------------------------------------------------
 
@@ -530,7 +545,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('2cF2i7G5cwlkkNiLZjsSpDCigh1m3Ff1TLHppqxI', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRklsY3hOeXlFOU5JV09wNFFXbTVFdVBEQkxBSFNHOTVhZzB5VjBYdSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1785428363);
+('R5PAnJhim8eGeSRah8MvJEZpXV3KOQSP4aUgNW5k', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUWl2MGxiY0RXTU10aHBDNks4Z002b1BSUHJpeHd2SG40UHpGbUlreiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1785510164);
 
 -- --------------------------------------------------------
 
@@ -596,6 +611,36 @@ CREATE TABLE `teachers` (
 INSERT INTO `teachers` (`id`, `school_id`, `employee_id`, `first_name`, `last_name`, `gender`, `date_of_birth`, `email`, `phone`, `qualification`, `experience`, `joining_date`, `address`, `photo`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
 (1, 1, '101', 'Ahmed', 'Khan', 'Male', '2026-07-30', 'ahmed@gmail.com', '22650262', 'Grduate', '10', '2026-08-02', 'test address', 'teachers/ycMQppJ1S41hOcyC1PHU1dDKF8MQ7IZQEZVOQ5aH.png', 1, 1, NULL, '2026-07-30 08:44:35', '2026-07-30 08:44:35', NULL),
 (2, 1, '102', 'Amber', 'Hussain', 'Male', '1983-07-18', 'amber@gmail.com', '12345678', 'MASTER', '12', '2026-07-24', 'test address goes here', 'teachers/XYSSJ4Uie7oQoDuYikXg3wQbcjT0ShojWWXQrRzU.jpg', 1, 1, NULL, '2026-07-30 08:55:53', '2026-07-30 08:55:53', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher_attendances`
+--
+
+CREATE TABLE `teacher_attendances` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `teacher_id` bigint(20) UNSIGNED NOT NULL,
+  `attendance_date` date NOT NULL,
+  `status` enum('Present','Absent','Late','Half Day','Leave') NOT NULL DEFAULT 'Present',
+  `check_in` time DEFAULT NULL,
+  `check_out` time DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `teacher_attendances`
+--
+
+INSERT INTO `teacher_attendances` (`id`, `school_id`, `teacher_id`, `attendance_date`, `status`, `check_in`, `check_out`, `remarks`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 2, '2026-07-31', 'Present', '10:32:00', '12:32:00', 'test', 1, NULL, '2026-07-31 09:36:34', '2026-07-31 09:36:34', NULL),
+(2, 1, 2, '2026-08-01', 'Present', '10:32:00', '12:32:00', 'test', 1, NULL, '2026-07-31 09:39:14', '2026-07-31 09:39:14', NULL);
 
 -- --------------------------------------------------------
 
@@ -846,6 +891,16 @@ ALTER TABLE `teachers`
   ADD KEY `teachers_school_id_status_index` (`school_id`,`status`);
 
 --
+-- Indexes for table `teacher_attendances`
+--
+ALTER TABLE `teacher_attendances`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `teacher_attendances_teacher_id_attendance_date_unique` (`teacher_id`,`attendance_date`),
+  ADD KEY `teacher_attendances_school_id_foreign` (`school_id`),
+  ADD KEY `teacher_attendances_created_by_foreign` (`created_by`),
+  ADD KEY `teacher_attendances_updated_by_foreign` (`updated_by`);
+
+--
 -- Indexes for table `timetables`
 --
 ALTER TABLE `timetables`
@@ -905,19 +960,19 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `leave_types`
 --
 ALTER TABLE `leave_types`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -929,7 +984,7 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -959,6 +1014,12 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `teacher_attendances`
+--
+ALTER TABLE `teacher_attendances`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
@@ -1048,6 +1109,15 @@ ALTER TABLE `teachers`
   ADD CONSTRAINT `teachers_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `teachers_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `teachers_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `teacher_attendances`
+--
+ALTER TABLE `teacher_attendances`
+  ADD CONSTRAINT `teacher_attendances_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `teacher_attendances_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `teacher_attendances_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `teacher_attendances_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `users`

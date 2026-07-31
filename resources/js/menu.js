@@ -92,6 +92,16 @@ export default [
                 route: "/teacher-leaves",
                 permission: "leave.view",
             },
+            {
+                title: "Leave Types",
+                route: "/leave-types",
+                permission: "leave_types.view",
+            },
+            {
+                title: "Attendance",
+                route: "/teacher-attendances",
+                permission: "teacher_attendance.view",
+            }
         ],
     },
 
