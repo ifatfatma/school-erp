@@ -1,12 +1,6 @@
 import { defineStore } from "pinia";
-/* import {
-    getSections,
-    getSection,
-    createSection,
-    updateSection,
-    deleteSection,
-} from "@/api/section"; */
- import sectionApi from "@/api/section";
+
+import sectionApi from "@/api/section";
 
 export const useSectionStore = defineStore("section", {
     state: () => ({

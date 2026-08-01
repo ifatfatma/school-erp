@@ -260,7 +260,128 @@ const routes = [
                     },
 
                 ],
-            }
+            },{
+                path: "/students",
+                children: [
+                    {
+                        path: "/students",
+                        name: "students.index",
+                        component: () => import("@/pages/students/Index.vue"),
+                    },
+
+                    {
+                        path: "/students/create",
+                        name: "students.create",
+                        component: () => import("@/pages/students/Create.vue"),
+                    },
+
+                    {
+                        path: "/students/:id",
+                        name: "students.show",
+                        component: () => import("@/pages/students/Show.vue"),
+                        props: true,
+                    },
+
+                    {
+                        path: "/students/:id/edit",
+                        name: "students.edit",
+                        component: () => import("@/pages/students/Edit.vue"),
+                        props: true,
+                    },
+
+                ],
+            },{
+                path: "/student-attendance",
+                children: [
+
+                    {
+                        path: "/student-attendance",
+                        name: "student-attendance.index",
+                        component: () =>import("@/pages/student-attendance/Index.vue")
+                    },
+
+                    {
+                        path: "/student-attendance/bulk",
+                        name: "student-attendance.bulk",
+                        component: () =>import("@/pages/student-attendance/BulkAttendance.vue")                        
+                    },
+
+                    {
+                        path: "/student-attendance/:id",
+                        name: "student-attendance.show",
+                        component: () =>import("@/pages/student-attendance/Show.vue"),
+                        props: true,
+                        meta: {
+                            title: "Attendance Details",
+                        },
+                    },
+
+                    {
+                        path: "/student-attendance/:id/edit",
+                        name: "student-attendance.edit",
+                        component: () =>import("@/pages/student-attendance/Edit.vue"),
+                        props: true,
+                        meta: {
+                            title: "Edit Attendance",
+                        },
+                    },
+
+                    {
+                        path: "/student-attendance/monthly/report",
+                        name: "student-attendance.monthly",
+                        component: () =>import("@/pages/student-attendance/MonthlyAttendance.vue"),
+                        meta: {
+                            title: "Monthly Attendance",
+                        },
+                    },
+
+                ],
+
+            },{
+                    path: "/guardians",
+                    children: [
+
+                        {
+                            path: "/guardians",
+                            name: "guardians.index",
+                            component: () => import("@/pages/guardians/Index.vue"),
+                            meta: {
+                                title: "Guardians",
+                            },
+                        },
+
+                        {
+                            path: "/guardians/create",
+                            name: "guardians.create",
+                            component: () => import("@/pages/guardians/Create.vue"),
+                            meta: {
+                                title: "Add Guardian",
+                            },
+                        },
+
+                        {
+                            path: "/guardians/:id",
+                            name: "guardians.show",
+                            component: () => import("@/pages/guardians/Show.vue"),
+                            props: true,
+                            meta: {
+                                title: "Guardian Details",
+                            },
+                        },
+
+                        {
+                            path: "/guardians/:id/edit",
+                            name: "guardians.edit",
+                            component: () => import("@/pages/guardians/Edit.vue"),
+                            props: true,
+                            meta: {
+                                title: "Edit Guardian",
+                            },
+                        },
+
+                    ],
+
+                },
         ],
     },
     {

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["resources/js/*"]
+    },
+    "checkJs": false
+  },
+  "include": [
+    "resources/js/**/*",
+    "resources/**/*.vue"
+  ],
+  "exclude": [
+    "node_modules",
+    "vendor",
+    "public"
+  ]
+}

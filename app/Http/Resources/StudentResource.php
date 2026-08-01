@@ -1,0 +1,103 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class StudentResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+
+            'id' => $this->id,
+
+            'school_id' => $this->school_id,
+
+            'admission_no' => $this->admission_no,
+
+            'roll_no' => $this->roll_no,
+
+            'first_name' => $this->first_name,
+
+            'last_name' => $this->last_name,
+
+            'full_name' => $this->full_name,
+
+            'gender' => $this->gender,
+
+            'dob' => optional($this->dob)->format('Y-m-d'),
+
+            'admission_date' => optional($this->admission_date)->format('Y-m-d'),
+
+            'blood_group' => $this->blood_group,
+
+            'religion' => $this->religion,
+
+            'category' => $this->category,
+
+            'aadhaar_no' => $this->aadhaar_no,
+
+            'mobile' => $this->mobile,
+
+            'email' => $this->email,
+
+            'address' => $this->address,
+
+            'father_name' => $this->father_name,
+
+            'father_mobile' => $this->father_mobile,
+
+            'father_occupation' => $this->father_occupation,
+
+            'mother_name' => $this->mother_name,
+
+            'mother_mobile' => $this->mother_mobile,
+
+            'guardian_name' => $this->guardian_name,
+
+            'guardian_mobile' => $this->guardian_mobile,
+
+            'photo' => $this->photo,
+
+            'photo_url' => $this->photo_url,
+
+            'status' => $this->status,
+
+            'status_text' => $this->status ? 'Active' : 'Inactive',
+
+            'class_id' => $this->class_id,
+
+            'class' => $this->whenLoaded('class', function () {
+
+                return [
+                    'id' => $this->class->id,
+                    'name' => $this->class->name,
+                ];
+
+            }),
+
+            'section_id' => $this->section_id,
+
+            'section' => $this->whenLoaded('section', function () {
+
+                return [
+                    'id' => $this->section->id,
+                    'name' => $this->section->name,
+                ];
+
+            }),
+
+            'created_at' => optional($this->created_at)
+                ->format('Y-m-d H:i:s'),
+
+            'updated_at' => optional($this->updated_at)
+                ->format('Y-m-d H:i:s'),
+
+        ];
+    }
+}

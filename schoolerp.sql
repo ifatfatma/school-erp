@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 31, 2026 at 05:14 PM
+-- Generation Time: Aug 01, 2026 at 05:51 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -165,6 +165,43 @@ CREATE TABLE `failed_jobs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `guardians`
+--
+
+CREATE TABLE `guardians` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `guardian_type` enum('Father','Mother','Grandfather','Grandmother','Uncle','Aunt','Brother','Sister','Legal Guardian','Other') NOT NULL DEFAULT 'Father',
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `gender` enum('Male','Female','Other') DEFAULT NULL,
+  `dob` date DEFAULT NULL,
+  `mobile` varchar(20) NOT NULL,
+  `alternate_mobile` varchar(20) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `occupation` varchar(255) DEFAULT NULL,
+  `annual_income` decimal(12,2) DEFAULT 0.00,
+  `education` varchar(255) DEFAULT NULL,
+  `aadhaar_no` varchar(20) DEFAULT NULL,
+  `pan_no` varchar(20) DEFAULT NULL,
+  `relation` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(255) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  `pincode` varchar(10) DEFAULT NULL,
+  `photo` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `jobs`
 --
 
@@ -294,7 +331,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (22, '2026_07_30_120640_create_timetables_table', 9),
 (23, '2026_07_30_161001_create_leave_types_table', 10),
 (24, '2026_07_30_160602_create_leave_requests_table', 11),
-(25, '2026_07_31_142124_create_teacher_attendances_table', 12);
+(25, '2026_07_31_142124_create_teacher_attendances_table', 12),
+(26, '2026_08_01_051629_create_students_table', 13),
+(27, '2026_08_01_115058_create_student_attendances_table', 14),
+(28, '2026_08_01_130450_create_guardians_table', 15),
+(29, '2026_08_01_130627_create_student_guardians_table', 15);
 
 -- --------------------------------------------------------
 
@@ -403,7 +444,7 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (1, 'App\\Models\\User', 1, 'admin', 'f4b40075eff10238f58d9db42e19cf7b815f9dec963ae7985cc2aecfc7a83c87', '[\"*\"]', '2026-07-28 07:10:16', NULL, '2026-07-28 06:47:02', '2026-07-28 07:10:16'),
 (19, 'App\\Models\\User', 1, 'admin', '5c655de360071321bb783541c3caf518bc31405473d596d0b1c7d442e4f8b93c', '[\"*\"]', '2026-07-28 10:43:09', NULL, '2026-07-28 10:40:46', '2026-07-28 10:43:09'),
 (33, 'App\\Models\\User', 1, 'admin', 'c282496b06ffff0a9507e6436af75b3e9b78fa626cf1fb0e923fa9a4783d304d', '[\"*\"]', '2026-07-30 03:04:08', NULL, '2026-07-29 07:29:44', '2026-07-30 03:04:08'),
-(71, 'App\\Models\\User', 1, 'admin', '256b126937029a028ce921d2df4a68cfd3bae4d5bfc321dbd02ffa4097864022', '[\"*\"]', '2026-07-31 09:44:10', NULL, '2026-07-31 07:54:20', '2026-07-31 09:44:10');
+(75, 'App\\Models\\User', 1, 'admin', '447576cd4007b76aa577dc9e583d1a97b3fd87e4e37b8232a86ad89fdcbb34db', '[\"*\"]', '2026-08-01 09:33:22', NULL, '2026-08-01 09:02:59', '2026-08-01 09:33:22');
 
 -- --------------------------------------------------------
 
@@ -545,7 +586,103 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('R5PAnJhim8eGeSRah8MvJEZpXV3KOQSP4aUgNW5k', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUWl2MGxiY0RXTU10aHBDNks4Z002b1BSUHJpeHd2SG40UHpGbUlreiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1785510164);
+('uaPhfEwx9NsaXLdCWhf9APj5eNbv85RgJIGtmKEe', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVzVxdjI4M3RPSGNGM0FjclBSaFRSNlpFVTZNWmtzNjV1TEJoNUl5eSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1785596237);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `students`
+--
+
+CREATE TABLE `students` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED NOT NULL,
+  `section_id` bigint(20) UNSIGNED NOT NULL,
+  `admission_no` varchar(255) NOT NULL,
+  `roll_no` varchar(255) DEFAULT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `gender` enum('Male','Female','Other') NOT NULL,
+  `dob` date DEFAULT NULL,
+  `admission_date` date NOT NULL,
+  `blood_group` varchar(255) DEFAULT NULL,
+  `religion` varchar(255) DEFAULT NULL,
+  `category` varchar(255) DEFAULT NULL,
+  `aadhaar_no` varchar(255) DEFAULT NULL,
+  `mobile` varchar(20) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `father_name` varchar(255) NOT NULL,
+  `father_mobile` varchar(255) DEFAULT NULL,
+  `father_occupation` varchar(255) DEFAULT NULL,
+  `mother_name` varchar(255) DEFAULT NULL,
+  `mother_mobile` varchar(255) DEFAULT NULL,
+  `guardian_name` varchar(255) DEFAULT NULL,
+  `guardian_mobile` varchar(255) DEFAULT NULL,
+  `photo` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`id`, `school_id`, `class_id`, `section_id`, `admission_no`, `roll_no`, `first_name`, `last_name`, `gender`, `dob`, `admission_date`, `blood_group`, `religion`, `category`, `aadhaar_no`, `mobile`, `email`, `address`, `father_name`, `father_mobile`, `father_occupation`, `mother_name`, `mother_mobile`, `guardian_name`, `guardian_mobile`, `photo`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 1, '10001', '1', 'Imran', 'Ahmed', 'Male', '2026-08-01', '2026-08-01', 'A', NULL, NULL, '123456789123', '7003578764', 'test@gmail.com', 'G318 meher manzil , garden reach kolkata - 24', 'imtiaz alama khan', '7003578764', 'self emploiyed', 'Amreen Haider', '00000010001', NULL, NULL, 'students/u73RZ7yQbBtrmhjgC41fqKi7jV1U2cMC2P32guWx.jpg', 1, 1, 1, NULL, '2026-08-01 02:10:41', '2026-08-01 03:01:02'),
+(2, 1, 2, 1, '1002', '2', 'Zakia', 'Nasim', 'Female', '1990-08-01', '2026-08-01', 'B', NULL, NULL, '700350123412', '7003578764', 'nasim@gmail.com', 'test address', 'Nasim', '7003578764', 'Driver', 'Sarwari', '7000325888', NULL, NULL, 'students/IHKXpz2VWd0TSedaJd0ZLOwHlvAuenbt5rBRNXvn.jpg', 1, 1, NULL, NULL, '2026-08-01 03:27:21', '2026-08-01 03:27:21');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_attendances`
+--
+
+CREATE TABLE `student_attendances` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED NOT NULL,
+  `section_id` bigint(20) UNSIGNED NOT NULL,
+  `attendance_date` date NOT NULL,
+  `status` enum('Present','Absent','Late','Half Day','Leave') NOT NULL DEFAULT 'Present',
+  `check_in` time DEFAULT NULL,
+  `check_out` time DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `student_attendances`
+--
+
+INSERT INTO `student_attendances` (`id`, `school_id`, `student_id`, `class_id`, `section_id`, `attendance_date`, `status`, `check_in`, `check_out`, `remarks`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 2, 1, '2026-08-01', 'Present', '08:30:00', '22:30:00', NULL, 1, 1, NULL, '2026-08-01 06:55:18', '2026-08-01 07:32:27'),
+(2, 1, 1, 2, 1, '2026-08-01', 'Present', NULL, NULL, NULL, 1, 1, NULL, '2026-08-01 06:55:18', '2026-08-01 06:55:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_guardians`
+--
+
+CREATE TABLE `student_guardians` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `guardian_id` bigint(20) UNSIGNED NOT NULL,
+  `is_primary` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -756,6 +893,18 @@ ALTER TABLE `failed_jobs`
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
 
 --
+-- Indexes for table `guardians`
+--
+ALTER TABLE `guardians`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `guardians_created_by_foreign` (`created_by`),
+  ADD KEY `guardians_updated_by_foreign` (`updated_by`),
+  ADD KEY `guardians_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `guardians_guardian_type_index` (`guardian_type`),
+  ADD KEY `guardians_mobile_index` (`mobile`),
+  ADD KEY `guardians_email_index` (`email`);
+
+--
 -- Indexes for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -871,6 +1020,42 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
+-- Indexes for table `students`
+--
+ALTER TABLE `students`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `students_admission_no_unique` (`admission_no`),
+  ADD KEY `students_class_id_foreign` (`class_id`),
+  ADD KEY `students_section_id_foreign` (`section_id`),
+  ADD KEY `students_created_by_foreign` (`created_by`),
+  ADD KEY `students_updated_by_foreign` (`updated_by`),
+  ADD KEY `students_school_id_class_id_section_id_index` (`school_id`,`class_id`,`section_id`),
+  ADD KEY `students_admission_no_index` (`admission_no`),
+  ADD KEY `students_father_mobile_index` (`father_mobile`);
+
+--
+-- Indexes for table `student_attendances`
+--
+ALTER TABLE `student_attendances`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `student_attendance_unique` (`student_id`,`attendance_date`),
+  ADD KEY `student_attendances_section_id_foreign` (`section_id`),
+  ADD KEY `student_attendances_created_by_foreign` (`created_by`),
+  ADD KEY `student_attendances_updated_by_foreign` (`updated_by`),
+  ADD KEY `student_attendances_school_id_attendance_date_index` (`school_id`,`attendance_date`),
+  ADD KEY `student_attendances_student_id_attendance_date_index` (`student_id`,`attendance_date`),
+  ADD KEY `student_attendances_class_id_section_id_index` (`class_id`,`section_id`),
+  ADD KEY `student_attendances_attendance_date_status_index` (`attendance_date`,`status`);
+
+--
+-- Indexes for table `student_guardians`
+--
+ALTER TABLE `student_guardians`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `student_guardians_student_id_guardian_id_unique` (`student_id`,`guardian_id`),
+  ADD KEY `student_guardians_guardian_id_foreign` (`guardian_id`);
+
+--
 -- Indexes for table `subjects`
 --
 ALTER TABLE `subjects`
@@ -951,6 +1136,12 @@ ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `guardians`
+--
+ALTER TABLE `guardians`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -972,7 +1163,7 @@ ALTER TABLE `leave_types`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -984,7 +1175,7 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1003,6 +1194,24 @@ ALTER TABLE `schools`
 --
 ALTER TABLE `sections`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `students`
+--
+ALTER TABLE `students`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `student_attendances`
+--
+ALTER TABLE `student_attendances`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `student_guardians`
+--
+ALTER TABLE `student_guardians`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `subjects`
@@ -1051,6 +1260,14 @@ ALTER TABLE `classes`
   ADD CONSTRAINT `classes_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `guardians`
+--
+ALTER TABLE `guardians`
+  ADD CONSTRAINT `guardians_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `guardians_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `guardians_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
@@ -1094,6 +1311,34 @@ ALTER TABLE `role_has_permissions`
 ALTER TABLE `sections`
   ADD CONSTRAINT `sections_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `sections_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `students`
+--
+ALTER TABLE `students`
+  ADD CONSTRAINT `students_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `students_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `students_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `students_section_id_foreign` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `students_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `student_attendances`
+--
+ALTER TABLE `student_attendances`
+  ADD CONSTRAINT `student_attendances_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_attendances_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `student_attendances_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_attendances_section_id_foreign` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_attendances_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_attendances_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `student_guardians`
+--
+ALTER TABLE `student_guardians`
+  ADD CONSTRAINT `student_guardians_guardian_id_foreign` FOREIGN KEY (`guardian_id`) REFERENCES `guardians` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_guardians_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `subjects`

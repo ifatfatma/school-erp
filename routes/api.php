@@ -14,6 +14,9 @@ use App\Http\Controllers\API\TeacherController;
 use App\Http\Controllers\API\LeaveTypeController;
 use App\Http\Controllers\API\LeaveRequestController;
 use App\Http\Controllers\Api\TeacherAttendanceController;
+use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\StudentAttendanceController;
+use App\Http\Controllers\Api\GuardianController;
 
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -32,11 +35,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('sections', SectionController::class);
     Route::apiResource('schools', SchoolController::class);
     Route::apiResource('teachers', TeacherController::class);
-    Route::apiResource('leave-types', LeaveTypeController::class);  
+    Route::apiResource('leave-types', LeaveTypeController::class);
     Route::apiResource('teacher-leaves', LeaveRequestController::class);
-    Route::post('teacher-leaves/{id}/approve',[LeaveRequestController::class, 'approve']);
-    Route::post('teacher-leaves/{id}/reject',[LeaveRequestController::class, 'reject']);
-    Route::apiResource('teacher-attendances',TeacherAttendanceController::class);
+    Route::post('teacher-leaves/{id}/approve', [LeaveRequestController::class, 'approve']);
+    Route::post('teacher-leaves/{id}/reject', [LeaveRequestController::class, 'reject']);
+    Route::apiResource('teacher-attendances', TeacherAttendanceController::class);
+    Route::apiResource('students', StudentController::class);
+    Route::get('students-active', [StudentController::class, 'active']);
+    Route::get('students-by-class', [StudentController::class, 'byClass']);
+
+    Route::apiResource('student-attendances',StudentAttendanceController::class);
+    Route::post('student-attendances/bulk',[StudentAttendanceController::class, 'bulkStore']);
+    Route::get('student-attendances/monthly',[StudentAttendanceController::class, 'monthly']);
+    Route::get('student-attendances/summary',[StudentAttendanceController::class, 'summary']);
+    Route::apiResource('guardians', GuardianController::class);
     // Optional restore route
     Route::post('schools/{id}/restore', [SchoolController::class, 'restore'])->name('schools.restore');
 });
