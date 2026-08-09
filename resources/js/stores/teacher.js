@@ -116,6 +116,13 @@ export const useTeacherStore = defineStore("teacher", {
             }
 
         },
+async active() {
+            
+                        const { data } = await teacherApi.active();
+            
+                        this.items = data.data ?? [];
+            
+                    },
 
         async delete(id) {
 

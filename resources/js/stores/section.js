@@ -138,6 +138,14 @@ export const useSectionStore = defineStore("section", {
 
         },
 
+        async active() {
+            
+                        const { data } = await sectionApi.active();
+            
+                        this.items = data.data ?? [];
+            
+                    },
+
         /**
          * Reset Current Item
          */

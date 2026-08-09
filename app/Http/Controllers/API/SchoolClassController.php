@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSchoolClassRequest;
 use App\Http\Requests\UpdateSchoolClassRequest;
 use App\Models\SchoolClass;
+use App\Http\Resources\ClassResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SchoolClassController extends Controller
 {
+     
+
     /**
      * Display a listing.
      */
@@ -159,4 +162,17 @@ class SchoolClassController extends Controller
             ], 500);
         }
     }
+
+     /**
+     * Active Exams
+     */
+    public function active()
+{
+    return response()->json([
+        'success' => true,
+        'data' => SchoolClass::where('status', 1)
+            ->orderBy('name')
+            ->get()
+    ]);
+}
 }

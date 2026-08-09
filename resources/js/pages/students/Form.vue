@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed , watch } from "vue";
 
 const props = defineProps({
 
@@ -7,7 +7,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-
+    academic_session: {
+        type: Array,
+        default: () => [],
+    },
     classes: {
         type: Array,
         default: () => [],
@@ -30,6 +33,18 @@ const props = defineProps({
 
 });
 
+const filteredSections = computed(() => {
+
+    if (!props.form.class_id) {
+        return [];
+    }
+
+    return props.sections.filter(
+        section => Number(section.class_id) === Number(props.form.class_id)
+    );
+
+});
+
 const emit = defineEmits([
     "submit",
     "cancel",
@@ -40,6 +55,20 @@ const genders = computed(() => [
     "Female",
     "Other",
 ]);
+
+watch(
+    () => props.form.class_id,
+    (newClassId, oldClassId) => {
+
+        if (
+            oldClassId !== undefined &&
+            Number(newClassId) !== Number(oldClassId)
+        ) {
+            props.form.section_id = "";
+        }
+
+    }
+);
 </script>
 
 <template>
@@ -208,7 +237,39 @@ v-model="form.blood_group"
 </div>
 </div>
 
-<div class="col-md-4 mb-3">
+
+<div class="col-md-3 mb-3">
+
+<label class="form-label">
+Academic Session
+</label>
+
+<select
+class="form-select"
+v-model="form.academic_session_id"
+>
+
+<option value="">
+Select Session
+</option>
+
+<option
+v-for="item in academic_session"
+:key="item.id"
+:value="item.id"
+>
+{{ item.name }}
+</option>
+
+</select>
+
+<div class="text-danger" v-if="errors.academic_session_id">
+{{ errors.academic_session_id[0] }}
+</div>
+
+</div>
+
+<div class="col-md-3 mb-3">
 
 <label class="form-label">
 Class
@@ -239,7 +300,7 @@ v-for="item in classes"
 
 </div>
 
-<div class="col-md-4 mb-3">
+<div class="col-md-3 mb-3">
 
 <label class="form-label">
 Section
@@ -255,11 +316,11 @@ Select Section
 </option>
 
 <option
-v-for="item in sections"
-:key="item.id"
-:value="item.id"
+    v-for="item in filteredSections"
+    :key="item.id"
+    :value="item.id"
 >
-{{ item.name }}
+    {{ item.name }}
 </option>
 
 </select>
@@ -270,7 +331,7 @@ v-for="item in sections"
 
 </div>
 
-<div class="col-md-4 mb-3">
+<div class="col-md-3 mb-3">
 
 <label class="form-label">
 Status

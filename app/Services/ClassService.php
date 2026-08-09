@@ -45,4 +45,12 @@ class ClassService
 
         return $this->repository->delete($class);
     }
+
+    /**
+     * Active class
+     */
+    public function active()
+    {
+        return $this->repository->active();
+    }
 }

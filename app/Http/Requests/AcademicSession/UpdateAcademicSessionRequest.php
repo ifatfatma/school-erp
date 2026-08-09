@@ -20,16 +20,39 @@ class UpdateAcademicSessionRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
-        return [
-            'name' => [
-                'required',
-                'string',
-                Rule::unique('academic_sessions')
-                    ->ignore($this->academicSession)
-                    ->where(fn ($q) => $q->where('school_id', $this->school_id)),
-            ],
-        ];
-    }
+
+public function rules(): array
+{
+    $academicSession = $this->route('academic_session');
+
+    return [
+
+        'school_id' => ['required', 'exists:schools,id'],
+
+        'name' => [
+
+            'required',
+
+            'string',
+
+            'max:100',
+
+            Rule::unique('academic_sessions', 'name')
+                ->ignore($academicSession)
+                ->where(fn ($q) =>
+                    $q->where('school_id', $this->school_id)
+                ),
+
+        ],
+
+        'start_date' => ['required', 'date'],
+
+        'end_date' => ['required', 'date', 'after:start_date'],
+
+        'status' => ['required', 'boolean'],
+
+        'is_current' => ['required', 'boolean'],
+
+    ];
+}
 }

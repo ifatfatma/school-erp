@@ -1,4 +1,4 @@
-import api from "@/api/axios";
+import api from "./axios";
 
 export default {
 
@@ -6,6 +6,12 @@ export default {
         return api.get("/classes", {
             params,
         });
+    },
+    /**
+     * Active List
+     */
+    active() {
+        return api.get("/classes/active");
     },
 
     get(id) {

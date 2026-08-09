@@ -131,4 +131,15 @@ class SubjectController extends Controller
             ], 500);
         }
     }
+
+
+        public function active()
+{
+    return response()->json([
+        'success' => true,
+        'data' => Subject::where('status', 1)
+            ->orderBy('name')
+            ->get()
+    ]);
+}
 }

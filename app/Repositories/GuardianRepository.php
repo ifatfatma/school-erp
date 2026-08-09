@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Guardian;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-
 class GuardianRepository
 {
     protected Guardian $model;

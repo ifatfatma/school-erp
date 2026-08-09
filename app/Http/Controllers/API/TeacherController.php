@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTeacherRequest;
 use App\Http\Requests\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
+use App\Models\Teacher;
 use App\Services\TeacherService;
 use Illuminate\Http\Request;
 
@@ -75,4 +76,14 @@ class TeacherController extends Controller
             'message' => 'Teacher deleted successfully.'
         ]);
     }
+
+     public function active()
+{
+    return response()->json([
+        'success' => true,
+        'data' => Teacher::where('status', 1)
+            ->orderBy('first_name')
+            ->get()
+    ]);
+}
 }

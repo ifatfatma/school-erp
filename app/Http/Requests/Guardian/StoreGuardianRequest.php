@@ -20,12 +20,7 @@ class StoreGuardianRequest extends FormRequest
     public function rules(): array
     {
         return [
-
-            'school_id' => [
-                'required',
-                'exists:schools,id',
-            ],
-
+            
             'guardian_type' => [
                 'required',
                 'in:Father,Mother,Grandfather,Grandmother,Uncle,Aunt,Brother,Sister,Legal Guardian,Other',

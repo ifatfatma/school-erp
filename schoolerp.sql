@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 01, 2026 at 05:51 PM
+-- Generation Time: Aug 09, 2026 at 06:16 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -46,8 +46,7 @@ CREATE TABLE `academic_sessions` (
 --
 
 INSERT INTO `academic_sessions` (`id`, `school_id`, `name`, `start_date`, `end_date`, `is_current`, `status`, `description`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, '2026-2027', '2026-07-30', '2027-06-29', 0, 1, NULL, '2026-07-28 23:43:35', '2026-07-28 23:45:25', '2026-07-28 23:45:25'),
-(2, 1, '2026-27', '2026-07-29', '2026-08-09', 1, 1, NULL, '2026-07-28 23:45:50', '2026-07-28 23:45:50', NULL);
+(1, 1, '2026-27', '2026-01-08', '2027-01-08', 1, 1, NULL, '2026-08-08 02:22:41', '2026-08-08 02:22:41', NULL);
 
 -- --------------------------------------------------------
 
@@ -75,23 +74,20 @@ CREATE TABLE `activity_log` (
 --
 
 INSERT INTO `activity_log` (`id`, `log_name`, `description`, `subject_type`, `event`, `subject_id`, `causer_type`, `causer_id`, `properties`, `batch_uuid`, `created_at`, `updated_at`) VALUES
-(1, 'default', 'updated', 'App\\Models\\School', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"name\":\"Demo School test\",\"updated_at\":\"2026-07-28T15:29:12.000000Z\"},\"old\":{\"name\":\"Demo School\",\"updated_at\":\"2026-07-28T11:39:31.000000Z\"}}', NULL, '2026-07-28 09:59:12', '2026-07-28 09:59:12'),
-(2, 'default', 'updated', 'App\\Models\\School', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"status\":false,\"updated_at\":\"2026-07-28T15:33:44.000000Z\"},\"old\":{\"status\":true,\"updated_at\":\"2026-07-28T15:29:12.000000Z\"}}', NULL, '2026-07-28 10:03:44', '2026-07-28 10:03:44'),
-(3, 'default', 'updated', 'App\\Models\\School', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"status\":true,\"updated_at\":\"2026-07-28T15:33:51.000000Z\"},\"old\":{\"status\":false,\"updated_at\":\"2026-07-28T15:33:44.000000Z\"}}', NULL, '2026-07-28 10:03:51', '2026-07-28 10:03:51'),
-(4, 'default', 'created', 'App\\Models\\AcademicSession', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"school_id\":1,\"name\":\"26-27\",\"start_date\":\"2026-07-30T00:00:00.000000Z\",\"end_date\":\"2027-06-29T00:00:00.000000Z\",\"is_current\":true,\"status\":true,\"description\":null,\"created_at\":\"2026-07-29T05:13:35.000000Z\",\"updated_at\":\"2026-07-29T05:13:35.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-28 23:43:35', '2026-07-28 23:43:35'),
-(5, 'default', 'updated', 'App\\Models\\AcademicSession', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"name\":\"2026-2027\",\"is_current\":false,\"updated_at\":\"2026-07-29T05:15:12.000000Z\"},\"old\":{\"name\":\"26-27\",\"is_current\":true,\"updated_at\":\"2026-07-29T05:13:35.000000Z\"}}', NULL, '2026-07-28 23:45:12', '2026-07-28 23:45:12'),
-(6, 'default', 'deleted', 'App\\Models\\AcademicSession', 'deleted', 1, 'App\\Models\\User', 1, '{\"old\":{\"id\":1,\"school_id\":1,\"name\":\"2026-2027\",\"start_date\":\"2026-07-30T00:00:00.000000Z\",\"end_date\":\"2027-06-29T00:00:00.000000Z\",\"is_current\":false,\"status\":true,\"description\":null,\"created_at\":\"2026-07-29T05:13:35.000000Z\",\"updated_at\":\"2026-07-29T05:15:25.000000Z\",\"deleted_at\":\"2026-07-29T05:15:25.000000Z\"}}', NULL, '2026-07-28 23:45:25', '2026-07-28 23:45:25'),
-(7, 'default', 'created', 'App\\Models\\AcademicSession', 'created', 2, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":2,\"school_id\":1,\"name\":\"2026-27\",\"start_date\":\"2026-07-29T00:00:00.000000Z\",\"end_date\":\"2026-08-09T00:00:00.000000Z\",\"is_current\":true,\"status\":true,\"description\":null,\"created_at\":\"2026-07-29T05:15:50.000000Z\",\"updated_at\":\"2026-07-29T05:15:50.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-28 23:45:50', '2026-07-28 23:45:50'),
-(8, 'default', 'created', 'App\\Models\\Subject', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"name\":\"English\",\"code\":\"ss\",\"type\":\"Theory\",\"description\":\"ss\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-07-29T15:29:53.000000Z\",\"updated_at\":\"2026-07-29T15:29:53.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-29 09:59:54', '2026-07-29 09:59:54'),
-(9, 'default', 'updated', 'App\\Models\\Subject', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"description\":\"ssssss\",\"updated_by\":1,\"updated_at\":\"2026-07-29T16:00:18.000000Z\"},\"old\":{\"description\":\"ss\",\"updated_by\":null,\"updated_at\":\"2026-07-29T15:29:53.000000Z\"}}', NULL, '2026-07-29 10:30:18', '2026-07-29 10:30:18'),
-(10, 'default', 'updated', 'App\\Models\\Subject', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"type\":\"Practical\",\"updated_at\":\"2026-07-29T16:00:35.000000Z\"},\"old\":{\"type\":\"Theory\",\"updated_at\":\"2026-07-29T16:00:18.000000Z\"}}', NULL, '2026-07-29 10:30:35', '2026-07-29 10:30:35'),
-(11, 'default', 'created', 'App\\Models\\Subject', 'created', 2, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":2,\"name\":\"Math\",\"code\":\"m\",\"type\":\"Theory\",\"description\":\"mmm\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-07-29T16:01:01.000000Z\",\"updated_at\":\"2026-07-29T16:01:01.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-29 10:31:01', '2026-07-29 10:31:01'),
-(12, 'default', 'created', 'App\\Models\\Section', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"school_id\":1,\"class_id\":2,\"name\":\"A\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-07-30T10:39:20.000000Z\",\"updated_at\":\"2026-07-30T10:39:20.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-30 05:09:20', '2026-07-30 05:09:20'),
-(13, 'default', 'updated', 'App\\Models\\Section', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"name\":\"B\",\"updated_at\":\"2026-07-30T10:39:43.000000Z\"},\"old\":{\"name\":\"A\",\"updated_at\":\"2026-07-30T10:39:20.000000Z\"}}', NULL, '2026-07-30 05:09:43', '2026-07-30 05:09:43'),
-(14, 'default', 'created', 'App\\Models\\Section', 'created', 2, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":2,\"school_id\":1,\"class_id\":3,\"name\":\"22\",\"capacity\":22,\"status\":true,\"created_at\":\"2026-07-30T15:27:32.000000Z\",\"updated_at\":\"2026-07-30T15:27:32.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-30 09:57:32', '2026-07-30 09:57:32'),
-(15, 'default', 'updated', 'App\\Models\\Section', 'updated', 2, 'App\\Models\\User', 1, '{\"attributes\":{\"name\":\"D\",\"updated_at\":\"2026-07-30T15:27:44.000000Z\"},\"old\":{\"name\":\"22\",\"updated_at\":\"2026-07-30T15:27:32.000000Z\"}}', NULL, '2026-07-30 09:57:44', '2026-07-30 09:57:44'),
-(16, 'default', 'created', 'App\\Models\\Timetable', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"school_id\":1,\"class_id\":2,\"section_id\":2,\"subject_id\":2,\"teacher_id\":2,\"day\":\"Monday\",\"start_time\":\"00:11:00\",\"end_time\":\"14:12:00\",\"room\":\"1\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-07-30T15:38:42.000000Z\",\"updated_at\":\"2026-07-30T15:38:42.000000Z\",\"deleted_at\":null}}', NULL, '2026-07-30 10:08:42', '2026-07-30 10:08:42'),
-(17, 'default', 'updated', 'App\\Models\\Timetable', 'updated', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"start_time\":\"11:00:00\",\"end_time\":\"15:12:00\",\"updated_by\":1,\"updated_at\":\"2026-07-30T16:02:23.000000Z\"},\"old\":{\"start_time\":\"00:11:00\",\"end_time\":\"14:12:00\",\"updated_by\":null,\"updated_at\":\"2026-07-30T15:38:42.000000Z\"}}', NULL, '2026-07-30 10:32:23', '2026-07-30 10:32:23');
+(1, 'default', 'created', 'App\\Models\\School', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"name\":\"St. George English Day School\",\"code\":\"S001\",\"email\":\"info@gmail.com\",\"phone\":\"03355629768\",\"address\":\"G335 , meher manzil lane , garden reach\",\"city\":\"Kolkata\",\"state\":\"West Bengal\",\"country\":\"India\",\"postal_code\":\"700024\",\"logo\":null,\"status\":true,\"created_at\":\"2026-08-08T07:48:56.000000Z\",\"updated_at\":\"2026-08-08T07:48:56.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:18:56', '2026-08-08 02:18:56'),
+(2, 'default', 'created', 'App\\Models\\AcademicSession', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"school_id\":1,\"name\":\"2026-27\",\"start_date\":\"2026-01-08T00:00:00.000000Z\",\"end_date\":\"2027-01-08T00:00:00.000000Z\",\"is_current\":true,\"status\":true,\"description\":null,\"created_at\":\"2026-08-08T07:52:41.000000Z\",\"updated_at\":\"2026-08-08T07:52:41.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:22:41', '2026-08-08 02:22:41'),
+(3, 'default', 'created', 'App\\Models\\Section', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"school_id\":1,\"class_id\":1,\"name\":\"A\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:57:02.000000Z\",\"updated_at\":\"2026-08-08T07:57:02.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:27:02', '2026-08-08 02:27:02'),
+(4, 'default', 'created', 'App\\Models\\Section', 'created', 2, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":2,\"school_id\":1,\"class_id\":1,\"name\":\"B\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:57:16.000000Z\",\"updated_at\":\"2026-08-08T07:57:16.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:27:16', '2026-08-08 02:27:16'),
+(5, 'default', 'created', 'App\\Models\\Section', 'created', 3, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":3,\"school_id\":1,\"class_id\":2,\"name\":\"A\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:57:27.000000Z\",\"updated_at\":\"2026-08-08T07:57:27.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:27:27', '2026-08-08 02:27:27'),
+(6, 'default', 'created', 'App\\Models\\Section', 'created', 4, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":4,\"school_id\":1,\"class_id\":2,\"name\":\"B\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:57:41.000000Z\",\"updated_at\":\"2026-08-08T07:57:41.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:27:41', '2026-08-08 02:27:41'),
+(7, 'default', 'created', 'App\\Models\\Section', 'created', 5, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":5,\"school_id\":1,\"class_id\":3,\"name\":\"A\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:57:58.000000Z\",\"updated_at\":\"2026-08-08T07:57:58.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:27:58', '2026-08-08 02:27:58'),
+(8, 'default', 'created', 'App\\Models\\Section', 'created', 6, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":6,\"school_id\":1,\"class_id\":4,\"name\":\"A\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:58:10.000000Z\",\"updated_at\":\"2026-08-08T07:58:10.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:28:10', '2026-08-08 02:28:10'),
+(9, 'default', 'created', 'App\\Models\\Section', 'created', 7, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":7,\"school_id\":1,\"class_id\":5,\"name\":\"A\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:58:22.000000Z\",\"updated_at\":\"2026-08-08T07:58:22.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:28:22', '2026-08-08 02:28:22'),
+(10, 'default', 'created', 'App\\Models\\Section', 'created', 8, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":8,\"school_id\":1,\"class_id\":6,\"name\":\"A\",\"capacity\":10,\"status\":true,\"created_at\":\"2026-08-08T07:58:31.000000Z\",\"updated_at\":\"2026-08-08T07:58:31.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:28:31', '2026-08-08 02:28:31'),
+(11, 'default', 'created', 'App\\Models\\Subject', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"name\":\"English\",\"code\":\"S1\",\"type\":\"Theory\",\"description\":\"eng\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-08-08T07:59:27.000000Z\",\"updated_at\":\"2026-08-08T07:59:27.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:29:27', '2026-08-08 02:29:27'),
+(12, 'default', 'created', 'App\\Models\\Subject', 'created', 2, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":2,\"name\":\"Hindi\",\"code\":\"H1\",\"type\":\"Theory\",\"description\":\"test\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-08-08T08:00:00.000000Z\",\"updated_at\":\"2026-08-08T08:00:00.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:30:00', '2026-08-08 02:30:00'),
+(13, 'default', 'created', 'App\\Models\\Subject', 'created', 3, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":3,\"name\":\"Math\",\"code\":\"M1\",\"type\":\"Theory\",\"description\":\"math\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-08-08T08:06:24.000000Z\",\"updated_at\":\"2026-08-08T08:06:24.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:36:24', '2026-08-08 02:36:24'),
+(14, 'default', 'created', 'App\\Models\\Timetable', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"school_id\":1,\"class_id\":1,\"section_id\":1,\"subject_id\":1,\"teacher_id\":1,\"day\":\"Monday\",\"start_time\":\"09:08:00\",\"end_time\":\"11:08:00\",\"room\":\"1\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-08-08T12:33:05.000000Z\",\"updated_at\":\"2026-08-08T12:33:05.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 07:03:05', '2026-08-08 07:03:05');
 
 -- --------------------------------------------------------
 
@@ -104,6 +100,13 @@ CREATE TABLE `cache` (
   `value` mediumtext NOT NULL,
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('school-erp-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:17:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"dashboard.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"school.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:13:\"school.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:13:\"school.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:13:\"school.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:12:\"student.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:14:\"student.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:14:\"student.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:8;a:4:{s:1:\"a\";i:9;s:1:\"b\";s:14:\"student.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:9;a:4:{s:1:\"a\";i:10;s:1:\"b\";s:12:\"teacher.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:10;a:4:{s:1:\"a\";i:11;s:1:\"b\";s:14:\"teacher.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:11;a:4:{s:1:\"a\";i:12;s:1:\"b\";s:14:\"teacher.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:12;a:4:{s:1:\"a\";i:13;s:1:\"b\";s:14:\"teacher.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:13;a:4:{s:1:\"a\";i:14;s:1:\"b\";s:10:\"class.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:14;a:4:{s:1:\"a\";i:15;s:1:\"b\";s:12:\"class.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:15;a:4:{s:1:\"a\";i:16;s:1:\"b\";s:12:\"class.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:16;a:4:{s:1:\"a\";i:17;s:1:\"b\";s:12:\"class.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}}s:5:\"roles\";a:1:{i:0;a:3:{s:1:\"a\";i:6;s:1:\"b\";s:11:\"Super Admin\";s:1:\"c\";s:7:\"sanctum\";}}}', 1786261735);
 
 -- --------------------------------------------------------
 
@@ -142,9 +145,169 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`id`, `school_id`, `name`, `numeric_name`, `remarks`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(2, 1, 'KG', 1, 'Kinder Garden', 1, 1, 1, '2026-07-29 08:32:48', '2026-07-29 09:23:32', NULL),
-(3, 1, 'UN', 2, '2', 1, 1, 1, '2026-07-29 09:26:17', '2026-07-30 02:54:11', NULL),
-(5, 1, 'ss', 22, '222', 1, 1, NULL, '2026-07-30 02:36:55', '2026-07-30 02:36:55', NULL);
+(1, 1, 'KG', 1, 'Kinder Garden', 1, 1, NULL, '2026-08-08 02:25:09', '2026-08-08 02:25:09', NULL),
+(2, 1, 'Class 1', 1, 'Class 1', 1, 1, NULL, '2026-08-08 02:25:45', '2026-08-08 02:25:45', NULL),
+(3, 1, 'Class 2', 2, 'Class 2', 1, 1, NULL, '2026-08-08 02:26:00', '2026-08-08 02:26:00', NULL),
+(4, 1, 'Class 3', 3, 'Class 3', 1, 1, NULL, '2026-08-08 02:26:16', '2026-08-08 02:26:16', NULL),
+(5, 1, 'Class 4', 4, 'Class 4', 1, 1, NULL, '2026-08-08 02:26:28', '2026-08-08 02:26:28', NULL),
+(6, 1, 'Class 5', 5, 'Class 5', 1, 1, NULL, '2026-08-08 02:26:40', '2026-08-08 02:26:40', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exams`
+--
+
+CREATE TABLE `exams` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `academic_session_id` bigint(20) UNSIGNED NOT NULL,
+  `exam_type_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(50) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `result_publish_date` date DEFAULT NULL,
+  `is_marks_locked` tinyint(1) NOT NULL DEFAULT 0,
+  `is_result_published` tinyint(1) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exams`
+--
+
+INSERT INTO `exams` (`id`, `school_id`, `academic_session_id`, `exam_type_id`, `name`, `code`, `description`, `start_date`, `end_date`, `result_publish_date`, `is_marks_locked`, `is_result_published`, `status`, `remarks`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 'Half Yearly', 'HY01', 'Half Yearly', '2026-08-08', '2026-08-21', NULL, 0, 0, 1, NULL, 1, NULL, NULL, '2026-08-08 07:35:37', '2026-08-08 07:35:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_marks`
+--
+
+CREATE TABLE `exam_marks` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `exam_schedule_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `theory_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `practical_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `viva_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `project_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `total_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `attendance` varchar(20) NOT NULL DEFAULT 'Present',
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_schedules`
+--
+
+CREATE TABLE `exam_schedules` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `exam_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED NOT NULL,
+  `section_id` bigint(20) UNSIGNED NOT NULL,
+  `subject_id` bigint(20) UNSIGNED NOT NULL,
+  `teacher_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `exam_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `room_no` varchar(50) DEFAULT NULL,
+  `full_marks` decimal(8,2) NOT NULL DEFAULT 100.00,
+  `pass_marks` decimal(8,2) NOT NULL DEFAULT 40.00,
+  `instructions` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exam_schedules`
+--
+
+INSERT INTO `exam_schedules` (`id`, `school_id`, `exam_id`, `class_id`, `section_id`, `subject_id`, `teacher_id`, `exam_date`, `start_time`, `end_time`, `room_no`, `full_marks`, `pass_marks`, `instructions`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 1, 1, '2026-08-10', '10:59:00', '11:59:00', '1', 100.00, 40.00, 'test', 1, 1, NULL, NULL, '2026-08-08 07:59:44', '2026-08-08 07:59:44');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_subjects`
+--
+
+CREATE TABLE `exam_subjects` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `exam_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED NOT NULL,
+  `subject_id` bigint(20) UNSIGNED NOT NULL,
+  `full_marks` decimal(8,2) NOT NULL DEFAULT 100.00,
+  `pass_marks` decimal(8,2) NOT NULL DEFAULT 40.00,
+  `theory_marks` decimal(8,2) NOT NULL DEFAULT 100.00,
+  `practical_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `viva_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `project_marks` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `display_order` int(11) NOT NULL DEFAULT 1,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exam_subjects`
+--
+
+INSERT INTO `exam_subjects` (`id`, `school_id`, `exam_id`, `class_id`, `subject_id`, `full_marks`, `pass_marks`, `theory_marks`, `practical_marks`, `viva_marks`, `project_marks`, `display_order`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 100.00, 40.00, 100.00, 0.00, 0.00, 0.00, 1, 1, 1, NULL, NULL, '2026-08-08 07:51:25', '2026-08-08 07:51:25');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_types`
+--
+
+CREATE TABLE `exam_types` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(20) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exam_types`
+--
+
+INSERT INTO `exam_types` (`id`, `school_id`, `name`, `code`, `description`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Exam Type1', 'UT1', 'Exam Type1', 1, 1, NULL, NULL, '2026-08-08 07:33:36', '2026-08-08 07:33:36');
 
 -- --------------------------------------------------------
 
@@ -165,12 +328,43 @@ CREATE TABLE `failed_jobs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `grades`
+--
+
+CREATE TABLE `grades` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `min_percentage` decimal(5,2) NOT NULL,
+  `max_percentage` decimal(5,2) NOT NULL,
+  `grade_point` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `is_pass` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `grades`
+--
+
+INSERT INTO `grades` (`id`, `school_id`, `name`, `min_percentage`, `max_percentage`, `grade_point`, `is_pass`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'A+', 90.00, 100.00, 10.00, 1, 'A+', 1, 1, NULL, '2026-08-09 09:51:14', '2026-08-09 09:51:14', NULL),
+(2, 1, 'A', 70.00, 89.00, 8.00, 1, 'test', 1, 1, NULL, '2026-08-09 09:52:06', '2026-08-09 09:52:06', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `guardians`
 --
 
 CREATE TABLE `guardians` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED DEFAULT NULL,
   `guardian_type` enum('Father','Mother','Grandfather','Grandmother','Uncle','Aunt','Brother','Sister','Legal Guardian','Other') NOT NULL DEFAULT 'Father',
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) DEFAULT NULL,
@@ -261,13 +455,6 @@ CREATE TABLE `leave_requests` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `leave_requests`
---
-
-INSERT INTO `leave_requests` (`id`, `school_id`, `teacher_id`, `leave_type_id`, `from_date`, `to_date`, `total_days`, `reason`, `attachment`, `status`, `approved_by`, `approved_at`, `remarks`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 1, '2026-07-31', '2026-08-09', 10.00, 'tewst', 'teacher-leaves/juL7wdTx9SdQ57FAoG2JLhGXTYnm5tyzCxApvW9e.pdf', 1, 1, '2026-07-31 08:15:49', NULL, 1, 1, NULL, '2026-07-31 08:10:31', '2026-07-31 08:37:11');
-
 -- --------------------------------------------------------
 
 --
@@ -288,13 +475,6 @@ CREATE TABLE `leave_types` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `leave_types`
---
-
-INSERT INTO `leave_types` (`id`, `school_id`, `name`, `description`, `max_days`, `is_paid`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Anual Leave', 'This is anual leave for all staff', 10, 1, 1, 1, 1, NULL, '2026-07-31 07:19:18', '2026-07-31 07:19:45');
 
 -- --------------------------------------------------------
 
@@ -335,7 +515,15 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (26, '2026_08_01_051629_create_students_table', 13),
 (27, '2026_08_01_115058_create_student_attendances_table', 14),
 (28, '2026_08_01_130450_create_guardians_table', 15),
-(29, '2026_08_01_130627_create_student_guardians_table', 15);
+(29, '2026_08_01_130627_create_student_guardians_table', 15),
+(30, '2026_08_02_095923_create_student_promotions_table', 16),
+(31, '2026_08_02_110016_add_academic_session_id_to_students_table', 17),
+(32, '2026_08_02_115733_create_exam_types_table', 18),
+(33, '2026_08_03_080721_create_exams_table', 19),
+(34, '2026_08_03_081328_add_description_to_exams_table', 20),
+(35, '2026_08_03_081630_add_is_result_published_to_exams_table', 21),
+(36, '2026_08_08_064821_create_exam_marks_table', 22),
+(37, '2026_08_09_144701_create_grades_table', 23);
 
 -- --------------------------------------------------------
 
@@ -441,10 +629,7 @@ CREATE TABLE `personal_access_tokens` (
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(1, 'App\\Models\\User', 1, 'admin', 'f4b40075eff10238f58d9db42e19cf7b815f9dec963ae7985cc2aecfc7a83c87', '[\"*\"]', '2026-07-28 07:10:16', NULL, '2026-07-28 06:47:02', '2026-07-28 07:10:16'),
-(19, 'App\\Models\\User', 1, 'admin', '5c655de360071321bb783541c3caf518bc31405473d596d0b1c7d442e4f8b93c', '[\"*\"]', '2026-07-28 10:43:09', NULL, '2026-07-28 10:40:46', '2026-07-28 10:43:09'),
-(33, 'App\\Models\\User', 1, 'admin', 'c282496b06ffff0a9507e6436af75b3e9b78fa626cf1fb0e923fa9a4783d304d', '[\"*\"]', '2026-07-30 03:04:08', NULL, '2026-07-29 07:29:44', '2026-07-30 03:04:08'),
-(75, 'App\\Models\\User', 1, 'admin', '447576cd4007b76aa577dc9e583d1a97b3fd87e4e37b8232a86ad89fdcbb34db', '[\"*\"]', '2026-08-01 09:33:22', NULL, '2026-08-01 09:02:59', '2026-08-01 09:33:22');
+(2, 'App\\Models\\User', 1, 'admin', '1817b804e8fdf177bc933e45a4d691e9a5b6824d2db3d6d56d4fef03e09ae313', '[\"*\"]', '2026-08-09 10:35:38', NULL, '2026-08-09 07:49:05', '2026-08-09 10:35:38');
 
 -- --------------------------------------------------------
 
@@ -538,7 +723,7 @@ CREATE TABLE `schools` (
 --
 
 INSERT INTO `schools` (`id`, `name`, `code`, `email`, `phone`, `address`, `city`, `state`, `country`, `postal_code`, `logo`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Demo School test', 'SCH001', 'info@school.com', '9999999999', 'Demo Address', 'Kolkata', 'West Bengal', 'India', '700001', NULL, 1, '2026-07-28 06:09:31', '2026-07-28 10:03:51', NULL);
+(1, 'St. George English Day School', 'S001', 'info@gmail.com', '03355629768', 'G335 , meher manzil lane , garden reach', 'Kolkata', 'West Bengal', 'India', '700024', NULL, 1, '2026-08-08 02:18:56', '2026-08-08 02:18:56', NULL);
 
 -- --------------------------------------------------------
 
@@ -563,8 +748,14 @@ CREATE TABLE `sections` (
 --
 
 INSERT INTO `sections` (`id`, `school_id`, `class_id`, `name`, `capacity`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 2, 'B', 10, 1, '2026-07-30 05:09:20', '2026-07-30 05:09:43', NULL),
-(2, 1, 3, 'D', 22, 1, '2026-07-30 09:57:32', '2026-07-30 09:57:44', NULL);
+(1, 1, 1, 'A', 10, 1, '2026-08-08 02:27:02', '2026-08-08 02:27:02', NULL),
+(2, 1, 1, 'B', 10, 1, '2026-08-08 02:27:16', '2026-08-08 02:27:16', NULL),
+(3, 1, 2, 'A', 10, 1, '2026-08-08 02:27:27', '2026-08-08 02:27:27', NULL),
+(4, 1, 2, 'B', 10, 1, '2026-08-08 02:27:41', '2026-08-08 02:27:41', NULL),
+(5, 1, 3, 'A', 10, 1, '2026-08-08 02:27:58', '2026-08-08 02:27:58', NULL),
+(6, 1, 4, 'A', 10, 1, '2026-08-08 02:28:10', '2026-08-08 02:28:10', NULL),
+(7, 1, 5, 'A', 10, 1, '2026-08-08 02:28:22', '2026-08-08 02:28:22', NULL),
+(8, 1, 6, 'A', 10, 1, '2026-08-08 02:28:31', '2026-08-08 02:28:31', NULL);
 
 -- --------------------------------------------------------
 
@@ -586,7 +777,10 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('uaPhfEwx9NsaXLdCWhf9APj5eNbv85RgJIGtmKEe', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVzVxdjI4M3RPSGNGM0FjclBSaFRSNlpFVTZNWmtzNjV1TEJoNUl5eSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1785596237);
+('cjZq9zeHDSt3IPfN7qwHNRvjMAl9FxN96XCCpqyR', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRFZNOWJSNHFtMXVIVUg5WThvUm4wZWEzbFp4bm8zNzFlWUY0a2RydSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786281489),
+('gPZlcxwX6lH2yTgPNMByh52FiUFKkwFQhayTuadK', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMHh3R3hxVHZ4YU1rM2hBYVRpak1jQVlXakF2aXpRZVRGWGNZS0owSiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786195316),
+('iI0dkKDXGaA31CNB4vfTsRJ5AfUsuxVlT6pnavuH', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQmJXdFF1ZWVRaTN5Y1hzcTVnbzlyQnp3RHE2ZGxVWnVyejAwUm5ldCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786189633),
+('oj4th2zAyREUDe9MJEP29a7psGZDh71GOjBLRHMn', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiZVVGUU5jczluN0wxQktPSndiWWlIUXk4bWJSMEJ6cm01azkwM0ZiTiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786291562);
 
 -- --------------------------------------------------------
 
@@ -597,6 +791,7 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 CREATE TABLE `students` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `school_id` bigint(20) UNSIGNED NOT NULL,
+  `academic_session_id` bigint(20) UNSIGNED DEFAULT NULL,
   `class_id` bigint(20) UNSIGNED NOT NULL,
   `section_id` bigint(20) UNSIGNED NOT NULL,
   `admission_no` varchar(255) NOT NULL,
@@ -633,9 +828,8 @@ CREATE TABLE `students` (
 -- Dumping data for table `students`
 --
 
-INSERT INTO `students` (`id`, `school_id`, `class_id`, `section_id`, `admission_no`, `roll_no`, `first_name`, `last_name`, `gender`, `dob`, `admission_date`, `blood_group`, `religion`, `category`, `aadhaar_no`, `mobile`, `email`, `address`, `father_name`, `father_mobile`, `father_occupation`, `mother_name`, `mother_mobile`, `guardian_name`, `guardian_mobile`, `photo`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 1, '10001', '1', 'Imran', 'Ahmed', 'Male', '2026-08-01', '2026-08-01', 'A', NULL, NULL, '123456789123', '7003578764', 'test@gmail.com', 'G318 meher manzil , garden reach kolkata - 24', 'imtiaz alama khan', '7003578764', 'self emploiyed', 'Amreen Haider', '00000010001', NULL, NULL, 'students/u73RZ7yQbBtrmhjgC41fqKi7jV1U2cMC2P32guWx.jpg', 1, 1, 1, NULL, '2026-08-01 02:10:41', '2026-08-01 03:01:02'),
-(2, 1, 2, 1, '1002', '2', 'Zakia', 'Nasim', 'Female', '1990-08-01', '2026-08-01', 'B', NULL, NULL, '700350123412', '7003578764', 'nasim@gmail.com', 'test address', 'Nasim', '7003578764', 'Driver', 'Sarwari', '7000325888', NULL, NULL, 'students/IHKXpz2VWd0TSedaJd0ZLOwHlvAuenbt5rBRNXvn.jpg', 1, 1, NULL, NULL, '2026-08-01 03:27:21', '2026-08-01 03:27:21');
+INSERT INTO `students` (`id`, `school_id`, `academic_session_id`, `class_id`, `section_id`, `admission_no`, `roll_no`, `first_name`, `last_name`, `gender`, `dob`, `admission_date`, `blood_group`, `religion`, `category`, `aadhaar_no`, `mobile`, `email`, `address`, `father_name`, `father_mobile`, `father_occupation`, `mother_name`, `mother_mobile`, `guardian_name`, `guardian_mobile`, `photo`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 'A01', '1', 'Ahmed Hussain', 'Khan', 'Male', '2023-02-18', '2026-08-09', 'A+', NULL, NULL, '123456789123', '9007963069', 'ahmed@gmail.com', 'G218 ,Meher Manzil , Garden Reach Road , Kolkata - 24', 'Nurullah', '9831203456', 'Self Emplyed', 'Akhtari B egum', '9007963069', NULL, NULL, 'students/c6yi5CWC9l4LGKeRW9cdmIilj82gMMlb2nWYEfAK.png', 1, 1, NULL, NULL, '2026-08-09 08:19:06', '2026-08-09 08:19:06');
 
 -- --------------------------------------------------------
 
@@ -661,14 +855,6 @@ CREATE TABLE `student_attendances` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `student_attendances`
---
-
-INSERT INTO `student_attendances` (`id`, `school_id`, `student_id`, `class_id`, `section_id`, `attendance_date`, `status`, `check_in`, `check_out`, `remarks`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 2, 1, '2026-08-01', 'Present', '08:30:00', '22:30:00', NULL, 1, 1, NULL, '2026-08-01 06:55:18', '2026-08-01 07:32:27'),
-(2, 1, 1, 2, 1, '2026-08-01', 'Present', NULL, NULL, NULL, 1, 1, NULL, '2026-08-01 06:55:18', '2026-08-01 06:55:18');
-
 -- --------------------------------------------------------
 
 --
@@ -680,6 +866,32 @@ CREATE TABLE `student_guardians` (
   `student_id` bigint(20) UNSIGNED NOT NULL,
   `guardian_id` bigint(20) UNSIGNED NOT NULL,
   `is_primary` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_promotions`
+--
+
+CREATE TABLE `student_promotions` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `from_session_id` bigint(20) UNSIGNED NOT NULL,
+  `to_session_id` bigint(20) UNSIGNED NOT NULL,
+  `from_class_id` bigint(20) UNSIGNED NOT NULL,
+  `to_class_id` bigint(20) UNSIGNED NOT NULL,
+  `from_section_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `to_section_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `promotion_date` date NOT NULL,
+  `promotion_type` enum('Promoted','Repeated','Transferred','Graduated','Dropped') NOT NULL DEFAULT 'Promoted',
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -709,8 +921,9 @@ CREATE TABLE `subjects` (
 --
 
 INSERT INTO `subjects` (`id`, `name`, `code`, `type`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'English', 'ss', 'Practical', 'ssssss', 1, 1, 1, '2026-07-29 09:59:53', '2026-07-29 10:30:35', NULL),
-(2, 'Math', 'm', 'Theory', 'mmm', 1, 1, NULL, '2026-07-29 10:31:01', '2026-07-29 10:31:01', NULL);
+(1, 'English', 'S1', 'Theory', 'eng', 1, 1, NULL, '2026-08-08 02:29:27', '2026-08-08 02:29:27', NULL),
+(2, 'Hindi', 'H1', 'Theory', 'test', 1, 1, NULL, '2026-08-08 02:30:00', '2026-08-08 02:30:00', NULL),
+(3, 'Math', 'M1', 'Theory', 'math', 1, 1, NULL, '2026-08-08 02:36:24', '2026-08-08 02:36:24', NULL);
 
 -- --------------------------------------------------------
 
@@ -746,8 +959,7 @@ CREATE TABLE `teachers` (
 --
 
 INSERT INTO `teachers` (`id`, `school_id`, `employee_id`, `first_name`, `last_name`, `gender`, `date_of_birth`, `email`, `phone`, `qualification`, `experience`, `joining_date`, `address`, `photo`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, '101', 'Ahmed', 'Khan', 'Male', '2026-07-30', 'ahmed@gmail.com', '22650262', 'Grduate', '10', '2026-08-02', 'test address', 'teachers/ycMQppJ1S41hOcyC1PHU1dDKF8MQ7IZQEZVOQ5aH.png', 1, 1, NULL, '2026-07-30 08:44:35', '2026-07-30 08:44:35', NULL),
-(2, 1, '102', 'Amber', 'Hussain', 'Male', '1983-07-18', 'amber@gmail.com', '12345678', 'MASTER', '12', '2026-07-24', 'test address goes here', 'teachers/XYSSJ4Uie7oQoDuYikXg3wQbcjT0ShojWWXQrRzU.jpg', 1, 1, NULL, '2026-07-30 08:55:53', '2026-07-30 08:55:53', NULL);
+(1, 1, 'E001', 'Imtiaz Alam', 'Khan', 'Male', '1988-08-29', 'itiaz@gmail.com', '22650262', 'Graduate', '5', '2026-08-01', 'test addrtess', 'teachers/aIVAnd1MJHri1xI2HbB2nazleoFZhK1mKh4W18il.png', 1, 1, NULL, '2026-08-08 06:27:06', '2026-08-08 06:27:06', NULL);
 
 -- --------------------------------------------------------
 
@@ -770,14 +982,6 @@ CREATE TABLE `teacher_attendances` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `teacher_attendances`
---
-
-INSERT INTO `teacher_attendances` (`id`, `school_id`, `teacher_id`, `attendance_date`, `status`, `check_in`, `check_out`, `remarks`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 2, '2026-07-31', 'Present', '10:32:00', '12:32:00', 'test', 1, NULL, '2026-07-31 09:36:34', '2026-07-31 09:36:34', NULL),
-(2, 1, 2, '2026-08-01', 'Present', '10:32:00', '12:32:00', 'test', 1, NULL, '2026-07-31 09:39:14', '2026-07-31 09:39:14', NULL);
 
 -- --------------------------------------------------------
 
@@ -809,7 +1013,7 @@ CREATE TABLE `timetables` (
 --
 
 INSERT INTO `timetables` (`id`, `school_id`, `class_id`, `section_id`, `subject_id`, `teacher_id`, `day`, `start_time`, `end_time`, `room`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 2, 2, 2, 2, 'Monday', '11:00:00', '15:12:00', '1', 1, 1, 1, '2026-07-30 10:08:42', '2026-07-30 10:32:23', NULL);
+(1, 1, 1, 1, 1, 1, 'Monday', '09:08:00', '11:08:00', '1', 1, 1, NULL, '2026-08-08 07:03:05', '2026-08-08 07:03:05', NULL);
 
 -- --------------------------------------------------------
 
@@ -886,11 +1090,67 @@ ALTER TABLE `classes`
   ADD KEY `classes_school_id_foreign` (`school_id`);
 
 --
+-- Indexes for table `exams`
+--
+ALTER TABLE `exams`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `exam_unique` (`school_id`,`academic_session_id`,`exam_type_id`,`name`),
+  ADD KEY `exams_academic_session_id_foreign` (`academic_session_id`),
+  ADD KEY `exams_exam_type_id_foreign` (`exam_type_id`),
+  ADD KEY `exams_created_by_foreign` (`created_by`),
+  ADD KEY `exams_updated_by_foreign` (`updated_by`);
+
+--
+-- Indexes for table `exam_marks`
+--
+ALTER TABLE `exam_marks`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `exam_marks_exam_schedule_id_student_id_unique` (`exam_schedule_id`,`student_id`),
+  ADD KEY `exam_marks_school_id_foreign` (`school_id`),
+  ADD KEY `exam_marks_student_id_foreign` (`student_id`),
+  ADD KEY `exam_marks_created_by_foreign` (`created_by`),
+  ADD KEY `exam_marks_updated_by_foreign` (`updated_by`);
+
+--
+-- Indexes for table `exam_schedules`
+--
+ALTER TABLE `exam_schedules`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `exam_schedules_school_id_foreign` (`school_id`);
+
+--
+-- Indexes for table `exam_subjects`
+--
+ALTER TABLE `exam_subjects`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `exam_subjects_school_id_foreign` (`school_id`),
+  ADD KEY `exam_subjects_exam_id_foreign` (`exam_id`);
+
+--
+-- Indexes for table `exam_types`
+--
+ALTER TABLE `exam_types`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `exam_types_school_id_name_unique` (`school_id`,`name`),
+  ADD KEY `exam_types_created_by_foreign` (`created_by`),
+  ADD KEY `exam_types_updated_by_foreign` (`updated_by`),
+  ADD KEY `exam_types_status_index` (`status`);
+
+--
 -- Indexes for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `grades`
+--
+ALTER TABLE `grades`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `grades_created_by_foreign` (`created_by`),
+  ADD KEY `grades_updated_by_foreign` (`updated_by`),
+  ADD KEY `grades_school_id_status_index` (`school_id`,`status`);
 
 --
 -- Indexes for table `guardians`
@@ -1031,7 +1291,8 @@ ALTER TABLE `students`
   ADD KEY `students_updated_by_foreign` (`updated_by`),
   ADD KEY `students_school_id_class_id_section_id_index` (`school_id`,`class_id`,`section_id`),
   ADD KEY `students_admission_no_index` (`admission_no`),
-  ADD KEY `students_father_mobile_index` (`father_mobile`);
+  ADD KEY `students_father_mobile_index` (`father_mobile`),
+  ADD KEY `students_academic_session_id_foreign` (`academic_session_id`);
 
 --
 -- Indexes for table `student_attendances`
@@ -1054,6 +1315,23 @@ ALTER TABLE `student_guardians`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `student_guardians_student_id_guardian_id_unique` (`student_id`,`guardian_id`),
   ADD KEY `student_guardians_guardian_id_foreign` (`guardian_id`);
+
+--
+-- Indexes for table `student_promotions`
+--
+ALTER TABLE `student_promotions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `student_session_unique` (`student_id`,`to_session_id`),
+  ADD KEY `student_promotions_to_session_id_foreign` (`to_session_id`),
+  ADD KEY `student_promotions_to_class_id_foreign` (`to_class_id`),
+  ADD KEY `student_promotions_from_section_id_foreign` (`from_section_id`),
+  ADD KEY `student_promotions_to_section_id_foreign` (`to_section_id`),
+  ADD KEY `student_promotions_created_by_foreign` (`created_by`),
+  ADD KEY `student_promotions_updated_by_foreign` (`updated_by`),
+  ADD KEY `student_promotions_school_id_student_id_index` (`school_id`,`student_id`),
+  ADD KEY `student_promotions_from_session_id_to_session_id_index` (`from_session_id`,`to_session_id`),
+  ADD KEY `student_promotions_from_class_id_to_class_id_index` (`from_class_id`,`to_class_id`),
+  ADD KEY `student_promotions_promotion_type_index` (`promotion_type`);
 
 --
 -- Indexes for table `subjects`
@@ -1115,25 +1393,61 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `academic_sessions`
 --
 ALTER TABLE `academic_sessions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `exams`
+--
+ALTER TABLE `exams`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `exam_marks`
+--
+ALTER TABLE `exam_marks`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `exam_schedules`
+--
+ALTER TABLE `exam_schedules`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `exam_subjects`
+--
+ALTER TABLE `exam_subjects`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `exam_types`
+--
+ALTER TABLE `exam_types`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `grades`
+--
+ALTER TABLE `grades`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `guardians`
@@ -1151,19 +1465,19 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `leave_types`
 --
 ALTER TABLE `leave_types`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -1175,7 +1489,7 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1193,19 +1507,19 @@ ALTER TABLE `schools`
 -- AUTO_INCREMENT for table `sections`
 --
 ALTER TABLE `sections`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `student_attendances`
 --
 ALTER TABLE `student_attendances`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `student_guardians`
@@ -1214,22 +1528,28 @@ ALTER TABLE `student_guardians`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `student_promotions`
+--
+ALTER TABLE `student_promotions`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `teacher_attendances`
 --
 ALTER TABLE `teacher_attendances`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `timetables`
@@ -1258,6 +1578,55 @@ ALTER TABLE `academic_sessions`
 --
 ALTER TABLE `classes`
   ADD CONSTRAINT `classes_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `exams`
+--
+ALTER TABLE `exams`
+  ADD CONSTRAINT `exams_academic_session_id_foreign` FOREIGN KEY (`academic_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exams_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `exams_exam_type_id_foreign` FOREIGN KEY (`exam_type_id`) REFERENCES `exam_types` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exams_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exams_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `exam_marks`
+--
+ALTER TABLE `exam_marks`
+  ADD CONSTRAINT `exam_marks_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `exam_marks_exam_schedule_id_foreign` FOREIGN KEY (`exam_schedule_id`) REFERENCES `exam_schedules` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_marks_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_marks_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_marks_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `exam_schedules`
+--
+ALTER TABLE `exam_schedules`
+  ADD CONSTRAINT `exam_schedules_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `exam_subjects`
+--
+ALTER TABLE `exam_subjects`
+  ADD CONSTRAINT `exam_subjects_exam_id_foreign` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_subjects_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `exam_types`
+--
+ALTER TABLE `exam_types`
+  ADD CONSTRAINT `exam_types_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `exam_types_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_types_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `grades`
+--
+ALTER TABLE `grades`
+  ADD CONSTRAINT `grades_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `grades_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `grades_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `guardians`
@@ -1316,6 +1685,7 @@ ALTER TABLE `sections`
 -- Constraints for table `students`
 --
 ALTER TABLE `students`
+  ADD CONSTRAINT `students_academic_session_id_foreign` FOREIGN KEY (`academic_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `students_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `students_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `students_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
@@ -1339,6 +1709,21 @@ ALTER TABLE `student_attendances`
 ALTER TABLE `student_guardians`
   ADD CONSTRAINT `student_guardians_guardian_id_foreign` FOREIGN KEY (`guardian_id`) REFERENCES `guardians` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `student_guardians_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `student_promotions`
+--
+ALTER TABLE `student_promotions`
+  ADD CONSTRAINT `student_promotions_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `student_promotions_from_class_id_foreign` FOREIGN KEY (`from_class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_promotions_from_section_id_foreign` FOREIGN KEY (`from_section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `student_promotions_from_session_id_foreign` FOREIGN KEY (`from_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_promotions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_promotions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_promotions_to_class_id_foreign` FOREIGN KEY (`to_class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_promotions_to_section_id_foreign` FOREIGN KEY (`to_section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `student_promotions_to_session_id_foreign` FOREIGN KEY (`to_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_promotions_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `subjects`

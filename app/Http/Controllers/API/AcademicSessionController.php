@@ -62,4 +62,14 @@ class AcademicSessionController extends Controller
             'message' => 'Academic session deleted successfully.'
         ]);
     }
+
+        public function active()
+{
+    return response()->json([
+        'success' => true,
+        'data' => AcademicSession::where('status', 1)
+            ->orderBy('name')
+            ->get()
+    ]);
+}
 }

@@ -16,7 +16,7 @@ class GuardianResource extends JsonResource
 
             'id' => $this->id,
 
-            'school_id' => auth()->user()->school_id,
+            'school_id' => auth()->user()->school_id??0,
 
             'guardian_type' => $this->guardian_type,
 

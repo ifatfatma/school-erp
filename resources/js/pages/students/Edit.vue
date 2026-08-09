@@ -7,6 +7,7 @@ import Form from "./Form.vue";
 import { useStudentStore } from "@/stores/student";
 import { useClassStore } from "@/stores/class";
 import { useSectionStore } from "@/stores/section";
+import { useAcademicSessionStore } from "@/stores/academicSession";
 
 const router = useRouter();
 const route = useRoute();
@@ -14,6 +15,7 @@ const route = useRoute();
 const studentStore = useStudentStore();
 const classStore = useClassStore();
 const sectionStore = useSectionStore();
+const AcademicSessionStore = useAcademicSessionStore();
 
 const loading = ref(false);
 
@@ -42,6 +44,7 @@ const form = reactive({
 
     class_id: "",
     section_id: "",
+    academic_session_id: "",
 
     father_name: "",
     father_mobile: "",
@@ -66,6 +69,7 @@ onMounted(async () => {
 
         await Promise.all([
             classStore.fetch(),
+            AcademicSessionStore.load(),
             sectionStore.load(),
             studentStore.find(route.params.id),
         ]);
@@ -96,6 +100,7 @@ onMounted(async () => {
             address: item.address,
 
             class_id: item.class_id,
+            academic_session_id: item.academic_session_id,
             section_id: item.section_id,
 
             father_name: item.father_name,
@@ -113,7 +118,6 @@ onMounted(async () => {
             status: item.status==true?1:0,
         });
 
-        
 
     } catch (e) {
 
@@ -185,6 +189,7 @@ function cancel() {
 
             <Form
                 :form="form"
+                :academic_session="AcademicSessionStore.sessions"
                 :classes="classStore.items"
                 :sections="sectionStore.items"
                 :errors="studentStore.errors"

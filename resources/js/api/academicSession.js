@@ -1,16 +1,29 @@
 import api from "./axios";
 
-export const getAcademicSessions = (params = {}) =>
-    api.get("/academic-sessions", { params });
+export default {
 
-export const getAcademicSession = (id) =>
-    api.get(`/academic-sessions/${id}`);
+    index(params = {}) {
+        return api.get("/academic-sessions", { params });
+    },
 
-export const createAcademicSession = (data) =>
-    api.post("/academic-sessions", data);
+    active() {
+        return api.get("/academic-sessions/active");
+    },
 
-export const updateAcademicSession = (id, data) =>
-    api.put(`/academic-sessions/${id}`, data);
+    find(id) {
+        return api.get(`/academic-sessions/${id}`);
+    },
 
-export const deleteAcademicSession = (id) =>
-    api.delete(`/academic-sessions/${id}`);
+    create(data) {
+        return api.post("/academic-sessions", data);
+    },
+
+    update(id, data) {
+        return api.put(`/academic-sessions/${id}`, data);
+    },
+
+    delete(id) {
+        return api.delete(`/academic-sessions/${id}`);
+    }
+
+};

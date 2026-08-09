@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Guardian;
 use App\Repositories\GuardianRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 
 class GuardianService
 {
@@ -36,6 +37,14 @@ class GuardianService
      */
     public function store(array $data): Guardian
     {
+        $data['school_id'] = auth()->user()->school_id;
+        if (!empty($data['photo'])) {
+
+            $data['photo'] = $data['photo']->store(
+                'guardians',
+                'public'
+            );
+        }
         return $this->repository->create($data);
     }
 
@@ -46,6 +55,25 @@ class GuardianService
         Guardian $guardian,
         array $data
     ): Guardian {
+
+        $data['school_id'] = auth()->user()->school_id;
+        if (!empty($data['photo'])) {
+
+            if (
+                $guardian->photo &&
+                Storage::disk('public')->exists($guardian->photo)
+            ) {
+                Storage::disk('public')->delete($guardian->photo);
+            }
+
+            $data['photo'] = $data['photo']->store(
+                'guardians',
+                'public'
+            );
+        } else {
+
+            unset($data['photo']);
+        }
 
         return $this->repository->update(
             $guardian,
@@ -75,7 +103,6 @@ class GuardianService
             $studentId,
             $primary
         );
-
     }
 
     /**
@@ -90,7 +117,6 @@ class GuardianService
             $guardian,
             $studentId
         );
-
     }
 
     /**
@@ -105,6 +131,5 @@ class GuardianService
             $guardian,
             $studentId
         );
-
     }
 }

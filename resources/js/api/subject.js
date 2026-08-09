@@ -19,9 +19,11 @@ export default {
     update(id, data) {
         return api.put(`/subjects/${id}`, data);
     },
-
+    active() {
+        return api.get("/subjects/active");
+    },
     delete(id) {
         return api.delete(`/subjects/${id}`);
     },
-
+    
 };

@@ -18,7 +18,7 @@ export const useClassStore = defineStore("class", {
             try {
 
                 const { data } = await classApi.getAll(params);
-
+                
                 this.items = data.data;
 
             } finally {
@@ -37,7 +37,13 @@ export const useClassStore = defineStore("class", {
 
             return this.item;
 
-        }
+        },async active() {
+    
+                const { data } = await classApi.active();
+    
+                this.items = data.data ?? [];
+    
+            }
 
     }
 

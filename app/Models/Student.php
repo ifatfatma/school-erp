@@ -20,7 +20,7 @@ class Student extends Model
 
         'admission_no',
         'roll_no',
-
+        'academic_session_id',
         'first_name',
         'last_name',
 

@@ -36,6 +36,8 @@ const form = reactive({
 
 async function save() {
 
+    console.log("FORM BEFORE SAVE:", JSON.parse(JSON.stringify(form)));
+
     try {
 
         await store.create(form);
@@ -45,9 +47,8 @@ async function save() {
         });
 
     } catch (e) {
-        // Validation errors handled by store
+        console.error(e);
     }
-
 }
 </script>
 

@@ -67,4 +67,21 @@ class ClassRepository
             })
             ->exists();
     }
+
+    /**
+     * Active Exams
+     */
+    public function active()
+    {
+        return $this->model
+
+            ->where('school_id', auth()->user()->school_id)
+
+            ->where('status', true)
+
+            ->orderBy('id')
+
+            ->get();
+    }
+
 }

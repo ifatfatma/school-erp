@@ -84,4 +84,14 @@ class SectionController extends Controller
             'message' => 'Section deleted successfully.'
         ]);
     }
+
+    public function active()
+{
+    return response()->json([
+        'success' => true,
+        'data' => Section::where('status', 1)
+            ->orderBy('name')
+            ->get()
+    ]);
+}
 }

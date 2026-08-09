@@ -45,7 +45,9 @@ export default {
             },
         });
     },
-
+    active() {
+        return api.get("/teachers/active");
+    },
     delete(id) {
         return api.delete(`/teachers/${id}`);
     },

@@ -167,8 +167,7 @@ const routes = [
                         component: () => import("@/pages/teachers/Edit.vue"),
                     },
                 ],
-            },
-            {
+            },{
                 path: "/leave-types",
                 children: [
                     {
@@ -198,8 +197,7 @@ const routes = [
                     },
 
                 ],
-            },
-            {
+            },{
                 path: "/teacher-leaves",
                 children: [
                     {
@@ -229,8 +227,7 @@ const routes = [
                     },
 
                 ],
-            },
-            {
+            },{
                 path: "/teacher-attendances",
                 children: [
                     {
@@ -381,7 +378,170 @@ const routes = [
 
                     ],
 
-                },
+            },{
+                    path: "/student-promotions",
+
+                    children: [
+                        {
+                            path: "/student-promotions",
+                            name: "student-promotions.index",
+                            component: () => import("@/pages/student-promotions/Index.vue"),
+                        },
+
+                        {
+                            path: "/student-promotions/bulk",
+                            name: "student-promotions.bulk",
+                            component: () => import("@/pages/student-promotions/BulkPromotion.vue"),
+                        },
+
+                        {
+                            path: "/student-promotions/:id",
+                            name: "student-promotions.show",
+                            component: () => import("@/pages/student-promotions/Show.vue"),
+                        },
+
+                    ]
+
+            },{
+                    path: "/exam-types",
+
+                    children: [
+                        {
+                            path: "/exam-types",
+                            name: "exam-types.index",
+                            component: () => import("@/pages/exam-types/Index.vue"),
+                        },
+                        
+                        {
+                        path: "/exam-types/create",
+                        name: "exam-types.create",
+                        component: () => import("@/pages/exam-types/Create.vue"),
+                       },
+                        {
+                        path: "/exam-types/:id/Edit",
+                        name: "exam-types.edit",
+                        component: () => import("@/pages/exam-types/Edit.vue"),
+                       },
+
+
+                    ]
+
+            },{
+                    path: "/exams",
+
+                    children: [
+                        {
+                            path: "/exams",
+                            name: "exams.index",
+                            component: () => import("@/pages/exams/Index.vue"),
+                        },
+                        
+                        {
+                        path: "/exams/create",
+                        name: "exams.create",
+                        component: () => import("@/pages/exams/Create.vue"),
+                       },
+                        {
+                        path: "/exams/:id/Edit",
+                        name: "exams.edit",
+                        component: () => import("@/pages/exams/Edit.vue"),
+                       },
+
+
+                    ]
+
+            },{
+                    path: "/exam-schedules",
+
+                    children: [
+                        {
+                            path: "/exam-schedules",
+                            name: "exam-schedules.index",
+                            component: () => import("@/pages/exam-schedules/Index.vue"),
+                        },
+                        
+                        {
+                        path: "/exam-schedules/create",
+                        name: "exam-schedules.create",
+                        component: () => import("@/pages/exam-schedules/Create.vue"),
+                       },
+                        {
+                        path: "/exam-schedules/:id/Edit",
+                        name: "exam-schedules.edit",
+                        component: () => import("@/pages/exam-schedules/Edit.vue"),
+                       },
+
+
+                    ]
+
+            },{
+                    path: "/exam-subjects",
+
+                    children: [
+                        {
+                            path: "/exam-subjects",
+                            name: "exam-subjects.index",
+                            component: () => import("@/pages/exam-subjects/Index.vue"),
+                        },
+                        
+                        {
+                        path: "/exam-subjects/create",
+                        name: "exam-subjects.create",
+                        component: () => import("@/pages/exam-subjects/Create.vue"),
+                       },
+                        {
+                        path: "/exam-subjects/:id/Edit",
+                        name: "exam-subjects.edit",
+                        component: () => import("@/pages/exam-subjects/Edit.vue"),
+                       },
+
+
+                    ]
+
+            },{
+                    path: "/exam-marks",
+                    name: "exam-marks.index",
+                    component: () => import("@/pages/exam-marks/Index.vue"),
+                    meta: {
+                        title: "Marks Entry",
+                        requiresAuth: true,
+                        permission: "exam-mark.view",
+                    },
+            },{
+                path: "/grades",
+                children: [
+                    {
+                        path: "",
+                        name: "grades.index",
+                        component: () => import("@/pages/grades/Index.vue"),
+                    },
+                    {
+                        path: "create",
+                        name: "grades.create",
+                        component: () => import("@/pages/grades/Create.vue"),
+                    },                    
+                    {
+                        path: ":id/edit",
+                        name: "grades.edit",
+                        component: () => import("@/pages/grades/Edit.vue"),
+                    },
+                ],
+            },{
+                path: "/report-cards",
+                children: [
+                    {
+                        path: "",
+                        name: "report-cards.index",
+                        component: () => import("@/pages/report-cards/Index.vue"),
+                    },
+                    {
+                        path: "/report-cards/:student/:exam",
+                        name: "report-cards.show",
+                        component: () =>
+                            import("@/pages/report-cards/Show.vue"),
+                    },
+                ],
+            }
         ],
     },
     {

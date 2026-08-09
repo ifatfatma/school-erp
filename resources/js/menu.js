@@ -110,9 +110,28 @@ export default [
         icon: "bi bi-pencil-square",
         children: [
             {
+                title: "Exam Types",
+                route: "/exam-types",
+                permission: "exam_types.view",
+            },
+            {
+                title: "Exam Subjects",
+                route: "/exam-subjects",
+                permission: "exam_subjects.view",
+            },
+            {
+                title: "Exam Schedule",
+                route: "/exam-schedules",
+                permission: "exam_schedules.view",
+            },
+            {
                 title: "Exams",
                 route: "/exams",
                 permission: "exam.view",
+            },{
+                title: "Exam Marks",
+                route: "/exam-marks",
+                permission: "exam_marks.view",
             },
             {
                 title: "Grades",

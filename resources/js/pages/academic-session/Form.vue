@@ -49,9 +49,11 @@
 
     </div>
 
-    <AppButton>
+    <AppButton  type="submit"
+            :loading="loading" 
+            text="Save Session">
 
-        Save Session
+       
 
     </AppButton>
 

@@ -11,6 +11,12 @@ export default {
     get(id) {
         return api.get(`/sections/${id}`);
     },
+/**
+     * Active List
+     */
+    active() {
+        return api.get("/sections/active");
+    },
 
     create(data) {
         return api.post("/sections", data);

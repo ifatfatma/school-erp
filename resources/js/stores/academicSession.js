@@ -1,19 +1,13 @@
 import { defineStore } from "pinia";
-
-import {
-    getAcademicSessions,
-    getAcademicSession,
-    createAcademicSession,
-    updateAcademicSession,
-    deleteAcademicSession
-} from "@/api/academicSession";
+import academicSessionApi from "@/api/academicSession";
 
 export const useAcademicSessionStore = defineStore("academicSession", {
 
     state: () => ({
         sessions: [],
         pagination: {},
-        loading: false
+        loading: false,
+        errors: {}
     }),
 
     actions: {
@@ -24,11 +18,29 @@ export const useAcademicSessionStore = defineStore("academicSession", {
 
             try {
 
-                const { data } = await getAcademicSessions(params);
+                const { data } = await academicSessionApi.index(params);
 
-                this.sessions = data.data;
+                this.sessions = data.data ?? [];
 
-                this.pagination = data.meta;
+                this.pagination = data.meta ?? {};
+
+            } finally {
+
+                this.loading = false;
+
+            }
+
+        },
+
+        async active() {
+
+            this.loading = true;
+
+            try {
+
+                const { data } = await academicSessionApi.active();
+
+                this.sessions = data.data ?? [];
 
             } finally {
 
@@ -40,7 +52,7 @@ export const useAcademicSessionStore = defineStore("academicSession", {
 
         async find(id) {
 
-            const { data } = await getAcademicSession(id);
+            const { data } = await academicSessionApi.find(id);
 
             return data.data ?? data;
 
@@ -48,19 +60,19 @@ export const useAcademicSessionStore = defineStore("academicSession", {
 
         async create(form) {
 
-            return await createAcademicSession(form);
+            return await academicSessionApi.create(form);
 
         },
 
         async update(id, form) {
 
-            return await updateAcademicSession(id, form);
+            return await academicSessionApi.update(id, form);
 
         },
 
         async delete(id) {
 
-            return await deleteAcademicSession(id);
+            return await academicSessionApi.delete(id);
 
         }
 

@@ -15,7 +15,10 @@ class StoreStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'academic_session_id' => [
+                'required',
+                'exists:academic_sessions,id',
+            ],
             'class_id' => [
                 'required',
                 'exists:classes,id',

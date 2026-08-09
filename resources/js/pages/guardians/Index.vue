@@ -333,7 +333,7 @@ params:{id:item.id}
 
 >
 
-<i class="fas fa-eye"></i>
+<i class="bi bi-eye"></i>
 
 </RouterLink>
 
@@ -351,7 +351,7 @@ params:{id:item.id}
 
 >
 
-<i class="fas fa-edit"></i>
+<i class="bi bi-pencil"></i>
 
 </RouterLink>
 
@@ -363,7 +363,7 @@ class="btn btn-sm btn-danger"
 
 >
 
-<i class="fas fa-trash"></i>
+<i class="bi bi-trash"></i>
 
 </button>
 

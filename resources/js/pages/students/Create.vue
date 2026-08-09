@@ -6,6 +6,7 @@ import Form from "./Form.vue";
 
 import { useStudentStore } from "@/stores/student";
 import { useClassStore } from "@/stores/class";
+import { useAcademicSessionStore } from "@/stores/academicSession";
 import { useSectionStore } from "@/stores/section";
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
@@ -13,6 +14,7 @@ const router = useRouter();
 
 const studentStore = useStudentStore();
 const classStore = useClassStore();
+const AcademicSessionStore = useAcademicSessionStore();
 const sectionStore = useSectionStore();
 
 const loading = ref(false);
@@ -50,6 +52,8 @@ const form = reactive({
     class_id: "",
 
     section_id: "",
+    
+    academic_session_id: "",
 
     father_name: "",
 
@@ -76,7 +80,7 @@ onMounted(async () => {
     await Promise.all([
 
         classStore.fetch(),
-
+        AcademicSessionStore.load(),
         sectionStore.load(),
 
     ]);
@@ -143,10 +147,12 @@ function cancel() {
             ]"
         />
 
-
 <Form
 
 :form="form"
+
+
+:academic_session="AcademicSessionStore.sessions"
 
 :classes="classStore.items"
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { watch, ref, onMounted } from "vue";
 
 import AppInput from "@/components/ui/AppInput.vue";
 import AppSelect from "@/components/ui/AppSelect.vue";
@@ -14,11 +14,15 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+
     errors: {
         type: Object,
         default: () => ({}),
     },
 });
+
+// Use parent's form object
+const form = props.form;
 
 const classOptions = ref([]);
 const sectionOptions = ref([]);
@@ -36,49 +40,92 @@ const days = [
 ];
 
 async function loadClasses() {
+
     const { data } = await classApi.getAll({
         per_page: 1000,
         status: 1,
     });
 
-    classOptions.value = data.data;
+    classOptions.value = data.data ?? [];
 }
 
 async function loadSections() {
-    const { data } = await sectionApi.getAll({
-        per_page: 1000,
-        status: 1,
-    });
 
-    sectionOptions.value = data.data;
+    sectionOptions.value = [];
+
+    if (!form.class_id) {
+        form.section_id = "";
+        return;
+    }
+
+    try {
+
+        const { data } = await sectionApi.getAll({
+            class_id: form.class_id,
+            per_page: 1000,
+            status: 1,
+        });
+
+        sectionOptions.value = data.data ?? [];
+
+    } catch (error) {
+
+        console.error("Failed to load sections:", error);
+
+        sectionOptions.value = [];
+    }
 }
 
 async function loadSubjects() {
+
     const { data } = await subjectApi.getAll({
         per_page: 1000,
         status: 1,
     });
 
-    subjectOptions.value = data.data;
+    subjectOptions.value = data.data ?? [];
 }
 
 async function loadTeachers() {
+
     const { data } = await teacherApi.getAll({
         per_page: 1000,
         status: 1,
     });
 
-    teacherOptions.value = data.data;
+    teacherOptions.value = data.data ?? [];
 }
 
-onMounted(() => {
-    loadClasses();
-    loadSections();
-    loadSubjects();
-    loadTeachers();
+watch(
+    () => form.class_id,
+    async (newClassId) => {
+
+        form.section_id = "";
+        sectionOptions.value = [];
+
+        if (!newClassId) {
+            return;
+        }
+
+        await loadSections();
+    }
+);
+
+onMounted(async () => {
+
+    await loadClasses();
+
+    await loadSubjects();
+
+    await loadTeachers();
+
+    // Important for Edit page
+    if (form.class_id) {
+        await loadSections();
+    }
+
 });
 </script>
-
 <template>
     <div class="row">
 
