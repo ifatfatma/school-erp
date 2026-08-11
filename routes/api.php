@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\ExamMarkController;
 use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ReportCardController;
 use App\Http\Controllers\Api\ResultGradeController;
+use App\Http\Controllers\Api\ExamRankController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
@@ -189,5 +190,13 @@ Route::apiResource(
 
 
 
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post(
+        '/exam-ranks/calculate',
+        [ExamRankController::class, 'calculate']
+    );
+
+});
 
 });

@@ -312,7 +312,7 @@ onMounted(() => {
                 <!-- Subjects -->
 
                 <div class="table-responsive">
-
+ 
                     <table
                         class="table table-bordered text-center align-middle"
                     >

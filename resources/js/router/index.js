@@ -508,25 +508,6 @@ const routes = [
                         permission: "exam-mark.view",
                     },
             },{
-                path: "/grades",
-                children: [
-                    {
-                        path: "",
-                        name: "grades.index",
-                        component: () => import("@/pages/grades/Index.vue"),
-                    },
-                    {
-                        path: "create",
-                        name: "grades.create",
-                        component: () => import("@/pages/grades/Create.vue"),
-                    },                    
-                    {
-                        path: ":id/edit",
-                        name: "grades.edit",
-                        component: () => import("@/pages/grades/Edit.vue"),
-                    },
-                ],
-            },{
                 path: "/report-cards",
                 children: [
                     {

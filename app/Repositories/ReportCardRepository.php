@@ -24,11 +24,15 @@ class ReportCardRepository
             ->findOrFail($studentId);
 
         $exam = Exam::query()
-            ->where(
-                'school_id',
-                auth()->user()->school_id
-            )
-            ->findOrFail($examId);
+    ->where(
+        'school_id',
+        auth()->user()->school_id
+    )
+    ->with([
+        'academicSession',
+        'examType',
+    ])
+    ->findOrFail($examId);
 
         /*
         |--------------------------------------------------------------------------
