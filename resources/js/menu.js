@@ -139,6 +139,11 @@ export default [
                 permission: "grade.view",
             },
             {
+                title: "Result Grades",
+                route: "/result-grades",
+                permission: "result_grades.view",
+            },
+            {
                 title: "Report Cards",
                 route: "/report-cards",
                 permission: "report_card.view",

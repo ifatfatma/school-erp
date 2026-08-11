@@ -120,67 +120,64 @@ class ExamMarkRepository
     /**
      * Bulk Save
      */
-    public function save(
-        int $scheduleId,
-        array $rows,
-        int $schoolId,
-        int $userId
-    ): void {
+   /**
+ * Bulk Save
+ */
+public function save(
+    int $scheduleId,
+    array $rows,
+    int $schoolId,
+    int $userId
+): void {
 
-        DB::transaction(function () use (
-            $scheduleId,
-            $rows,
-            $schoolId,
-            $userId
-        ) {
+    DB::transaction(function () use (
+        $scheduleId,
+        $rows,
+        $schoolId,
+        $userId
+    ) {
 
-            foreach ($rows as $row) {
+        foreach ($rows as $row) {
 
-                ExamMark::updateOrCreate(
+            ExamMark::updateOrCreate(
 
-                    [
+                [
+                    'exam_schedule_id' => $scheduleId,
+                    'student_id' => $row['student_id'],
+                ],
 
-                        'exam_schedule_id' => $scheduleId,
+                [
+                    'school_id' => $schoolId,
 
-                        'student_id' => $row['student_id']
-
-                    ],
-
-                    [
-
-                        'school_id' => $schoolId,
-
-                        'theory_marks' =>
+                    'theory_marks' =>
                         $row['theory_marks'] ?? 0,
 
-                        'practical_marks' =>
+                    'practical_marks' =>
                         $row['practical_marks'] ?? 0,
 
-                        'viva_marks' =>
+                    'viva_marks' =>
                         $row['viva_marks'] ?? 0,
 
-                        'project_marks' =>
+                    'project_marks' =>
                         $row['project_marks'] ?? 0,
 
-                        'total_marks' =>
+                    'total_marks' =>
                         $row['total_marks'] ?? 0,
 
-                        'attendance' =>
-                        $row['attendance'],
+                    'attendance' =>
+                        $row['attendance'] ?? 'Present',
 
-                        'remarks' =>
+                    'remarks' =>
                         $row['remarks'] ?? null,
 
-                        'updated_by' => $userId,
+                    'updated_by' => $userId,
 
-                        'created_by' => $userId,
-
-                    ]
-
-                );
-            }
-        });
-    }
+                    'created_by' => $userId,
+                ]
+            );
+        }
+    });
+}
 
     /**
      * Student Result

@@ -7,7 +7,10 @@ export default {
     },
 
     save(data) {
-        return api.post("/exam-marks/save", data);
+    return api.post("/exam-marks/save", {
+        exam_schedule_id: data.exam_schedule_id,
+        marks: data.marks
+    });
     },
 
     student(studentId) {

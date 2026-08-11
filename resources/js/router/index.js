@@ -541,6 +541,25 @@ const routes = [
                             import("@/pages/report-cards/Show.vue"),
                     },
                 ],
+            },{
+                path: "/result-grades",
+                children: [
+                    {
+                        path: "",
+                        name: "result-grades.index",
+                        component: () => import("@/pages/result-grades/Index.vue"),
+                    },
+                    {
+                        path: "create",
+                        name: "result-grades.create",
+                        component: () => import("@/pages/result-grades/Create.vue"),
+                    },                    
+                    {
+                        path: ":id/edit",
+                        name: "result-grades.edit",
+                        component: () => import("@/pages/result-grades/Edit.vue"),
+                    },
+                ],
             }
         ],
     },

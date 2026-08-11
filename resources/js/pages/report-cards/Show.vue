@@ -642,20 +642,96 @@ onMounted(() => {
     background: #fff;
 }
 
+/* Normal screen */
+.no-print {
+    display: flex;
+}
+
+/* PRINT */
 @media print {
 
-    .no-print {
-        display: none !important;
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
     }
 
+    /*
+     * Hide everything outside the report card.
+     */
+    :global(body *) {
+        visibility: hidden !important;
+    }
+
+    /*
+     * Show only report card.
+     */
+    .report-card-container,
+    .report-card-container * {
+        visibility: visible !important;
+    }
+
+    /*
+     * Put report at the top-left of the paper.
+     */
     .report-card-container {
-        max-width: 100%;
-        margin: 0;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+
+        width: 100% !important;
+        max-width: none !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     .report-card {
+        width: 100% !important;
+
         border: none !important;
         box-shadow: none !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /*
+     * Hide buttons.
+     */
+    .no-print {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /*
+     * Remove Bootstrap/card spacing that can
+     * create unnecessary print space.
+     */
+    .card-body {
+        padding: 0 !important;
+    }
+
+    /*
+     * Keep table rows together where possible.
+     */
+    table {
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    /*
+     * Prevent report heading from separating.
+     */
+    .report-card-container {
+        break-inside: avoid;
     }
 
     body {

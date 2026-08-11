@@ -1,12 +1,13 @@
 <script setup>
 import { reactive, onMounted, watch,ref } from "vue";
-
+import examMarkApi from "@/api/examMark";
 import { useExamMarkStore } from "@/stores/examMark";
 import { useAcademicSessionStore } from "@/stores/academicSession";
 import { useExamStore } from "@/stores/exam";
 import { useClassStore } from "@/stores/class";
 import { useSectionStore } from "@/stores/section";
 import { useExamSubjectStore } from "@/stores/examSubject";
+import resultGradeApi from "@/api/resultGrade";
 const grades = ref([]);
 const markStore = useExamMarkStore();
 
@@ -30,6 +31,7 @@ onMounted(async () => {
         sessionStore.active(),
         examStore.active(),
         classStore.active(),
+        loadGrades(),
     ]);
 
 });
@@ -76,6 +78,32 @@ watch(
     }
 );
 
+async function loadGrades() {
+
+    try {
+
+        const { data } =
+            await resultGradeApi.active();
+
+        console.log(
+            "Result Grades:",
+            data
+        );
+
+        grades.value =
+            data.data ?? [];
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load result grades:",
+            error
+        );
+
+        grades.value = [];
+    }
+}
+
 async function loadStudents() {
 
     if (
@@ -99,28 +127,237 @@ async function loadStudents() {
 }
 
 
+
+
 function calculate(student) {
 
+    // Calculate total
     student.total_marks =
         Number(student.obtained_theory || 0) +
         Number(student.obtained_practical || 0) +
         Number(student.obtained_viva || 0) +
         Number(student.obtained_project || 0);
 
-}
 
-async function saveMarks() {
+    // Get full marks from schedule
+    const fullMarks = Number(
+        markStore.schedule?.exam_subject?.full_marks
+        ??
+        markStore.schedule?.full_marks
+        ??
+        0
+    );
 
-    await markStore.save({
 
-        ...filter,
+    // Calculate percentage
+    student.percentage =
+        fullMarks > 0
+            ? Number(
+                (
+                    student.total_marks /
+                    fullMarks *
+                    100
+                ).toFixed(2)
+            )
+            : 0;
 
-        students: markStore.students
+
+    // Find grade
+    const grade = grades.value.find(g => {
+
+        const min =
+            Number(g.min_percentage);
+
+        const max =
+            Number(g.max_percentage);
+
+        return (
+            student.percentage >= min &&
+            student.percentage <= max
+        );
 
     });
 
-    alert("Marks saved successfully.");
 
+    // Set grade
+    student.grade =
+        grade
+            ? grade.name
+            : "-";
+
+
+    // Set grade point
+    student.grade_point =
+        grade
+            ? Number(grade.grade_point)
+            : 0;
+
+
+    // Set result
+    student.result =
+        grade
+            ? (
+                grade.is_pass
+                    ? "Pass"
+                    : "Fail"
+            )
+            : "-";
+
+
+    console.log(
+        "Grade calculation:",
+        {
+            total: student.total_marks,
+            fullMarks,
+            percentage: student.percentage,
+            grade,
+            result: student.result,
+        }
+    );
+}
+async function saveMarks() {
+
+    try {
+
+        // 1. Get the exam schedule first
+        const response = await examMarkApi.load({
+            academic_session_id: filter.academic_session_id,
+            exam_id: filter.exam_id,
+            class_id: filter.class_id,
+            section_id: filter.section_id,
+            subject_id: filter.subject_id,
+        });
+
+        console.log(
+            "Schedule response before save:",
+            response.data
+        );
+
+        const schedule =
+            response.data?.data?.schedule;
+
+        if (!schedule?.id) {
+
+            alert(
+                "Exam schedule not found for the selected Exam, Class, Section and Subject."
+            );
+
+            return;
+        }
+
+        const scheduleId =
+            Number(schedule.id);
+
+        console.log(
+            "Exam Schedule ID:",
+            scheduleId
+        );
+
+
+        // 2. Get students from the store
+        if (!markStore.students?.length) {
+
+            alert("No students found.");
+
+            return;
+        }
+
+
+        // 3. Prepare marks
+        const marks =
+            markStore.students.map(student => ({
+
+                student_id:
+                    Number(student.id),
+
+                theory_marks:
+                    Number(
+                        student.obtained_theory || 0
+                    ),
+
+                practical_marks:
+                    Number(
+                        student.obtained_practical || 0
+                    ),
+
+                viva_marks:
+                    Number(
+                        student.obtained_viva || 0
+                    ),
+
+                project_marks:
+                    Number(
+                        student.obtained_project || 0
+                    ),
+
+                total_marks:
+                    Number(
+                        student.total_marks || 0
+                    ),
+
+                percentage:
+                    Number(
+                        student.percentage || 0
+                    ),
+
+                grade:
+                    student.grade || null,
+
+                grade_point:
+                    Number(
+                        student.grade_point || 0
+                    ),
+
+                result:
+                    student.result || null,
+
+                attendance:
+                    student.attendance || "Present",
+
+                remarks:
+                    student.remarks || null,
+
+            }));
+
+
+        // 4. FINAL PAYLOAD
+        const payload = {
+
+            exam_schedule_id:
+                scheduleId,
+
+            marks:
+                marks,
+
+        };
+
+
+        console.log(
+            "FINAL SAVE PAYLOAD:",
+            JSON.stringify(
+                payload,
+                null,
+                2
+            )
+        );
+
+
+        // 5. Save
+        await examMarkApi.save(payload);
+
+        alert(
+            "Marks saved successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Save marks error:",
+            error.response?.data || error
+        );
+
+    }
 }
 </script>
 

@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\ExamSubjectController;
 use App\Http\Controllers\Api\ExamMarkController;
 use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ReportCardController;
+use App\Http\Controllers\Api\ResultGradeController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
@@ -176,5 +177,17 @@ Route::get(
 );
     // Optional restore route
     Route::post('schools/{id}/restore', [SchoolController::class, 'restore'])->name('schools.restore');
-    
+    Route::get(
+    'result-grades/active',
+    [ResultGradeController::class, 'active']
+);
+
+Route::apiResource(
+    'result-grades',
+    ResultGradeController::class
+);
+
+
+
+
 });

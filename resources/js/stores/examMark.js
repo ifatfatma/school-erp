@@ -4,42 +4,60 @@ import examMarkApi from "@/api/examMark";
 export const useExamMarkStore = defineStore("examMark", {
 
     state: () => ({
-
         schedule: null,
-
         students: [],
-
-        marks: {},
+        marks: [],
 
         loading: false,
-
         saving: false,
-
-        errors: {}
-
+        errors: {},
     }),
 
     actions: {
 
-        async load(filters = {}) {
+        async load(params = {}) {
 
             this.loading = true;
-
             this.errors = {};
 
             try {
 
-                const { data } = await examMarkApi.load(filters);
+                console.log("Marks filters:", params);
 
-                this.schedule = data.data?.schedule ?? null;
+                const { data } =
+                    await examMarkApi.load(params);
 
-                this.students = data.data?.students ?? [];
+                console.log(
+                    "Marks Entry Response:",
+                    data
+                );
 
-                this.marks = data.data?.marks ?? {};
+                // IMPORTANT
+                this.schedule =
+                    data.data?.schedule ?? null;
 
-                console.log("Marks Entry Response:", data);
+                this.students =
+                    data.data?.students ?? [];
 
-                console.log("Students:", this.students);
+                this.marks =
+                    data.data?.marks ?? [];
+
+                console.log(
+                    "Loaded Schedule:",
+                    this.schedule
+                );
+
+                console.log(
+                    "Loaded Schedule ID:",
+                    this.schedule?.id
+                );
+
+                console.log(
+                    "Students:",
+                    this.students
+                );
+
+                return data;
 
             } catch (error) {
 
@@ -51,20 +69,17 @@ export const useExamMarkStore = defineStore("examMark", {
             } finally {
 
                 this.loading = false;
-
             }
-
         },
 
-        async save(payload) {
+        async save(data) {
 
             this.saving = true;
-
             this.errors = {};
 
             try {
 
-                return await examMarkApi.save(payload);
+                return await examMarkApi.save(data);
 
             } catch (error) {
 
@@ -76,17 +91,7 @@ export const useExamMarkStore = defineStore("examMark", {
             } finally {
 
                 this.saving = false;
-
             }
-
         },
-
-        async student(studentId) {
-
-            return await examMarkApi.student(studentId);
-
-        }
-
-    }
-
+    },
 });
