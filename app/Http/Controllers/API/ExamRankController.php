@@ -16,6 +16,7 @@ class ExamRankController extends Controller
     public function calculate(Request $request)
     {
         $validated = $request->validate([
+
             'exam_id' => [
                 'required',
                 'integer',
@@ -33,17 +34,27 @@ class ExamRankController extends Controller
                 'integer',
                 'exists:sections,id',
             ],
+
         ]);
 
+
         $data = $this->service->calculate(
-            $validated['exam_id'],
-            $validated['class_id'],
-            $validated['section_id']
+
+            (int) $validated['exam_id'],
+
+            (int) $validated['class_id'],
+
+            (int) $validated['section_id']
+
         );
 
+
         return response()->json([
+
             'success' => true,
+
             'data' => $data,
+
         ]);
     }
 }

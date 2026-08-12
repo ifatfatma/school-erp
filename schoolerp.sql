@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 09, 2026 at 06:16 PM
+-- Generation Time: Aug 12, 2026 at 05:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -100,13 +100,6 @@ CREATE TABLE `cache` (
   `value` mediumtext NOT NULL,
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `cache`
---
-
-INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('school-erp-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:17:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"dashboard.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"school.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:13:\"school.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:13:\"school.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:13:\"school.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:12:\"student.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:14:\"student.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:14:\"student.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:8;a:4:{s:1:\"a\";i:9;s:1:\"b\";s:14:\"student.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:9;a:4:{s:1:\"a\";i:10;s:1:\"b\";s:12:\"teacher.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:10;a:4:{s:1:\"a\";i:11;s:1:\"b\";s:14:\"teacher.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:11;a:4:{s:1:\"a\";i:12;s:1:\"b\";s:14:\"teacher.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:12;a:4:{s:1:\"a\";i:13;s:1:\"b\";s:14:\"teacher.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:13;a:4:{s:1:\"a\";i:14;s:1:\"b\";s:10:\"class.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:14;a:4:{s:1:\"a\";i:15;s:1:\"b\";s:12:\"class.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:15;a:4:{s:1:\"a\";i:16;s:1:\"b\";s:12:\"class.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}i:16;a:4:{s:1:\"a\";i:17;s:1:\"b\";s:12:\"class.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:6;}}}s:5:\"roles\";a:1:{i:0;a:3:{s:1:\"a\";i:6;s:1:\"b\";s:11:\"Super Admin\";s:1:\"c\";s:7:\"sanctum\";}}}', 1786261735);
 
 -- --------------------------------------------------------
 
@@ -211,6 +204,42 @@ CREATE TABLE `exam_marks` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exam_marks`
+--
+
+INSERT INTO `exam_marks` (`id`, `school_id`, `exam_schedule_id`, `student_id`, `theory_marks`, `practical_marks`, `viva_marks`, `project_marks`, `total_marks`, `attendance`, `remarks`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 1, 90.00, 0.00, 0.00, 0.00, 90.00, 'Present', NULL, 1, 1, '2026-08-11 07:29:27', '2026-08-11 07:42:19', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_ranks`
+--
+
+CREATE TABLE `exam_ranks` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `academic_session_id` bigint(20) UNSIGNED NOT NULL,
+  `exam_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED NOT NULL,
+  `section_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `total_full_marks` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `total_obtained_marks` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `percentage` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `rank` int(10) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exam_ranks`
+--
+
+INSERT INTO `exam_ranks` (`id`, `school_id`, `academic_session_id`, `exam_id`, `class_id`, `section_id`, `student_id`, `total_full_marks`, `total_obtained_marks`, `percentage`, `rank`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 1, 1, 100.00, 90.00, 90.00, 1, '2026-08-12 07:32:07', '2026-08-12 07:32:07');
 
 -- --------------------------------------------------------
 
@@ -324,6 +353,107 @@ CREATE TABLE `failed_jobs` (
   `exception` longtext NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fee_payments`
+--
+
+CREATE TABLE `fee_payments` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `academic_session_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `receipt_no` varchar(100) NOT NULL,
+  `payment_date` date NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `payment_method` enum('Cash','Card','Bank Transfer','UPI','Cheque','Online','Other') NOT NULL DEFAULT 'Cash',
+  `transaction_no` varchar(150) DEFAULT NULL,
+  `bank_name` varchar(255) DEFAULT NULL,
+  `cheque_no` varchar(100) DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `status` enum('Success','Pending','Cancelled') NOT NULL DEFAULT 'Success',
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fee_payment_items`
+--
+
+CREATE TABLE `fee_payment_items` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `fee_payment_id` bigint(20) UNSIGNED NOT NULL,
+  `student_fee_due_id` bigint(20) UNSIGNED NOT NULL,
+  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fee_structures`
+--
+
+CREATE TABLE `fee_structures` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `academic_session_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED NOT NULL,
+  `fee_type_id` bigint(20) UNSIGNED NOT NULL,
+  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `effective_from` date DEFAULT NULL,
+  `effective_to` date DEFAULT NULL,
+  `due_day` int(11) DEFAULT NULL COMMENT 'Day of month when fee becomes due',
+  `late_fee` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `fee_structures`
+--
+
+INSERT INTO `fee_structures` (`id`, `school_id`, `academic_session_id`, `class_id`, `fee_type_id`, `amount`, `effective_from`, `effective_to`, `due_day`, `late_fee`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 5000.00, '2026-08-12', '2026-08-20', 10, 500.00, 1, 1, NULL, NULL, '2026-08-12 09:30:38', '2026-08-12 09:30:38');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fee_types`
+--
+
+CREATE TABLE `fee_types` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(50) DEFAULT NULL,
+  `frequency` enum('One Time','Monthly','Quarterly','Half Yearly','Yearly') NOT NULL DEFAULT 'Monthly',
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `fee_types`
+--
+
+INSERT INTO `fee_types` (`id`, `school_id`, `name`, `code`, `frequency`, `description`, `status`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Session Fee', 'SF', 'Quarterly', NULL, 1, 1, NULL, NULL, '2026-08-12 08:28:46', '2026-08-12 08:28:46');
 
 -- --------------------------------------------------------
 
@@ -523,7 +653,14 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (34, '2026_08_03_081328_add_description_to_exams_table', 20),
 (35, '2026_08_03_081630_add_is_result_published_to_exams_table', 21),
 (36, '2026_08_08_064821_create_exam_marks_table', 22),
-(37, '2026_08_09_144701_create_grades_table', 23);
+(37, '2026_08_09_144701_create_grades_table', 23),
+(38, '2026_08_10_145831_create_result_grades_table', 24),
+(39, '2026_08_11_162954_create_exam_ranks_table', 25),
+(40, '2026_08_12_133615_create_fee_types_table', 26),
+(41, '2026_08_12_133623_create_fee_structures_table', 27),
+(42, '2026_08_12_133631_create_student_fee_dues_table', 28),
+(43, '2026_08_12_133638_create_fee_payments_table', 29),
+(44, '2026_08_12_133646_create_fee_payment_items_table', 30);
 
 -- --------------------------------------------------------
 
@@ -629,7 +766,39 @@ CREATE TABLE `personal_access_tokens` (
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(2, 'App\\Models\\User', 1, 'admin', '1817b804e8fdf177bc933e45a4d691e9a5b6824d2db3d6d56d4fef03e09ae313', '[\"*\"]', '2026-08-09 10:35:38', NULL, '2026-08-09 07:49:05', '2026-08-09 10:35:38');
+(4, 'App\\Models\\User', 1, 'admin', '2abb3df2e8fa98c68f4e2b3723deb610d4c67b0fc39b6c55db873030376ff0d3', '[\"*\"]', '2026-08-12 10:08:48', NULL, '2026-08-11 06:07:39', '2026-08-12 10:08:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `result_grades`
+--
+
+CREATE TABLE `result_grades` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `min_percentage` decimal(5,2) NOT NULL,
+  `max_percentage` decimal(5,2) NOT NULL,
+  `grade_point` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `is_pass` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `result_grades`
+--
+
+INSERT INTO `result_grades` (`id`, `school_id`, `name`, `min_percentage`, `max_percentage`, `grade_point`, `is_pass`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'A+', 90.00, 100.00, 10.00, 1, 'test description', 1, 1, NULL, '2026-08-11 06:17:38', '2026-08-11 06:17:38', NULL),
+(2, 1, 'A', 70.00, 89.00, 8.00, 1, 'test', 1, 1, NULL, '2026-08-11 06:18:21', '2026-08-11 06:18:21', NULL),
+(3, 1, 'B', 60.00, 79.00, 7.00, 1, 'test', 1, 1, NULL, '2026-08-11 06:19:01', '2026-08-11 06:19:01', NULL);
 
 -- --------------------------------------------------------
 
@@ -777,10 +946,11 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('cjZq9zeHDSt3IPfN7qwHNRvjMAl9FxN96XCCpqyR', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRFZNOWJSNHFtMXVIVUg5WThvUm4wZWEzbFp4bm8zNzFlWUY0a2RydSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786281489),
-('gPZlcxwX6lH2yTgPNMByh52FiUFKkwFQhayTuadK', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMHh3R3hxVHZ4YU1rM2hBYVRpak1jQVlXakF2aXpRZVRGWGNZS0owSiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786195316),
-('iI0dkKDXGaA31CNB4vfTsRJ5AfUsuxVlT6pnavuH', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQmJXdFF1ZWVRaTN5Y1hzcTVnbzlyQnp3RHE2ZGxVWnVyejAwUm5ldCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786189633),
-('oj4th2zAyREUDe9MJEP29a7psGZDh71GOjBLRHMn', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiZVVGUU5jczluN0wxQktPSndiWWlIUXk4bWJSMEJ6cm01azkwM0ZiTiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC8ud2VsbC1rbm93bi9hcHBzcGVjaWZpYy9jb20uY2hyb21lLmRldnRvb2xzLmpzb24iO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786291562);
+('6FSEjxT1sMEJ3s0wycMh8uMOHE973qVoeREddit3', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicGRRWHJNRUF5R0lZM3lvbE1PdnpNWFhId3o2VlNrU0ViQWhmWmc3RyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9yZXBvcnQtY2FyZHMvMS8xIjtzOjU6InJvdXRlIjtOO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1786466113),
+('KpzlN3bY9DBwlFoVXwLC6mzUOwDOhOMtZl10kMAQ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibXNIN05kcHd4bWcyVVZTUVdBdll4QmdTNWE0ZDMzclpkQ05ReXRZRCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786539528),
+('qEyrx3upB8OkqLlbvCuHdUF32NO7UmGHTR8bVMl8', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQ0hUWVhHYXpoY2lTOFc5Z0tVQ0xpZnJDUEV6ZmJUUUJnZFdQVnFUZiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786462944),
+('t0TCSK84CE3gWiGeZIsGuLKMu0dThUQye75z4ajV', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiYVJaWTBhNlNlaDdaRzhrdnA5c05VUEhNVDJZcXgxTjgyaWg4ZllQUyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9mZWUtYXNzaWdubWVudHMiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786549120),
+('WNcLyWJApEXTYWk8948APG26woTDVKIAsLS8XfhY', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNFRQVlU0NElOQkRlQjBsV2xOUWttOWFiZ3NabTlsUlU1R2FPRzhIeiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786448181);
 
 -- --------------------------------------------------------
 
@@ -854,6 +1024,46 @@ CREATE TABLE `student_attendances` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_fee_dues`
+--
+
+CREATE TABLE `student_fee_dues` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `academic_session_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED NOT NULL,
+  `section_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `fee_type_id` bigint(20) UNSIGNED NOT NULL,
+  `fee_structure_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `fee_date` date NOT NULL,
+  `due_date` date DEFAULT NULL,
+  `period` varchar(50) DEFAULT NULL COMMENT 'Example: June 2026',
+  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `discount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `late_fee` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `net_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `paid_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `balance_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `status` enum('Pending','Partial','Paid','Cancelled') NOT NULL DEFAULT 'Pending',
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `student_fee_dues`
+--
+
+INSERT INTO `student_fee_dues` (`id`, `school_id`, `academic_session_id`, `student_id`, `class_id`, `section_id`, `fee_type_id`, `fee_structure_id`, `fee_date`, `due_date`, `period`, `amount`, `discount`, `late_fee`, `net_amount`, `paid_amount`, `balance_amount`, `status`, `remarks`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 1, 1, 1, '2026-08-15', NULL, 'August 2026', 5000.00, 0.00, 500.00, 5500.00, 0.00, 5500.00, 'Pending', NULL, 1, NULL, NULL, '2026-08-12 10:02:58', '2026-08-12 10:02:58');
 
 -- --------------------------------------------------------
 
@@ -1112,6 +1322,18 @@ ALTER TABLE `exam_marks`
   ADD KEY `exam_marks_updated_by_foreign` (`updated_by`);
 
 --
+-- Indexes for table `exam_ranks`
+--
+ALTER TABLE `exam_ranks`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `exam_rank_unique` (`exam_id`,`class_id`,`section_id`,`student_id`),
+  ADD KEY `exam_ranks_school_id_foreign` (`school_id`),
+  ADD KEY `exam_ranks_academic_session_id_foreign` (`academic_session_id`),
+  ADD KEY `exam_ranks_class_id_foreign` (`class_id`),
+  ADD KEY `exam_ranks_section_id_foreign` (`section_id`),
+  ADD KEY `exam_ranks_student_id_foreign` (`student_id`);
+
+--
 -- Indexes for table `exam_schedules`
 --
 ALTER TABLE `exam_schedules`
@@ -1142,6 +1364,47 @@ ALTER TABLE `exam_types`
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `fee_payments`
+--
+ALTER TABLE `fee_payments`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `fee_payments_school_id_receipt_no_unique` (`school_id`,`receipt_no`),
+  ADD KEY `fee_payments_academic_session_id_foreign` (`academic_session_id`),
+  ADD KEY `fee_payments_student_id_foreign` (`student_id`),
+  ADD KEY `fee_payments_created_by_foreign` (`created_by`),
+  ADD KEY `fee_payments_updated_by_foreign` (`updated_by`),
+  ADD KEY `fee_payments_school_id_student_id_payment_date_index` (`school_id`,`student_id`,`payment_date`);
+
+--
+-- Indexes for table `fee_payment_items`
+--
+ALTER TABLE `fee_payment_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fee_payment_items_student_fee_due_id_foreign` (`student_fee_due_id`),
+  ADD KEY `fee_payment_items_fee_payment_id_student_fee_due_id_index` (`fee_payment_id`,`student_fee_due_id`);
+
+--
+-- Indexes for table `fee_structures`
+--
+ALTER TABLE `fee_structures`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fee_structures_academic_session_id_foreign` (`academic_session_id`),
+  ADD KEY `fee_structures_class_id_foreign` (`class_id`),
+  ADD KEY `fee_structures_fee_type_id_foreign` (`fee_type_id`),
+  ADD KEY `fee_structures_created_by_foreign` (`created_by`),
+  ADD KEY `fee_structures_updated_by_foreign` (`updated_by`),
+  ADD KEY `fee_structures_school_id_academic_session_id_class_id_index` (`school_id`,`academic_session_id`,`class_id`);
+
+--
+-- Indexes for table `fee_types`
+--
+ALTER TABLE `fee_types`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fee_types_created_by_foreign` (`created_by`),
+  ADD KEY `fee_types_updated_by_foreign` (`updated_by`),
+  ADD KEY `fee_types_school_id_status_index` (`school_id`,`status`);
 
 --
 -- Indexes for table `grades`
@@ -1243,6 +1506,15 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_expires_at_index` (`expires_at`);
 
 --
+-- Indexes for table `result_grades`
+--
+ALTER TABLE `result_grades`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `result_grades_created_by_foreign` (`created_by`),
+  ADD KEY `result_grades_updated_by_foreign` (`updated_by`),
+  ADD KEY `result_grades_school_id_status_index` (`school_id`,`status`);
+
+--
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
@@ -1307,6 +1579,21 @@ ALTER TABLE `student_attendances`
   ADD KEY `student_attendances_student_id_attendance_date_index` (`student_id`,`attendance_date`),
   ADD KEY `student_attendances_class_id_section_id_index` (`class_id`,`section_id`),
   ADD KEY `student_attendances_attendance_date_status_index` (`attendance_date`,`status`);
+
+--
+-- Indexes for table `student_fee_dues`
+--
+ALTER TABLE `student_fee_dues`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `student_fee_dues_academic_session_id_foreign` (`academic_session_id`),
+  ADD KEY `student_fee_dues_class_id_foreign` (`class_id`),
+  ADD KEY `student_fee_dues_section_id_foreign` (`section_id`),
+  ADD KEY `student_fee_dues_fee_type_id_foreign` (`fee_type_id`),
+  ADD KEY `student_fee_dues_fee_structure_id_foreign` (`fee_structure_id`),
+  ADD KEY `student_fee_dues_created_by_foreign` (`created_by`),
+  ADD KEY `student_fee_dues_updated_by_foreign` (`updated_by`),
+  ADD KEY `student_fee_dues_school_id_academic_session_id_student_id_index` (`school_id`,`academic_session_id`,`student_id`),
+  ADD KEY `student_fee_dues_student_id_status_index` (`student_id`,`status`);
 
 --
 -- Indexes for table `student_guardians`
@@ -1417,7 +1704,13 @@ ALTER TABLE `exams`
 -- AUTO_INCREMENT for table `exam_marks`
 --
 ALTER TABLE `exam_marks`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `exam_ranks`
+--
+ALTER TABLE `exam_ranks`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `exam_schedules`
@@ -1442,6 +1735,30 @@ ALTER TABLE `exam_types`
 --
 ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `fee_payments`
+--
+ALTER TABLE `fee_payments`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `fee_payment_items`
+--
+ALTER TABLE `fee_payment_items`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `fee_structures`
+--
+ALTER TABLE `fee_structures`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `fee_types`
+--
+ALTER TABLE `fee_types`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `grades`
@@ -1477,7 +1794,7 @@ ALTER TABLE `leave_types`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -1489,7 +1806,13 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `result_grades`
+--
+ALTER TABLE `result_grades`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1520,6 +1843,12 @@ ALTER TABLE `students`
 --
 ALTER TABLE `student_attendances`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `student_fee_dues`
+--
+ALTER TABLE `student_fee_dues`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `student_guardians`
@@ -1600,6 +1929,17 @@ ALTER TABLE `exam_marks`
   ADD CONSTRAINT `exam_marks_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `exam_ranks`
+--
+ALTER TABLE `exam_ranks`
+  ADD CONSTRAINT `exam_ranks_academic_session_id_foreign` FOREIGN KEY (`academic_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_ranks_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_ranks_exam_id_foreign` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_ranks_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_ranks_section_id_foreign` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_ranks_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `exam_schedules`
 --
 ALTER TABLE `exam_schedules`
@@ -1619,6 +1959,42 @@ ALTER TABLE `exam_types`
   ADD CONSTRAINT `exam_types_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `exam_types_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `exam_types_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `fee_payments`
+--
+ALTER TABLE `fee_payments`
+  ADD CONSTRAINT `fee_payments_academic_session_id_foreign` FOREIGN KEY (`academic_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_payments_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fee_payments_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_payments_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_payments_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `fee_payment_items`
+--
+ALTER TABLE `fee_payment_items`
+  ADD CONSTRAINT `fee_payment_items_fee_payment_id_foreign` FOREIGN KEY (`fee_payment_id`) REFERENCES `fee_payments` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_payment_items_student_fee_due_id_foreign` FOREIGN KEY (`student_fee_due_id`) REFERENCES `student_fee_dues` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `fee_structures`
+--
+ALTER TABLE `fee_structures`
+  ADD CONSTRAINT `fee_structures_academic_session_id_foreign` FOREIGN KEY (`academic_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_structures_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_structures_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fee_structures_fee_type_id_foreign` FOREIGN KEY (`fee_type_id`) REFERENCES `fee_types` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_structures_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_structures_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `fee_types`
+--
+ALTER TABLE `fee_types`
+  ADD CONSTRAINT `fee_types_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fee_types_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fee_types_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `grades`
@@ -1668,6 +2044,14 @@ ALTER TABLE `model_has_roles`
   ADD CONSTRAINT `model_has_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `result_grades`
+--
+ALTER TABLE `result_grades`
+  ADD CONSTRAINT `result_grades_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `result_grades_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `result_grades_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `role_has_permissions`
 --
 ALTER TABLE `role_has_permissions`
@@ -1702,6 +2086,20 @@ ALTER TABLE `student_attendances`
   ADD CONSTRAINT `student_attendances_section_id_foreign` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `student_attendances_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `student_attendances_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `student_fee_dues`
+--
+ALTER TABLE `student_fee_dues`
+  ADD CONSTRAINT `student_fee_dues_academic_session_id_foreign` FOREIGN KEY (`academic_session_id`) REFERENCES `academic_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_fee_dues_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_fee_dues_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `student_fee_dues_fee_structure_id_foreign` FOREIGN KEY (`fee_structure_id`) REFERENCES `fee_structures` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `student_fee_dues_fee_type_id_foreign` FOREIGN KEY (`fee_type_id`) REFERENCES `fee_types` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_fee_dues_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_fee_dues_section_id_foreign` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `student_fee_dues_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_fee_dues_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `student_guardians`

@@ -1,11 +1,12 @@
-Examination
+Fee & Accounts
 │
-├── Exam Types
-├── Exams
-├── Exam Schedule
-├── Subjects
-├── Marks Entry
-├── Grade System
-├── Report Cards
-├── Rank Calculation
-└── Result Publish
+├── Fee Types
+├── Fee Structures
+├── Fee Assignments
+├── Fee Dues
+├── Fee Collection        ← current module
+├── Payment History
+├── Fee Receipts
+├── Discounts
+├── Late Fees
+└── Fee Reports

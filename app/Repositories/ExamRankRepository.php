@@ -2,13 +2,18 @@
 
 namespace App\Repositories;
 
+use App\Models\Exam;
 use App\Models\ExamMark;
 use App\Models\ExamRank;
 use App\Models\ExamSchedule;
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
 class ExamRankRepository
 {
+    /**
+     * Calculate ranks for one exam/class/section.
+     */
     public function calculate(
         int $examId,
         int $classId,
@@ -16,43 +21,124 @@ class ExamRankRepository
         int $schoolId
     ): array {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Exam
+        |--------------------------------------------------------------------------
+        */
+
+        $exam = Exam::query()
+            ->where('school_id', $schoolId)
+            ->findOrFail($examId);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validate Section belongs to Class
+        |--------------------------------------------------------------------------
+        */
+
+        $sectionExists = DB::table('sections')
+            ->where('id', $sectionId)
+            ->where('school_id', $schoolId)
+            ->where('class_id', $classId)
+            ->where('status', true)
+            ->exists();
+
+        if (!$sectionExists) {
+            abort(422, 'Selected section does not belong to selected class.');
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Exam schedules
+        |--------------------------------------------------------------------------
+        */
+
         $schedules = ExamSchedule::query()
             ->where('school_id', $schoolId)
             ->where('exam_id', $examId)
             ->where('class_id', $classId)
             ->where('section_id', $sectionId)
-            ->with(['examSubject','exam'])
+            ->with([
+                'examSubject',
+                'subject',
+            ])
+            ->orderBy('id')
             ->get();
+
+
+        if ($schedules->isEmpty()) {
+            return [];
+        }
+
 
         $scheduleIds = $schedules->pluck('id');
 
-        if ($scheduleIds->isEmpty()) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Students
+        |--------------------------------------------------------------------------
+        */
+
+        $students = Student::query()
+            ->where('school_id', $schoolId)
+            ->where(
+                'academic_session_id',
+                $exam->academic_session_id
+            )
+            ->where('class_id', $classId)
+            ->where('section_id', $sectionId)
+            ->where('status', true)
+            ->orderBy('roll_no')
+            ->get();
+
+
+        if ($students->isEmpty()) {
             return [];
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Marks
+        |--------------------------------------------------------------------------
+        */
 
         $marks = ExamMark::query()
             ->where('school_id', $schoolId)
             ->whereIn('exam_schedule_id', $scheduleIds)
-            ->with('student')
-            ->get();
+            ->whereIn(
+                'student_id',
+                $students->pluck('id')
+            )
+            ->get()
+            ->groupBy('student_id');
 
-        $students = [];
 
-        foreach ($marks->groupBy('student_id') as $studentId => $studentMarks) {
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate student totals
+        |--------------------------------------------------------------------------
+        */
+
+        $results = [];
+
+
+        foreach ($students as $student) {
+
+            $studentMarks =
+                $marks->get($student->id, collect());
+
 
             $totalFullMarks = 0;
-            $totalObtained = 0;
 
-            foreach ($studentMarks as $mark) {
+            $totalObtainedMarks = 0;
 
-                $schedule = $schedules->firstWhere(
-                    'id',
-                    $mark->exam_schedule_id
-                );
 
-                if (!$schedule) {
-                    continue;
-                }
+            foreach ($schedules as $schedule) {
 
                 $fullMarks = (float) (
                     $schedule->examSubject->full_marks
@@ -61,108 +147,267 @@ class ExamRankRepository
                 );
 
                 $totalFullMarks += $fullMarks;
-                $totalObtained += (float) $mark->total_marks;
+
+
+                $mark = $studentMarks->firstWhere(
+                    'exam_schedule_id',
+                    $schedule->id
+                );
+
+
+                if ($mark) {
+                    $totalObtainedMarks +=
+                        (float) $mark->total_marks;
+                }
             }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Percentage
+            |--------------------------------------------------------------------------
+            */
 
             $percentage = $totalFullMarks > 0
                 ? round(
-                    ($totalObtained / $totalFullMarks) * 100,
+                    ($totalObtainedMarks / $totalFullMarks) * 100,
                     2
                 )
                 : 0;
 
-            $student = $studentMarks->first()->student;
 
-            $students[] = [
-                'student_id' => $studentId,
-                'student' => $student,
-                'total_full_marks' => $totalFullMarks,
-                'total_obtained_marks' => $totalObtained,
-                'percentage' => $percentage,
+            /*
+            |--------------------------------------------------------------------------
+            | Determine whether marks are entered
+            |--------------------------------------------------------------------------
+            */
+
+            $enteredSubjects =
+                $studentMarks->count();
+
+
+            $results[] = [
+
+                'student_id' =>
+                    $student->id,
+
+                'student' =>
+                    $student,
+
+                'total_subjects' =>
+                    $schedules->count(),
+
+                'entered_subjects' =>
+                    $enteredSubjects,
+
+                'total_full_marks' =>
+                    $totalFullMarks,
+
+                'total_obtained_marks' =>
+                    $totalObtainedMarks,
+
+                'percentage' =>
+                    $percentage,
+
+                'rank' =>
+                    null,
+
             ];
         }
 
-        /*
-         * Highest percentage first.
-         */
-        usort(
-            $students,
-            fn ($a, $b) =>
-                $b['percentage'] <=> $a['percentage']
-        );
 
         /*
-         * Competition ranking:
-         *
-         * 95 = 1
-         * 90 = 2
-         * 90 = 2
-         * 85 = 4
-         */
+        |--------------------------------------------------------------------------
+        | Rank only students having marks
+        |--------------------------------------------------------------------------
+        */
+
+        $rankable = collect($results)
+            ->filter(function ($item) {
+
+                return $item['entered_subjects'] > 0;
+            })
+            ->sortByDesc('percentage')
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Competition Rank
+        |
+        | 95 = 1
+        | 90 = 2
+        | 90 = 2
+        | 85 = 4
+        |--------------------------------------------------------------------------
+        */
+
         $lastPercentage = null;
-        $rank = 0;
+        $currentRank = 0;
 
-        foreach ($students as $index => &$student) {
+
+        foreach ($rankable as $index => $item) {
 
             if (
                 $lastPercentage === null ||
-                $student['percentage'] != $lastPercentage
+                (float) $item['percentage'] !==
+                (float) $lastPercentage
             ) {
-                $rank = $index + 1;
+
+                $currentRank = $index + 1;
             }
 
-            $student['rank'] = $rank;
+
+            $resultsIndex = collect($results)
+                ->search(
+                    fn ($result) =>
+                        $result['student_id'] ===
+                        $item['student_id']
+                );
+
+
+            if ($resultsIndex !== false) {
+
+                $results[$resultsIndex]['rank'] =
+                    $currentRank;
+            }
+
 
             $lastPercentage =
-                $student['percentage'];
+                $item['percentage'];
         }
 
-        unset($student);
 
         /*
-         * Save ranks.
-         */
+        |--------------------------------------------------------------------------
+        | Sort final result
+        |--------------------------------------------------------------------------
+        */
+
+        usort(
+            $results,
+            function ($a, $b) {
+
+                /*
+                 * Ranked students first.
+                 */
+                if (
+                    $a['rank'] !== null &&
+                    $b['rank'] === null
+                ) {
+                    return -1;
+                }
+
+                if (
+                    $a['rank'] === null &&
+                    $b['rank'] !== null
+                ) {
+                    return 1;
+                }
+
+
+                /*
+                 * Percentage descending.
+                 */
+                if (
+                    $a['percentage'] !=
+                    $b['percentage']
+                ) {
+                    return
+                        $b['percentage']
+                        <=>
+                        $a['percentage'];
+                }
+
+
+                /*
+                 * Roll number.
+                 */
+                return
+                    ((int) ($a['student']->roll_no ?? 0))
+                    <=>
+                    ((int) ($b['student']->roll_no ?? 0));
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save ranks
+        |--------------------------------------------------------------------------
+        */
+
         DB::transaction(function () use (
-            $students,
+            $results,
+            $exam,
             $examId,
             $classId,
             $sectionId,
-            $schoolId,
-            $schedules
+            $schoolId
         ) {
 
-            $exam = $schedules->first()->exam;
+            foreach ($results as $result) {
 
-            foreach ($students as $student) {
+                /*
+                 * Don't save rank for students
+                 * without any marks.
+                 */
+                if ($result['rank'] === null) {
+
+                    ExamRank::query()
+                        ->where('exam_id', $examId)
+                        ->where('class_id', $classId)
+                        ->where('section_id', $sectionId)
+                        ->where(
+                            'student_id',
+                            $result['student_id']
+                        )
+                        ->delete();
+
+                    continue;
+                }
+
 
                 ExamRank::updateOrCreate(
+
                     [
-                        'exam_id' => $examId,
-                        'class_id' => $classId,
-                        'section_id' => $sectionId,
-                        'student_id' => $student['student_id'],
+                        'exam_id' =>
+                            $examId,
+
+                        'class_id' =>
+                            $classId,
+
+                        'section_id' =>
+                            $sectionId,
+
+                        'student_id' =>
+                            $result['student_id'],
                     ],
+
                     [
-                        'school_id' => $schoolId,
+                        'school_id' =>
+                            $schoolId,
+
                         'academic_session_id' =>
                             $exam->academic_session_id,
 
                         'total_full_marks' =>
-                            $student['total_full_marks'],
+                            $result['total_full_marks'],
 
                         'total_obtained_marks' =>
-                            $student['total_obtained_marks'],
+                            $result['total_obtained_marks'],
 
                         'percentage' =>
-                            $student['percentage'],
+                            $result['percentage'],
 
                         'rank' =>
-                            $student['rank'],
+                            $result['rank'],
                     ]
                 );
             }
         });
 
-        return $students;
+
+        return $results;
     }
 }

@@ -541,7 +541,61 @@ const routes = [
                         component: () => import("@/pages/result-grades/Edit.vue"),
                     },
                 ],
-            }
+            },{
+                path: "/exam-ranks",
+                children: [
+                    {
+                        path: "",
+                        name: "exam-ranks.index",
+                        component: () =>
+                            import("@/pages/exam-ranks/Index.vue"),
+                    }
+                ],
+            },{
+                path: "/result-publish",
+                name: "result-publish.index",
+                component: () =>
+                    import("@/pages/result-publish/Index.vue"),
+            },{
+                path: "/fee-types",
+                name: "fee-types.index",
+                component: () =>
+                    import("@/pages/fee-types/Index.vue"),
+            },{
+                path: "/fee-types/create",
+                name: "fee-types.create",
+                component: () =>
+                    import("@/pages/fee-types/Create.vue"),
+            },{
+                path: "/fee-types/:id/edit",
+                name: "fee-types.edit",
+                component: () =>
+                    import("@/pages/fee-types/Edit.vue"),
+            },{
+                path: "/fee-structures",
+                children: [
+                    {
+                        path: "",
+                        name: "fee-structures.index",
+                        component: () => import("@/pages/fee-structures/Index.vue"),
+                    },
+                    {
+                        path: "create",
+                        name: "fee-structures.create",
+                        component: () => import("@/pages/fee-structures/Create.vue"),
+                    },                    
+                    {
+                        path: ":id/edit",
+                        name: "fee-structures.edit",
+                        component: () => import("@/pages/fee-structures/Edit.vue"),
+                    },
+                ],
+            },{
+                path: "/fee-assignments",
+                name: "fee-assignments.index",
+                component: () =>
+                    import("@/pages/fee-assignments/Index.vue"),
+            },
         ],
     },
     {

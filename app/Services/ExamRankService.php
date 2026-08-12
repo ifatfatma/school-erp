@@ -17,14 +17,11 @@ class ExamRankService
         int $sectionId
     ): array {
 
-        $schoolId =
-            auth()->user()->school_id;
-
         return $this->repository->calculate(
             $examId,
             $classId,
             $sectionId,
-            $schoolId
+            auth()->user()->school_id
         );
     }
 }

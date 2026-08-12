@@ -23,10 +23,14 @@ use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\ExamScheduleController;
 use App\Http\Controllers\Api\ExamSubjectController;
 use App\Http\Controllers\Api\ExamMarkController;
-use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ReportCardController;
 use App\Http\Controllers\Api\ResultGradeController;
 use App\Http\Controllers\Api\ExamRankController;
+use App\Http\Controllers\Api\FeeCollectionController;
+use App\Http\Controllers\Api\FeeTypeController;
+use App\Http\Controllers\Api\FeeStructureController;
+use App\Http\Controllers\Api\FeeAssignmentController;
+
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
@@ -162,15 +166,6 @@ Route::prefix('exam-marks')->group(function () {
 
 
 
-Route::get(
-    'grades/active',
-    [GradeController::class, 'active']
-);
-
-Route::apiResource(
-    'grades',
-    GradeController::class
-);
 
 Route::get(
     'report-cards/student/{student}/exam/{exam}',
@@ -190,12 +185,125 @@ Route::apiResource(
 
 
 
-Route::middleware('auth:sanctum')->group(function () {
-
-    Route::post(
+Route::post(
         '/exam-ranks/calculate',
         [ExamRankController::class, 'calculate']
     );
+
+
+
+Route::prefix('fee-collection')->group(function () {
+
+    Route::get('/students', [
+        FeeCollectionController::class,
+        'students'
+    ]);
+
+    Route::get('/student/{student}/dues', [
+        FeeCollectionController::class,
+        'dues'
+    ]);
+
+    Route::post('/collect', [
+        FeeCollectionController::class,
+        'collect'
+    ]);
+
+    Route::get('/{payment}', [
+        FeeCollectionController::class,
+        'show'
+    ]);
+
+    Route::get('/{payment}/receipt', [
+        FeeCollectionController::class,
+        'receipt'
+    ]);
+
+});
+
+
+
+Route::prefix('fee-types')->group(function () {
+
+    Route::get('/', [
+        FeeTypeController::class,
+        'index'
+    ]);
+
+    Route::post('/', [
+        FeeTypeController::class,
+        'store'
+    ]);
+
+    Route::get('/{id}', [
+        FeeTypeController::class,
+        'show'
+    ]);
+
+    Route::put('/{id}', [
+        FeeTypeController::class,
+        'update'
+    ]);
+
+    Route::delete('/{id}', [
+        FeeTypeController::class,
+        'destroy'
+    ]);
+
+});
+
+
+Route::prefix('fee-structures')->group(function () {
+
+    Route::get('/', [
+        FeeStructureController::class,
+        'index'
+    ]);
+
+    Route::post('/', [
+        FeeStructureController::class,
+        'store'
+    ]);
+
+    Route::get('/{id}', [
+        FeeStructureController::class,
+        'show'
+    ]);
+
+    Route::put('/{id}', [
+        FeeStructureController::class,
+        'update'
+    ]);
+
+    Route::delete('/{id}', [
+        FeeStructureController::class,
+        'destroy'
+    ]);
+
+});
+
+
+Route::prefix('fee-assignments')->group(function () {
+
+    Route::get('/', [
+        FeeAssignmentController::class,
+        'index'
+    ]);
+
+    Route::get('/students', [
+        FeeAssignmentController::class,
+        'students'
+    ]);
+
+    Route::post('/assign', [
+        FeeAssignmentController::class,
+        'assign'
+    ]);
+
+    Route::delete('/{id}', [
+        FeeAssignmentController::class,
+        'destroy'
+    ]);
 
 });
 

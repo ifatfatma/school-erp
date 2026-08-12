@@ -148,6 +148,11 @@ export default [
                 route: "/report-cards",
                 permission: "report_card.view",
             },
+            {
+                title: "Exam Ranks",
+                route: "/exam-ranks",
+                permission: "exam_ranks.index",
+            },
         ],
     },
 
@@ -156,9 +161,18 @@ export default [
         icon: "bi bi-cash-stack",
         children: [
             {
-                title: "Fee Collection",
-                route: "/fees",
-                permission: "fee.view",
+                title: "Fee Types",
+                route: "/fee-types",
+                permission: "fee_types.view",
+            },{
+                title: "Fee Structures",
+                route: "/fee-structures",
+                permission: "fee_structures.view",
+            },
+            {
+                title: "Fee Assignments",
+                route: "/fee-assignments",
+                permission: "fee-assignments.index",
             },
             {
                 title: "Expenses",
