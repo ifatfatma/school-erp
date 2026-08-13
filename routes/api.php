@@ -30,6 +30,10 @@ use App\Http\Controllers\Api\FeeCollectionController;
 use App\Http\Controllers\Api\FeeTypeController;
 use App\Http\Controllers\Api\FeeStructureController;
 use App\Http\Controllers\Api\FeeAssignmentController;
+use App\Http\Controllers\Api\FeeDueController;
+use App\Http\Controllers\Api\PaymentHistoryController;
+use App\Http\Controllers\Api\FeeReceiptController;
+use App\Http\Controllers\Api\DiscountController;
 
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -306,5 +310,100 @@ Route::prefix('fee-assignments')->group(function () {
     ]);
 
 });
+
+
+Route::prefix('fee-dues')->group(function () {
+
+    Route::get('/', [
+        FeeDueController::class,
+        'index'
+    ]);
+
+    Route::get('/summary', [
+        FeeDueController::class,
+        'summary'
+    ]);
+
+    Route::get('/{id}', [
+        FeeDueController::class,
+        'show'
+    ]);
+
+});
+
+
+
+Route::prefix('payment-history')->group(function () {
+
+    Route::get('/', [
+        PaymentHistoryController::class,
+        'index'
+    ]);
+
+    Route::get('/{id}', [
+        PaymentHistoryController::class,
+        'show'
+    ]);
+
+});
+
+
+Route::prefix('fee-receipts')->group(function () {
+
+        Route::get('/', [
+            FeeReceiptController::class,
+            'index'
+        ]);
+
+        Route::get('/{id}', [
+            FeeReceiptController::class,
+            'show'
+        ]);
+
+        Route::get('/{id}/pdf', [
+            FeeReceiptController::class,
+            'pdf'
+        ]);
+
+        Route::get('/{id}/download', [
+            FeeReceiptController::class,
+            'download'
+        ]);
+
+    });
+
+    Route::prefix('discounts')->group(function () {
+
+        Route::get('/', [
+            DiscountController::class,
+            'index'
+        ]);
+
+        Route::get('/{id}', [
+            DiscountController::class,
+            'show'
+        ]);
+
+        Route::post('/', [
+            DiscountController::class,
+            'store'
+        ]);
+
+        Route::put('/{id}', [
+            DiscountController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            DiscountController::class,
+            'destroy'
+        ]);
+
+        Route::patch('/{id}/toggle-status', [
+            DiscountController::class,
+            'toggleStatus'
+        ]);
+
+    });
 
 });

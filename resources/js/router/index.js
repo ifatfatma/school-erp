@@ -595,7 +595,42 @@ const routes = [
                 name: "fee-assignments.index",
                 component: () =>
                     import("@/pages/fee-assignments/Index.vue"),
-            },
+            },{
+                path: "/fee-dues",
+                name: "fee-dues.index",
+                component: () =>
+                    import(
+                        "@/pages/fee-dues/Index.vue"
+                    ),
+            },{
+                path: "/fee-collection",
+                name: "fee-collection.index",
+                component: () =>
+                    import(
+                        "@/pages/fee-collection/Index.vue"
+                    ),
+            },{
+                path: "/payment-history",
+                name: "payment-history",
+                component: () =>
+                    import(
+                        "@/pages/payment-history/Index.vue"
+                    )
+            },{
+                path: "/fee-receipts",
+                name: "fee-receipts",
+                component: () =>
+                    import(
+                        "@/pages/fee-receipts/Index.vue"
+                    )
+            },{
+                    path: "/discounts",
+                    name: "discounts",
+                    component: () =>
+                        import(
+                            "@/pages/discounts/Index.vue"
+                        )
+                }
         ],
     },
     {

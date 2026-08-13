@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 12, 2026 at 05:39 PM
+-- Generation Time: Aug 13, 2026 at 06:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -144,6 +144,36 @@ INSERT INTO `classes` (`id`, `school_id`, `name`, `numeric_name`, `remarks`, `st
 (4, 1, 'Class 3', 3, 'Class 3', 1, 1, NULL, '2026-08-08 02:26:16', '2026-08-08 02:26:16', NULL),
 (5, 1, 'Class 4', 4, 'Class 4', 1, 1, NULL, '2026-08-08 02:26:28', '2026-08-08 02:26:28', NULL),
 (6, 1, 'Class 5', 5, 'Class 5', 1, 1, NULL, '2026-08-08 02:26:40', '2026-08-08 02:26:40', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `discounts`
+--
+
+CREATE TABLE `discounts` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `discount_type` enum('Percentage','Fixed') NOT NULL,
+  `value` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `max_discount` decimal(10,2) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `discounts`
+--
+
+INSERT INTO `discounts` (`id`, `school_id`, `name`, `code`, `discount_type`, `value`, `max_discount`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'New Admission', 'NEW01', 'Percentage', 5.00, NULL, NULL, 1, 1, 1, '2026-08-13 09:44:29', '2026-08-13 09:44:29', NULL);
 
 -- --------------------------------------------------------
 
@@ -380,6 +410,13 @@ CREATE TABLE `fee_payments` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `fee_payments`
+--
+
+INSERT INTO `fee_payments` (`id`, `school_id`, `academic_session_id`, `student_id`, `receipt_no`, `payment_date`, `total_amount`, `payment_method`, `transaction_no`, `bank_name`, `cheque_no`, `remarks`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 'RCPT-2026-000001', '2026-08-13', 5500.00, 'Cash', NULL, NULL, NULL, NULL, 'Success', 1, 1, '2026-08-13 06:08:35', '2026-08-13 06:08:35');
+
 -- --------------------------------------------------------
 
 --
@@ -394,6 +431,13 @@ CREATE TABLE `fee_payment_items` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `fee_payment_items`
+--
+
+INSERT INTO `fee_payment_items` (`id`, `fee_payment_id`, `student_fee_due_id`, `amount`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 5500.00, '2026-08-13 06:08:35', '2026-08-13 06:08:35');
 
 -- --------------------------------------------------------
 
@@ -561,6 +605,31 @@ CREATE TABLE `job_batches` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `late_fees`
+--
+
+CREATE TABLE `late_fees` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `late_fee_type` enum('Fixed','Percentage') NOT NULL,
+  `value` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `grace_days` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `max_amount` decimal(10,2) DEFAULT NULL,
+  `per_day` tinyint(1) NOT NULL DEFAULT 0,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `leave_requests`
 --
 
@@ -660,7 +729,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (41, '2026_08_12_133623_create_fee_structures_table', 27),
 (42, '2026_08_12_133631_create_student_fee_dues_table', 28),
 (43, '2026_08_12_133638_create_fee_payments_table', 29),
-(44, '2026_08_12_133646_create_fee_payment_items_table', 30);
+(44, '2026_08_12_133646_create_fee_payment_items_table', 30),
+(45, '2026_08_13_150050_create_discounts_table', 31),
+(46, '2026_08_13_151552_create_late_fees_table', 32);
 
 -- --------------------------------------------------------
 
@@ -766,7 +837,7 @@ CREATE TABLE `personal_access_tokens` (
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(4, 'App\\Models\\User', 1, 'admin', '2abb3df2e8fa98c68f4e2b3723deb610d4c67b0fc39b6c55db873030376ff0d3', '[\"*\"]', '2026-08-12 10:08:48', NULL, '2026-08-11 06:07:39', '2026-08-12 10:08:48');
+(4, 'App\\Models\\User', 1, 'admin', '2abb3df2e8fa98c68f4e2b3723deb610d4c67b0fc39b6c55db873030376ff0d3', '[\"*\"]', '2026-08-13 09:44:29', NULL, '2026-08-11 06:07:39', '2026-08-13 09:44:29');
 
 -- --------------------------------------------------------
 
@@ -946,11 +1017,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('6FSEjxT1sMEJ3s0wycMh8uMOHE973qVoeREddit3', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicGRRWHJNRUF5R0lZM3lvbE1PdnpNWFhId3o2VlNrU0ViQWhmWmc3RyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9yZXBvcnQtY2FyZHMvMS8xIjtzOjU6InJvdXRlIjtOO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1786466113),
-('KpzlN3bY9DBwlFoVXwLC6mzUOwDOhOMtZl10kMAQ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibXNIN05kcHd4bWcyVVZTUVdBdll4QmdTNWE0ZDMzclpkQ05ReXRZRCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786539528),
-('qEyrx3upB8OkqLlbvCuHdUF32NO7UmGHTR8bVMl8', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQ0hUWVhHYXpoY2lTOFc5Z0tVQ0xpZnJDUEV6ZmJUUUJnZFdQVnFUZiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786462944),
-('t0TCSK84CE3gWiGeZIsGuLKMu0dThUQye75z4ajV', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiYVJaWTBhNlNlaDdaRzhrdnA5c05VUEhNVDJZcXgxTjgyaWg4ZllQUyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9mZWUtYXNzaWdubWVudHMiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786549120),
-('WNcLyWJApEXTYWk8948APG26woTDVKIAsLS8XfhY', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNFRQVlU0NElOQkRlQjBsV2xOUWttOWFiZ3NabTlsUlU1R2FPRzhIeiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786448181);
+('8sMUoCO1kNGGXjljpb34rKboGwZ07VLvJusITVgZ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUktieWVZSE1kdTZVVzhnWXJIV2RuM2NnckVubWNhSnBOcnpLTVNpTyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9mZWUtcmVjZWlwdHMiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786633929);
 
 -- --------------------------------------------------------
 
@@ -1063,7 +1130,7 @@ CREATE TABLE `student_fee_dues` (
 --
 
 INSERT INTO `student_fee_dues` (`id`, `school_id`, `academic_session_id`, `student_id`, `class_id`, `section_id`, `fee_type_id`, `fee_structure_id`, `fee_date`, `due_date`, `period`, `amount`, `discount`, `late_fee`, `net_amount`, `paid_amount`, `balance_amount`, `status`, `remarks`, `created_by`, `updated_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, 1, 1, 1, 1, '2026-08-15', NULL, 'August 2026', 5000.00, 0.00, 500.00, 5500.00, 0.00, 5500.00, 'Pending', NULL, 1, NULL, NULL, '2026-08-12 10:02:58', '2026-08-12 10:02:58');
+(1, 1, 1, 1, 1, 1, 1, 1, '2026-08-15', NULL, 'August 2026', 5000.00, 0.00, 500.00, 5500.00, 5500.00, 0.00, 'Paid', NULL, 1, 1, NULL, '2026-08-12 10:02:58', '2026-08-13 06:08:35');
 
 -- --------------------------------------------------------
 
@@ -1300,6 +1367,14 @@ ALTER TABLE `classes`
   ADD KEY `classes_school_id_foreign` (`school_id`);
 
 --
+-- Indexes for table `discounts`
+--
+ALTER TABLE `discounts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `discounts_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `discounts_school_id_code_index` (`school_id`,`code`);
+
+--
 -- Indexes for table `exams`
 --
 ALTER TABLE `exams`
@@ -1439,6 +1514,14 @@ ALTER TABLE `jobs`
 --
 ALTER TABLE `job_batches`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `late_fees`
+--
+ALTER TABLE `late_fees`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `late_fees_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `late_fees_school_id_code_index` (`school_id`,`code`);
 
 --
 -- Indexes for table `leave_requests`
@@ -1695,6 +1778,12 @@ ALTER TABLE `classes`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT for table `discounts`
+--
+ALTER TABLE `discounts`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `exams`
 --
 ALTER TABLE `exams`
@@ -1740,13 +1829,13 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `fee_payments`
 --
 ALTER TABLE `fee_payments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `fee_payment_items`
 --
 ALTER TABLE `fee_payment_items`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `fee_structures`
@@ -1779,6 +1868,12 @@ ALTER TABLE `jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `late_fees`
+--
+ALTER TABLE `late_fees`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
@@ -1794,7 +1889,7 @@ ALTER TABLE `leave_types`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -1909,6 +2004,12 @@ ALTER TABLE `classes`
   ADD CONSTRAINT `classes_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `discounts`
+--
+ALTER TABLE `discounts`
+  ADD CONSTRAINT `discounts_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `exams`
 --
 ALTER TABLE `exams`
@@ -2011,6 +2112,12 @@ ALTER TABLE `guardians`
   ADD CONSTRAINT `guardians_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `guardians_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `guardians_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `late_fees`
+--
+ALTER TABLE `late_fees`
+  ADD CONSTRAINT `late_fees_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `leave_requests`

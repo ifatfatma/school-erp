@@ -23,13 +23,68 @@ class FeePayment extends Model
         'updated_by',
     ];
 
+    protected $casts = [
+        'payment_date' => 'date',
+        'total_amount' => 'decimal:2',
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Student
+    |--------------------------------------------------------------------------
+    */
+
     public function student()
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(
+            Student::class,
+            'student_id'
+        );
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Items
+    |--------------------------------------------------------------------------
+    */
 
     public function items()
     {
-        return $this->hasMany(FeePaymentItem::class);
+        return $this->hasMany(
+            FeePaymentItem::class,
+            'fee_payment_id'
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Creator
+    |--------------------------------------------------------------------------
+    */
+
+    public function creator()
+    {
+        return $this->belongsTo(
+            User::class,
+            'created_by'
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Updater
+    |--------------------------------------------------------------------------
+    */
+
+    public function updater()
+    {
+        return $this->belongsTo(
+            User::class,
+            'updated_by'
+        );
     }
 }

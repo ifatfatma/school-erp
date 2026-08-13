@@ -170,9 +170,34 @@ export default [
                 permission: "fee_structures.view",
             },
             {
+                title: "Fee Dues",
+                route: "/fee-dues",
+                permission: "fee-dues.index",
+            },
+            {
                 title: "Fee Assignments",
                 route: "/fee-assignments",
                 permission: "fee-assignments.index",
+            },
+            {
+                title: "Fee Collection",
+                route: "/fee-collection",
+                permission: "fee-collection.index",
+            },
+            {
+                title: "Payment History",
+                route: "/payment-history",
+                permission: "payment-history.index",
+            },
+            {
+                title: "Fee Receipts",
+                route: "/fee-receipts",
+                permission: "fee-receipts.index",
+            },
+            {
+                title: "Discounts",
+                route: "/discounts",
+                permission: "discounts.index",
             },
             {
                 title: "Expenses",

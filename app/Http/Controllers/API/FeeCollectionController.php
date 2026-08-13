@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\FeeCollectionService;
 use Illuminate\Http\Request;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class FeeCollectionController extends Controller
 {
     public function __construct(
@@ -100,10 +100,23 @@ class FeeCollectionController extends Controller
     }
 
     public function receipt(int $payment)
-    {
-        return response()->json([
-            'success' => true,
-            'data' => $this->service->receipt($payment),
-        ]);
-    }
+{
+    $paymentData = $this->service->receipt($payment);
+
+    $pdf = Pdf::loadView(
+        'fee-collection.receipt',
+        [
+            'payment' => $paymentData
+        ]
+    );
+
+    $pdf->setPaper(
+        'A4',
+        'portrait'
+    );
+
+    return $pdf->download(
+        $paymentData->receipt_no . '.pdf'
+    );
+}
 }

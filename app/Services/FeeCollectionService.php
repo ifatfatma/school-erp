@@ -38,9 +38,7 @@ class FeeCollectionService
     }
 
     public function receipt(int $paymentId)
-    {
-        return $this->repository->receipt(
-            $paymentId
-        );
-    }
+{
+    return $this->repository->receipt($paymentId);
+}
 }

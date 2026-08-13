@@ -12,12 +12,31 @@ class FeePaymentItem extends Model
         'amount',
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:2',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment
+    |--------------------------------------------------------------------------
+    */
+
     public function payment()
     {
-        return $this->belongsTo(FeePayment::class);
+        return $this->belongsTo(
+            FeePayment::class,
+            'fee_payment_id'
+        );
     }
 
-    public function due()
+    /*
+    |--------------------------------------------------------------------------
+    | Fee Due
+    |--------------------------------------------------------------------------
+    */
+
+    public function feeDue()
     {
         return $this->belongsTo(
             StudentFeeDue::class,
