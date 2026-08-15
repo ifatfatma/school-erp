@@ -200,32 +200,93 @@ export default [
                 permission: "discounts.index",
             },
             {
-                title: "Expenses",
-                route: "/expenses",
-                permission: "expense.view",
+                title: "Late Fees",
+                route: "/late-fees",
+                permission: "late-fees.index",
             },
             {
-                title: "Income",
-                route: "/income",
-                permission: "income.view",
-            },
+                title: "Fee Reports",
+                route: "/fee-reports",
+                permission: "fee-reports.index",
+            }
         ],
     },
-
+     {
+        title: "Expense Management",
+        icon: "bi bi-cash-stack",
+        children: [
+            {
+                title: "Expense Categories",
+                route: "/expense-categories",
+                permission: "expense_categories.view",
+            },
+            {
+                title: "Expenses",
+                route: "/expenses",
+                permission: "expenses.view",
+            },
+            {
+                title: "Expense Payments",
+                route: "/expense-payments",
+                permission: "expense_payments.view",
+            },{
+                title: "Recurring Expenses",
+                route: "/recurring-expenses",
+                permission: "recurring_expenses.view",
+            },{
+                title: "Expense Reports",
+                route: "/expense-reports",
+                permission: "expense_reports.view",
+            },
+        ]
+    },
+    ,
+     {
+        title: "Income Management",
+        icon: "bi bi-cash-stack",
+        children: [
+                {
+                    title: "Income Categories",
+                    route: "/income-categories",
+                    permission: "income_categories.view",
+                },{
+                    title: "Income Entries",
+                    route: "/incomes",
+                    permission: "incomes.view",
+                },{
+                    title: "Income Payments",
+                    route: "/income-payments",
+                    permission: "income_payments.view",
+                },{
+                    title: "Recurring Income",
+                    route: "/recurring-incomes",
+                    permission: "recurring_incomes.view",
+                },{
+                    title: "Income Reports",
+                    route: "/income-reports",
+                    permission: "income_reports.view",
+                }
+        ]
+    },
     {
         title: "Library",
         icon: "bi bi-journal-bookmark",
         children: [
-            {
-                title: "Books",
-                route: "/library/books",
-                permission: "library.view",
-            },
-            {
-                title: "Categories",
-                route: "/library/categories",
-                permission: "book_category.view",
-            },
+                {
+                    title: "Authors",
+                    route: "/authors",
+                    permission: "authors.view",
+                },
+                {
+                    title: "Books",
+                    route: "/library/books",
+                    permission: "library.view",
+                },
+                {
+                    title: "Categories",
+                    route: "/book-categories",
+                    permission: "book_category.view",
+                },
         ],
     },
 

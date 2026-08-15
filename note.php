@@ -1,12 +1,15 @@
-Fee & Accounts
+Library
 │
-├── Fee Types
-├── Fee Structures
-├── Fee Assignments
-├── Fee Dues
-├── Fee Collection        ← current module
-├── Payment History
-├── Fee Receipts
-├── Discounts
-├── Late Fees
-└── Fee Reports
+├── Book Categories
+├── Authors
+├── Publishers
+├── Books
+├── Book Copies
+├── Library Members
+├── Book Issue
+├── Book Return
+├── Book Renewal
+├── Lost / Damaged Books
+├── Library Fines
+├── Fine Collection
+└── Library Reports

@@ -630,7 +630,106 @@ const routes = [
                         import(
                             "@/pages/discounts/Index.vue"
                         )
-                }
+                },{
+                    path: "/late-fees",
+                    name: "late-fees",
+                    component: () =>
+                        import(
+                            "@/pages/late-fees/Index.vue"
+                        )
+                },{
+                    path: "/fee-reports",
+                    name: "fee-reports",
+                    component: () =>
+                        import(
+                            "@/pages/fee-reports/Index.vue"
+                        )
+                },{
+                    path: "/expense-categories",
+                    name: "expense-categories",
+                    component: () =>
+                        import(
+                            "@/pages/expense-categories/Index.vue"
+                        )
+                },{
+                    path: "/expenses",
+                    name: "expenses",
+                    component: () =>
+                        import(
+                            "@/pages/expenses/Index.vue"
+                        )
+                },{
+                    path: "/expense-payments",
+                    name: "expense-payments",
+                    component: () =>
+                        import(
+                            "@/pages/expense-payments/Index.vue"
+                        )
+                },{
+                    path: "/recurring-expenses",
+                    name: "recurring-expenses",
+                    component: () =>
+                        import(
+                            "@/pages/recurring-expenses/Index.vue"
+                        )
+                },{
+                    path: "/expense-reports",
+                    name: "expense-reports",
+                    component: () =>
+                        import(
+                            "@/pages/expense-reports/Index.vue"
+                        )
+                },{
+                        path: "/income-categories",
+                        name: "income-categories",
+                        component: () =>
+                            import(
+                                "@/pages/income-categories/Index.vue"
+                            )
+                    },{
+                        path: "/incomes",
+                        name: "incomes",
+                        component: () =>
+                            import(
+                                "@/pages/incomes/Index.vue"
+                            )
+                    },{
+                        path: "/income-payments",
+                        name: "income-payments",
+                        component: () =>
+                            import(
+                                "@/pages/income-payments/Index.vue"
+                            )
+                    },{
+                        path: "/recurring-incomes",
+                        name: "recurring-incomes",
+                        component: () =>
+                            import(
+                                "@/pages/recurring-incomes/Index.vue"
+                            )
+                    },
+                    {
+                        path: "/income-reports",
+                        name: "income-reports",
+                        component: () =>
+                            import(
+                                "@/pages/income-reports/Index.vue"
+                            )
+                    },{
+                        path: "/authors",
+                        name: "authors",
+                        component: () =>
+                            import(
+                                "@/pages/authors/Index.vue"
+                            )
+                    },{
+                        path: "/book-categories",
+                        name: "book-categories",
+                        component: () =>
+                            import(
+                                "@/pages/book-categories/Index.vue"
+                            )
+                    }
         ],
     },
     {

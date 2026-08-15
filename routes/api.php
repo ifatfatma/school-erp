@@ -34,6 +34,20 @@ use App\Http\Controllers\Api\FeeDueController;
 use App\Http\Controllers\Api\PaymentHistoryController;
 use App\Http\Controllers\Api\FeeReceiptController;
 use App\Http\Controllers\Api\DiscountController;
+use App\Http\Controllers\Api\LateFeeController;
+use App\Http\Controllers\Api\ExpenseCategoryController;
+use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\ExpensePaymentController;
+use App\Http\Controllers\Api\RecurringExpenseController;
+use App\Http\Controllers\Api\ExpenseReportController;
+use App\Http\Controllers\Api\IncomeCategoryController;
+use App\Http\Controllers\Api\IncomeController;
+use App\Http\Controllers\Api\IncomePaymentController;
+use App\Http\Controllers\Api\RecurringIncomeController;
+use App\Http\Controllers\Api\IncomeReportController;
+use App\Http\Controllers\Api\AuthorController;
+use App\Http\Controllers\Api\BookCategoryController;
+
 
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -405,5 +419,690 @@ Route::prefix('fee-receipts')->group(function () {
         ]);
 
     });
+
+    Route::prefix('late-fees')->group(function () {
+
+        Route::get('/', [
+            LateFeeController::class,
+            'index'
+        ]);
+
+        Route::get('/{id}', [
+            LateFeeController::class,
+            'show'
+        ]);
+
+        Route::post('/', [
+            LateFeeController::class,
+            'store'
+        ]);
+
+        Route::put('/{id}', [
+            LateFeeController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            LateFeeController::class,
+            'destroy'
+        ]);
+
+        Route::patch('/{id}/toggle-status', [
+            LateFeeController::class,
+            'toggleStatus'
+        ]);
+
+    });
+
+    Route::prefix('expense-categories')->group(function () {
+
+        Route::get('/', [
+            ExpenseCategoryController::class,
+            'index'
+        ]);
+
+        Route::get('/{id}', [
+            ExpenseCategoryController::class,
+            'show'
+        ]);
+
+        Route::post('/', [
+            ExpenseCategoryController::class,
+            'store'
+        ]);
+
+        Route::put('/{id}', [
+            ExpenseCategoryController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            ExpenseCategoryController::class,
+            'destroy'
+        ]);
+
+        Route::patch('/{id}/toggle-status', [
+            ExpenseCategoryController::class,
+            'toggleStatus'
+        ]);
+
+    });
+
+    Route::prefix('expenses')->group(function () {
+
+        Route::get('/', [
+            ExpenseController::class,
+            'index'
+        ]);
+
+        Route::get('/total', [
+            ExpenseController::class,
+            'total'
+        ]);
+
+        Route::get('/{id}', [
+            ExpenseController::class,
+            'show'
+        ]);
+
+        Route::post('/', [
+            ExpenseController::class,
+            'store'
+        ]);
+
+        Route::put('/{id}', [
+            ExpenseController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            ExpenseController::class,
+            'destroy'
+        ]);
+
+        Route::patch('/{id}/status', [
+            ExpenseController::class,
+            'status'
+        ]);
+
+    });
+
+    Route::prefix('expense-payments')->group(function () {
+
+        Route::get('/', [
+            ExpensePaymentController::class,
+            'index'
+        ]);
+
+        Route::get('/{id}', [
+            ExpensePaymentController::class,
+            'show'
+        ]);
+
+        Route::post('/', [
+            ExpensePaymentController::class,
+            'store'
+        ]);
+
+        Route::put('/{id}', [
+            ExpensePaymentController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            ExpensePaymentController::class,
+            'destroy'
+        ]);
+
+    });
+
+
+    /*
+     * Keep this outside the {id} route
+     * because expense ID is different from
+     * payment ID.
+     */
+    Route::get(
+        '/expenses/{expenseId}/payment-summary',
+        [
+            ExpensePaymentController::class,
+            'summary'
+        ]
+    );
+
+
+    Route::get(
+        '/recurring-expenses',
+        [RecurringExpenseController::class, 'index']
+    );
+
+    Route::post(
+        '/recurring-expenses',
+        [RecurringExpenseController::class, 'store']
+    );
+
+    Route::get(
+        '/recurring-expenses/{id}',
+        [RecurringExpenseController::class, 'show']
+    );
+
+    Route::put(
+        '/recurring-expenses/{id}',
+        [RecurringExpenseController::class, 'update']
+    );
+
+    Route::delete(
+        '/recurring-expenses/{id}',
+        [RecurringExpenseController::class, 'destroy']
+    );
+
+    Route::post(
+        '/recurring-expenses/{id}/generate',
+        [RecurringExpenseController::class, 'generate']
+    );
+
+    Route::post(
+        '/recurring-expenses/{id}/status',
+        [RecurringExpenseController::class, 'status']
+    );
+
+    Route::post(
+        '/recurring-expenses/{id}/toggle-auto-create',
+        [RecurringExpenseController::class, 'toggleAutoCreate']
+    );
+
+    Route::prefix('expense-reports')->group(function () {
+
+        Route::get('/', [
+            ExpenseReportController::class,
+            'index'
+        ]);
+
+        Route::get('/category-summary', [
+            ExpenseReportController::class,
+            'categorySummary'
+        ]);
+
+        Route::get('/payment-method-summary', [
+            ExpenseReportController::class,
+            'paymentMethodSummary'
+        ]);
+
+        Route::get('/daily-summary', [
+            ExpenseReportController::class,
+            'dailySummary'
+        ]);
+
+
+    });
+
+
+    Route::prefix('income-categories')->group(function () {
+
+        Route::get('/', [
+            IncomeCategoryController::class,
+            'index'
+        ]);
+
+        /*
+         * Keep /active before /{id}
+         */
+        Route::get('/active', [
+            IncomeCategoryController::class,
+            'active'
+        ]);
+
+        Route::post('/', [
+            IncomeCategoryController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            IncomeCategoryController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            IncomeCategoryController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            IncomeCategoryController::class,
+            'destroy'
+        ]);
+
+        Route::post('/{id}/status', [
+            IncomeCategoryController::class,
+            'status'
+        ]);
+
+    });
+
+
+
+    Route::prefix('incomes')->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | List
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/', [
+            IncomeController::class,
+            'index'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Categories
+        |--------------------------------------------------------------------------
+        | Must be before /{id}
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/categories', [
+            IncomeController::class,
+            'categories'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Summary
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/summary', [
+            IncomeController::class,
+            'summary'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/', [
+            IncomeController::class,
+            'store'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Show
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/{id}', [
+            IncomeController::class,
+            'show'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update
+        |--------------------------------------------------------------------------
+        */
+
+        Route::put('/{id}', [
+            IncomeController::class,
+            'update'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete
+        |--------------------------------------------------------------------------
+        */
+
+        Route::delete('/{id}', [
+            IncomeController::class,
+            'destroy'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/{id}/status', [
+            IncomeController::class,
+            'status'
+        ]);
+
+    });
+
+
+
+    Route::prefix('income-payments')->group(function () {
+
+        Route::get('/', [
+            IncomePaymentController::class,
+            'index'
+        ]);
+
+        Route::get('/summary', [
+            IncomePaymentController::class,
+            'summary'
+        ]);
+
+        Route::get('/remaining/{incomeId}', [
+            IncomePaymentController::class,
+            'remaining'
+        ]);
+
+        Route::post('/', [
+            IncomePaymentController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            IncomePaymentController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            IncomePaymentController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            IncomePaymentController::class,
+            'destroy'
+        ]);
+
+        Route::post('/{id}/status', [
+            IncomePaymentController::class,
+            'status'
+        ]);
+    });
+
+
+
+    Route::prefix('recurring-incomes')->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | List
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/', [
+            RecurringIncomeController::class,
+            'index'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate Due
+        |--------------------------------------------------------------------------
+        | IMPORTANT:
+        | This must be before /{id}
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/generate-due', [
+            RecurringIncomeController::class,
+            'generateDue'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/', [
+            RecurringIncomeController::class,
+            'store'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Show
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/{id}', [
+            RecurringIncomeController::class,
+            'show'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update
+        |--------------------------------------------------------------------------
+        */
+
+        Route::put('/{id}', [
+            RecurringIncomeController::class,
+            'update'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete
+        |--------------------------------------------------------------------------
+        */
+
+        Route::delete('/{id}', [
+            RecurringIncomeController::class,
+            'destroy'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/{id}/status', [
+            RecurringIncomeController::class,
+            'status'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate Income
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/{id}/generate', [
+            RecurringIncomeController::class,
+            'generate'
+        ]);
+
+    });
+
+
+
+    Route::prefix('income-reports')->group(function () {
+
+        Route::get('/summary', [
+            IncomeReportController::class,
+            'summary'
+        ]);
+
+        Route::get('/daily', [
+            IncomeReportController::class,
+            'daily'
+        ]);
+
+        Route::get('/monthly', [
+            IncomeReportController::class,
+            'monthly'
+        ]);
+
+        Route::get('/yearly', [
+            IncomeReportController::class,
+            'yearly'
+        ]);
+
+        Route::get('/category-wise', [
+            IncomeReportController::class,
+            'categoryWise'
+        ]);
+
+        Route::get('/payment-method-wise', [
+            IncomeReportController::class,
+            'paymentMethodWise'
+        ]);
+
+
+
+
+    });
+
+
+
+
+    Route::prefix('authors')->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | List
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/', [
+            AuthorController::class,
+            'index'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Active Authors
+        |--------------------------------------------------------------------------
+        | IMPORTANT: Keep this BEFORE /{id}
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/active', [
+            AuthorController::class,
+            'active'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/', [
+            AuthorController::class,
+            'store'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Show
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/{id}', [
+            AuthorController::class,
+            'show'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update
+        |--------------------------------------------------------------------------
+        */
+
+        Route::put('/{id}', [
+            AuthorController::class,
+            'update'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete
+        |--------------------------------------------------------------------------
+        */
+
+        Route::delete('/{id}', [
+            AuthorController::class,
+            'destroy'
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/{id}/status', [
+            AuthorController::class,
+            'status'
+        ]);
+
+    });
+
+
+
+    Route::prefix('book-categories')->group(function () {
+
+        Route::get('/', [
+            BookCategoryController::class,
+            'index'
+        ]);
+
+        Route::get('/active', [
+            BookCategoryController::class,
+            'active'
+        ]);
+
+        Route::post('/', [
+            BookCategoryController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            BookCategoryController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            BookCategoryController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            BookCategoryController::class,
+            'destroy'
+        ]);
+
+        Route::post('/{id}/status', [
+            BookCategoryController::class,
+            'status'
+        ]);
+
+    });
+
+
 
 });

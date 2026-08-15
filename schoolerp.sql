@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 13, 2026 at 06:38 PM
+-- Generation Time: Aug 15, 2026 at 05:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -88,6 +88,63 @@ INSERT INTO `activity_log` (`id`, `log_name`, `description`, `subject_type`, `ev
 (12, 'default', 'created', 'App\\Models\\Subject', 'created', 2, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":2,\"name\":\"Hindi\",\"code\":\"H1\",\"type\":\"Theory\",\"description\":\"test\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-08-08T08:00:00.000000Z\",\"updated_at\":\"2026-08-08T08:00:00.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:30:00', '2026-08-08 02:30:00'),
 (13, 'default', 'created', 'App\\Models\\Subject', 'created', 3, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":3,\"name\":\"Math\",\"code\":\"M1\",\"type\":\"Theory\",\"description\":\"math\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-08-08T08:06:24.000000Z\",\"updated_at\":\"2026-08-08T08:06:24.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 02:36:24', '2026-08-08 02:36:24'),
 (14, 'default', 'created', 'App\\Models\\Timetable', 'created', 1, 'App\\Models\\User', 1, '{\"attributes\":{\"id\":1,\"school_id\":1,\"class_id\":1,\"section_id\":1,\"subject_id\":1,\"teacher_id\":1,\"day\":\"Monday\",\"start_time\":\"09:08:00\",\"end_time\":\"11:08:00\",\"room\":\"1\",\"status\":true,\"created_by\":1,\"updated_by\":null,\"created_at\":\"2026-08-08T12:33:05.000000Z\",\"updated_at\":\"2026-08-08T12:33:05.000000Z\",\"deleted_at\":null}}', NULL, '2026-08-08 07:03:05', '2026-08-08 07:03:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `authors`
+--
+
+CREATE TABLE `authors` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `biography` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `authors`
+--
+
+INSERT INTO `authors` (`id`, `school_id`, `name`, `code`, `email`, `phone`, `biography`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Imtiaz Alam kHan', 'AUTH01', 'imtiaz@gmail.com', '9007963069', NULL, 1, 1, 1, '2026-08-15 09:56:33', '2026-08-15 09:56:58', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `book_categories`
+--
+
+CREATE TABLE `book_categories` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `book_categories`
+--
+
+INSERT INTO `book_categories` (`id`, `school_id`, `name`, `code`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Hindi', 'H01', NULL, 1, 1, 1, '2026-08-15 09:55:45', '2026-08-15 09:55:45', NULL),
+(2, 1, 'English', 'ENG01', NULL, 1, 1, 1, '2026-08-15 09:55:56', '2026-08-15 09:55:56', NULL);
 
 -- --------------------------------------------------------
 
@@ -371,6 +428,100 @@ INSERT INTO `exam_types` (`id`, `school_id`, `name`, `code`, `description`, `sta
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `expenses`
+--
+
+CREATE TABLE `expenses` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `expense_category_id` bigint(20) UNSIGNED NOT NULL,
+  `expense_date` date NOT NULL,
+  `expense_no` varchar(255) DEFAULT NULL,
+  `payee_name` varchar(255) NOT NULL,
+  `payment_method` varchar(255) NOT NULL DEFAULT 'Cash',
+  `amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `reference_no` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `attachment` varchar(255) DEFAULT NULL,
+  `status` enum('Paid','Pending','Cancelled') NOT NULL DEFAULT 'Paid',
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `expenses`
+--
+
+INSERT INTO `expenses` (`id`, `school_id`, `expense_category_id`, `expense_date`, `expense_no`, `payee_name`, `payment_method`, `amount`, `reference_no`, `description`, `attachment`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, '2026-08-15', '1', 'CESC', 'Online', 5000.00, 'RFC00783464564', 'test', 'expenses/YY5Jd8qBkKwHMZitj254qq0FdOpWbwImlIwHrR6b.pdf', 'Paid', 1, 1, '2026-08-15 03:11:38', '2026-08-15 03:11:38', NULL),
+(2, 1, 1, '2026-08-15', NULL, 'test', 'Cash', 5000.00, NULL, NULL, NULL, 'Pending', 1, 1, '2026-08-15 05:15:46', '2026-08-15 05:15:46', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `expense_categories`
+--
+
+CREATE TABLE `expense_categories` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `expense_categories`
+--
+
+INSERT INTO `expense_categories` (`id`, `school_id`, `name`, `code`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Electricity Bill', 'ELECB', NULL, 1, 1, 1, '2026-08-15 02:46:37', '2026-08-15 02:46:37', NULL),
+(2, 1, 'Stationery Items', 'STAI', NULL, 1, 1, 1, '2026-08-15 02:46:59', '2026-08-15 02:46:59', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `expense_payments`
+--
+
+CREATE TABLE `expense_payments` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `expense_id` bigint(20) UNSIGNED NOT NULL,
+  `payment_date` date NOT NULL,
+  `amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `payment_method` enum('Cash','Card','Bank Transfer','UPI','Cheque','Online','Other') NOT NULL DEFAULT 'Cash',
+  `transaction_no` varchar(255) DEFAULT NULL,
+  `bank_name` varchar(255) DEFAULT NULL,
+  `cheque_no` varchar(255) DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `status` enum('Success','Pending','Cancelled') NOT NULL DEFAULT 'Success',
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `expense_payments`
+--
+
+INSERT INTO `expense_payments` (`id`, `school_id`, `expense_id`, `payment_date`, `amount`, `payment_method`, `transaction_no`, `bank_name`, `cheque_no`, `remarks`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '2026-08-15', 5000.00, 'Cash', 't0001', 'BOI', NULL, NULL, 'Success', 1, 1, '2026-08-15 04:41:31', '2026-08-15 04:41:31'),
+(2, 1, 2, '2026-08-15', 500.00, 'Cash', NULL, NULL, NULL, NULL, 'Success', 1, 1, '2026-08-15 05:16:28', '2026-08-15 05:16:28');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `failed_jobs`
 --
 
@@ -570,6 +721,99 @@ CREATE TABLE `guardians` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `incomes`
+--
+
+CREATE TABLE `incomes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `income_category_id` bigint(20) UNSIGNED NOT NULL,
+  `income_date` date NOT NULL,
+  `income_no` varchar(255) DEFAULT NULL,
+  `received_from` varchar(255) NOT NULL,
+  `payment_method` varchar(255) NOT NULL DEFAULT 'Cash',
+  `amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `reference_no` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `attachment` varchar(255) DEFAULT NULL,
+  `status` enum('Received','Pending','Cancelled') NOT NULL DEFAULT 'Received',
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `incomes`
+--
+
+INSERT INTO `incomes` (`id`, `school_id`, `income_category_id`, `income_date`, `income_no`, `received_from`, `payment_method`, `amount`, `reference_no`, `description`, `attachment`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 2, '2026-08-15', 'IN01', 'School', 'Cash', 59000.00, NULL, NULL, NULL, 'Received', 1, 1, '2026-08-15 07:12:47', '2026-08-15 07:12:47', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `income_categories`
+--
+
+CREATE TABLE `income_categories` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `income_categories`
+--
+
+INSERT INTO `income_categories` (`id`, `school_id`, `name`, `code`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Donation', 'DON', NULL, 1, 1, 1, '2026-08-15 06:29:39', '2026-08-15 06:29:39', NULL),
+(2, 1, 'School Fees', 'SCFE', NULL, 1, 1, 1, '2026-08-15 06:29:53', '2026-08-15 06:29:53', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `income_payments`
+--
+
+CREATE TABLE `income_payments` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `income_id` bigint(20) UNSIGNED NOT NULL,
+  `receipt_no` varchar(100) NOT NULL,
+  `payment_date` date NOT NULL,
+  `amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `payment_method` varchar(100) NOT NULL DEFAULT 'Cash',
+  `transaction_no` varchar(150) DEFAULT NULL,
+  `bank_name` varchar(255) DEFAULT NULL,
+  `cheque_no` varchar(100) DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `status` enum('Success','Pending','Cancelled') NOT NULL DEFAULT 'Success',
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `income_payments`
+--
+
+INSERT INTO `income_payments` (`id`, `school_id`, `income_id`, `receipt_no`, `payment_date`, `amount`, `payment_method`, `transaction_no`, `bank_name`, `cheque_no`, `remarks`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'INR-2026-000001', '2026-08-15', 59000.00, 'Cash', 'trsn01', 'boi', NULL, NULL, 'Success', 1, 1, '2026-08-15 08:49:31', '2026-08-15 08:49:31');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `jobs`
 --
 
@@ -626,6 +870,13 @@ CREATE TABLE `late_fees` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `late_fees`
+--
+
+INSERT INTO `late_fees` (`id`, `school_id`, `name`, `code`, `late_fee_type`, `value`, `grace_days`, `max_amount`, `per_day`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'July', 'JL01', 'Fixed', 1000.00, 20, 500.00, 1, NULL, 1, 1, 1, '2026-08-15 02:18:35', '2026-08-15 02:18:35', NULL);
 
 -- --------------------------------------------------------
 
@@ -731,7 +982,17 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (43, '2026_08_12_133638_create_fee_payments_table', 29),
 (44, '2026_08_12_133646_create_fee_payment_items_table', 30),
 (45, '2026_08_13_150050_create_discounts_table', 31),
-(46, '2026_08_13_151552_create_late_fees_table', 32);
+(46, '2026_08_13_151552_create_late_fees_table', 32),
+(47, '2026_08_15_080552_create_expense_categories_table', 33),
+(49, '2026_08_15_081746_create_expenses_table', 34),
+(50, '2026_08_15_093319_create_expense_payments_table', 35),
+(51, '2026_08_15_101454_create_recurring_expenses_table', 36),
+(52, '2026_08_15_113747_create_income_categories_table', 37),
+(53, '2026_08_15_121454_create_incomes_table', 38),
+(54, '2026_08_15_133453_create_income_payments_table', 39),
+(55, '2026_08_15_140013_create_recurring_incomes_table', 40),
+(56, '2026_08_15_144646_create_book_categories_table', 41),
+(57, '2026_08_15_150001_create_authors_table', 42);
 
 -- --------------------------------------------------------
 
@@ -837,7 +1098,77 @@ CREATE TABLE `personal_access_tokens` (
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(4, 'App\\Models\\User', 1, 'admin', '2abb3df2e8fa98c68f4e2b3723deb610d4c67b0fc39b6c55db873030376ff0d3', '[\"*\"]', '2026-08-13 09:44:29', NULL, '2026-08-11 06:07:39', '2026-08-13 09:44:29');
+(4, 'App\\Models\\User', 1, 'admin', '2abb3df2e8fa98c68f4e2b3723deb610d4c67b0fc39b6c55db873030376ff0d3', '[\"*\"]', '2026-08-15 09:56:59', NULL, '2026-08-11 06:07:39', '2026-08-15 09:56:59');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `recurring_expenses`
+--
+
+CREATE TABLE `recurring_expenses` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `expense_category_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `payee_name` varchar(255) NOT NULL,
+  `amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `frequency` enum('Daily','Weekly','Monthly','Quarterly','Yearly') NOT NULL DEFAULT 'Monthly',
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `next_due_date` date NOT NULL,
+  `payment_method` varchar(255) NOT NULL DEFAULT 'Cash',
+  `description` text DEFAULT NULL,
+  `auto_create` tinyint(1) NOT NULL DEFAULT 1,
+  `status` enum('Active','Paused','Completed') NOT NULL DEFAULT 'Active',
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `recurring_expenses`
+--
+
+INSERT INTO `recurring_expenses` (`id`, `school_id`, `expense_category_id`, `name`, `payee_name`, `amount`, `frequency`, `start_date`, `end_date`, `next_due_date`, `payment_method`, `description`, `auto_create`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 'School', 'test', 5000.00, 'Monthly', '2026-08-15', NULL, '2026-09-15', 'Cash', NULL, 1, 'Active', 1, 1, '2026-08-15 05:15:08', '2026-08-15 05:15:46', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `recurring_incomes`
+--
+
+CREATE TABLE `recurring_incomes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `income_category_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `reference_no` varchar(255) DEFAULT NULL,
+  `received_from` varchar(255) NOT NULL,
+  `amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `payment_method` varchar(100) NOT NULL DEFAULT 'Cash',
+  `frequency` enum('Daily','Weekly','Monthly','Quarterly','Yearly') NOT NULL DEFAULT 'Monthly',
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `next_date` date DEFAULT NULL,
+  `auto_create` tinyint(1) NOT NULL DEFAULT 1,
+  `status` enum('Active','Paused','Completed','Cancelled') NOT NULL DEFAULT 'Active',
+  `description` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `recurring_incomes`
+--
+
+INSERT INTO `recurring_incomes` (`id`, `school_id`, `income_category_id`, `name`, `reference_no`, `received_from`, `amount`, `payment_method`, `frequency`, `start_date`, `end_date`, `next_date`, `auto_create`, `status`, `description`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 'Ahmed', 'ref01', 'test', 59000.00, 'Cash', 'Monthly', '2026-08-15', NULL, '2026-09-15', 1, 'Active', NULL, 1, 1, '2026-08-15 08:51:48', '2026-08-15 08:51:48');
 
 -- --------------------------------------------------------
 
@@ -1017,7 +1348,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('8sMUoCO1kNGGXjljpb34rKboGwZ07VLvJusITVgZ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUktieWVZSE1kdTZVVzhnWXJIV2RuM2NnckVubWNhSnBOcnpLTVNpTyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9mZWUtcmVjZWlwdHMiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786633929);
+('8sMUoCO1kNGGXjljpb34rKboGwZ07VLvJusITVgZ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUktieWVZSE1kdTZVVzhnWXJIV2RuM2NnckVubWNhSnBOcnpLTVNpTyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9mZWUtcmVjZWlwdHMiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786633929),
+('LhlEt15AjFP2UbrlTE3w3Sa6pm8x8SUeE4STuLx1', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidWpwR1ZhTEY4V3hxczJ6TW9NSmdrd1FaaG9VWm1kdHJQVDNrSDFLaiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmNvbWUtcmVwb3J0cyI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786807231),
+('qA7Q35e0DdeYc5dt0OPrU9dedm2MvEDD9ifV1Dz6', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUENLNlBDWDVxYXBzQjBGQ2c1cHNvZlNRWnpIY1o2NGZPWXZNdnBwYSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786779447);
 
 -- --------------------------------------------------------
 
@@ -1346,6 +1679,27 @@ ALTER TABLE `activity_log`
   ADD KEY `activity_log_log_name_index` (`log_name`);
 
 --
+-- Indexes for table `authors`
+--
+ALTER TABLE `authors`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `authors_school_id_code_unique` (`school_id`,`code`),
+  ADD KEY `authors_created_by_foreign` (`created_by`),
+  ADD KEY `authors_updated_by_foreign` (`updated_by`),
+  ADD KEY `authors_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `authors_school_id_name_index` (`school_id`,`name`);
+
+--
+-- Indexes for table `book_categories`
+--
+ALTER TABLE `book_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `book_categories_school_id_code_unique` (`school_id`,`code`),
+  ADD KEY `book_categories_created_by_foreign` (`created_by`),
+  ADD KEY `book_categories_updated_by_foreign` (`updated_by`),
+  ADD KEY `book_categories_school_id_status_index` (`school_id`,`status`);
+
+--
 -- Indexes for table `cache`
 --
 ALTER TABLE `cache`
@@ -1434,6 +1788,35 @@ ALTER TABLE `exam_types`
   ADD KEY `exam_types_status_index` (`status`);
 
 --
+-- Indexes for table `expenses`
+--
+ALTER TABLE `expenses`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `expenses_expense_category_id_foreign` (`expense_category_id`),
+  ADD KEY `expenses_school_id_expense_date_index` (`school_id`,`expense_date`),
+  ADD KEY `expenses_school_id_expense_category_id_index` (`school_id`,`expense_category_id`),
+  ADD KEY `expenses_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `expenses_school_id_payment_method_index` (`school_id`,`payment_method`);
+
+--
+-- Indexes for table `expense_categories`
+--
+ALTER TABLE `expense_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `expense_categories_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `expense_categories_school_id_code_index` (`school_id`,`code`);
+
+--
+-- Indexes for table `expense_payments`
+--
+ALTER TABLE `expense_payments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `expense_payments_expense_id_foreign` (`expense_id`),
+  ADD KEY `expense_payments_school_id_expense_id_index` (`school_id`,`expense_id`),
+  ADD KEY `expense_payments_school_id_payment_date_index` (`school_id`,`payment_date`),
+  ADD KEY `expense_payments_school_id_status_index` (`school_id`,`status`);
+
+--
 -- Indexes for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
@@ -1501,6 +1884,40 @@ ALTER TABLE `guardians`
   ADD KEY `guardians_guardian_type_index` (`guardian_type`),
   ADD KEY `guardians_mobile_index` (`mobile`),
   ADD KEY `guardians_email_index` (`email`);
+
+--
+-- Indexes for table `incomes`
+--
+ALTER TABLE `incomes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `incomes_income_category_id_foreign` (`income_category_id`),
+  ADD KEY `incomes_created_by_foreign` (`created_by`),
+  ADD KEY `incomes_updated_by_foreign` (`updated_by`),
+  ADD KEY `incomes_school_id_income_category_id_index` (`school_id`,`income_category_id`),
+  ADD KEY `incomes_school_id_income_date_index` (`school_id`,`income_date`),
+  ADD KEY `incomes_school_id_status_index` (`school_id`,`status`);
+
+--
+-- Indexes for table `income_categories`
+--
+ALTER TABLE `income_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `income_categories_created_by_foreign` (`created_by`),
+  ADD KEY `income_categories_updated_by_foreign` (`updated_by`),
+  ADD KEY `income_categories_school_id_status_index` (`school_id`,`status`);
+
+--
+-- Indexes for table `income_payments`
+--
+ALTER TABLE `income_payments`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `income_payments_school_id_receipt_no_unique` (`school_id`,`receipt_no`),
+  ADD KEY `income_payments_income_id_foreign` (`income_id`),
+  ADD KEY `income_payments_created_by_foreign` (`created_by`),
+  ADD KEY `income_payments_updated_by_foreign` (`updated_by`),
+  ADD KEY `income_payments_school_id_income_id_index` (`school_id`,`income_id`),
+  ADD KEY `income_payments_school_id_payment_date_index` (`school_id`,`payment_date`),
+  ADD KEY `income_payments_school_id_status_index` (`school_id`,`status`);
 
 --
 -- Indexes for table `jobs`
@@ -1587,6 +2004,28 @@ ALTER TABLE `personal_access_tokens`
   ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
   ADD KEY `personal_access_tokens_expires_at_index` (`expires_at`);
+
+--
+-- Indexes for table `recurring_expenses`
+--
+ALTER TABLE `recurring_expenses`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `recurring_expenses_expense_category_id_foreign` (`expense_category_id`),
+  ADD KEY `recurring_expenses_school_id_next_due_date_index` (`school_id`,`next_due_date`),
+  ADD KEY `recurring_expenses_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `recurring_expenses_school_id_expense_category_id_index` (`school_id`,`expense_category_id`);
+
+--
+-- Indexes for table `recurring_incomes`
+--
+ALTER TABLE `recurring_incomes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `recurring_incomes_income_category_id_foreign` (`income_category_id`),
+  ADD KEY `recurring_incomes_created_by_foreign` (`created_by`),
+  ADD KEY `recurring_incomes_updated_by_foreign` (`updated_by`),
+  ADD KEY `recurring_incomes_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `recurring_incomes_school_id_next_date_index` (`school_id`,`next_date`),
+  ADD KEY `recurring_incomes_school_id_frequency_index` (`school_id`,`frequency`);
 
 --
 -- Indexes for table `result_grades`
@@ -1772,6 +2211,18 @@ ALTER TABLE `activity_log`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
+-- AUTO_INCREMENT for table `authors`
+--
+ALTER TABLE `authors`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `book_categories`
+--
+ALTER TABLE `book_categories`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
@@ -1820,6 +2271,24 @@ ALTER TABLE `exam_types`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `expenses`
+--
+ALTER TABLE `expenses`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `expense_categories`
+--
+ALTER TABLE `expense_categories`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `expense_payments`
+--
+ALTER TABLE `expense_payments`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
@@ -1862,6 +2331,24 @@ ALTER TABLE `guardians`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `incomes`
+--
+ALTER TABLE `incomes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `income_categories`
+--
+ALTER TABLE `income_categories`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `income_payments`
+--
+ALTER TABLE `income_payments`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -1871,7 +2358,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `late_fees`
 --
 ALTER TABLE `late_fees`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `leave_requests`
@@ -1889,7 +2376,7 @@ ALTER TABLE `leave_types`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -1902,6 +2389,18 @@ ALTER TABLE `permissions`
 --
 ALTER TABLE `personal_access_tokens`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `recurring_expenses`
+--
+ALTER TABLE `recurring_expenses`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `recurring_incomes`
+--
+ALTER TABLE `recurring_incomes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `result_grades`
@@ -1998,6 +2497,22 @@ ALTER TABLE `academic_sessions`
   ADD CONSTRAINT `academic_sessions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `authors`
+--
+ALTER TABLE `authors`
+  ADD CONSTRAINT `authors_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `authors_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `authors_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `book_categories`
+--
+ALTER TABLE `book_categories`
+  ADD CONSTRAINT `book_categories_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `book_categories_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `book_categories_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `classes`
 --
 ALTER TABLE `classes`
@@ -2062,6 +2577,26 @@ ALTER TABLE `exam_types`
   ADD CONSTRAINT `exam_types_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `expenses`
+--
+ALTER TABLE `expenses`
+  ADD CONSTRAINT `expenses_expense_category_id_foreign` FOREIGN KEY (`expense_category_id`) REFERENCES `expense_categories` (`id`),
+  ADD CONSTRAINT `expenses_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `expense_categories`
+--
+ALTER TABLE `expense_categories`
+  ADD CONSTRAINT `expense_categories_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `expense_payments`
+--
+ALTER TABLE `expense_payments`
+  ADD CONSTRAINT `expense_payments_expense_id_foreign` FOREIGN KEY (`expense_id`) REFERENCES `expenses` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `expense_payments_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `fee_payments`
 --
 ALTER TABLE `fee_payments`
@@ -2114,6 +2649,32 @@ ALTER TABLE `guardians`
   ADD CONSTRAINT `guardians_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `incomes`
+--
+ALTER TABLE `incomes`
+  ADD CONSTRAINT `incomes_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `incomes_income_category_id_foreign` FOREIGN KEY (`income_category_id`) REFERENCES `income_categories` (`id`),
+  ADD CONSTRAINT `incomes_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `incomes_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `income_categories`
+--
+ALTER TABLE `income_categories`
+  ADD CONSTRAINT `income_categories_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `income_categories_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `income_categories_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `income_payments`
+--
+ALTER TABLE `income_payments`
+  ADD CONSTRAINT `income_payments_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `income_payments_income_id_foreign` FOREIGN KEY (`income_id`) REFERENCES `incomes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `income_payments_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `income_payments_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `late_fees`
 --
 ALTER TABLE `late_fees`
@@ -2149,6 +2710,22 @@ ALTER TABLE `model_has_permissions`
 --
 ALTER TABLE `model_has_roles`
   ADD CONSTRAINT `model_has_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `recurring_expenses`
+--
+ALTER TABLE `recurring_expenses`
+  ADD CONSTRAINT `recurring_expenses_expense_category_id_foreign` FOREIGN KEY (`expense_category_id`) REFERENCES `expense_categories` (`id`),
+  ADD CONSTRAINT `recurring_expenses_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `recurring_incomes`
+--
+ALTER TABLE `recurring_incomes`
+  ADD CONSTRAINT `recurring_incomes_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `recurring_incomes_income_category_id_foreign` FOREIGN KEY (`income_category_id`) REFERENCES `income_categories` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `recurring_incomes_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `recurring_incomes_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `result_grades`
