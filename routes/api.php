@@ -47,6 +47,13 @@ use App\Http\Controllers\Api\RecurringIncomeController;
 use App\Http\Controllers\Api\IncomeReportController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\BookCategoryController;
+use App\Http\Controllers\Api\PublisherController;
+use App\Http\Controllers\Api\BookController;
+use App\Http\Controllers\Api\BookCopyController;
+use App\Http\Controllers\Api\LibraryMemberController;
+use App\Http\Controllers\Api\BookIssueController;
+use App\Http\Controllers\Api\BookReturnController;
+use App\Http\Controllers\Api\BookRenewalController;
 
 
 
@@ -1099,6 +1106,363 @@ Route::prefix('fee-receipts')->group(function () {
         Route::post('/{id}/status', [
             BookCategoryController::class,
             'status'
+        ]);
+
+    });
+
+
+
+    Route::prefix('publishers')->group(function () {
+
+        Route::get('/', [
+            PublisherController::class,
+            'index'
+        ]);
+
+        /*
+         * Must be before /{id}
+         */
+        Route::get('/active', [
+            PublisherController::class,
+            'active'
+        ]);
+
+        Route::post('/', [
+            PublisherController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            PublisherController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            PublisherController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            PublisherController::class,
+            'destroy'
+        ]);
+
+        Route::post('/{id}/status', [
+            PublisherController::class,
+            'status'
+        ]);
+
+    });
+
+
+
+
+    Route::prefix('books')->group(function () {
+
+        Route::get('/', [
+            BookController::class,
+            'index'
+        ]);
+
+        // Keep before /{id}
+        Route::get('/active', [
+            BookController::class,
+            'active'
+        ]);
+
+        Route::post('/', [
+            BookController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            BookController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            BookController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            BookController::class,
+            'destroy'
+        ]);
+
+        Route::post('/{id}/status', [
+            BookController::class,
+            'status'
+        ]);
+
+    });
+
+
+
+    Route::prefix('book-copies')->group(function () {
+
+        Route::get('/', [
+            BookCopyController::class,
+            'index'
+        ]);
+
+        /*
+         * These must come BEFORE /{id}
+         */
+        Route::get('/available', [
+            BookCopyController::class,
+            'available'
+        ]);
+
+        Route::get('/statistics', [
+            BookCopyController::class,
+            'statistics'
+        ]);
+
+        Route::post('/barcode', [
+            BookCopyController::class,
+            'barcode'
+        ]);
+
+        Route::post('/accession', [
+            BookCopyController::class,
+            'accession'
+        ]);
+
+        Route::post('/', [
+            BookCopyController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            BookCopyController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            BookCopyController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            BookCopyController::class,
+            'destroy'
+        ]);
+
+        Route::post('/{id}/status', [
+            BookCopyController::class,
+            'status'
+        ]);
+
+        Route::post('/{id}/condition', [
+            BookCopyController::class,
+            'condition'
+        ]);
+
+    });
+
+
+
+    Route::prefix('library-members')->group(function () {
+
+        Route::get('/', [
+            LibraryMemberController::class,
+            'index'
+        ]);
+
+        /*
+         * Keep these before /{id}
+         */
+        Route::get('/active', [
+            LibraryMemberController::class,
+            'active'
+        ]);
+
+        Route::get('/statistics', [
+            LibraryMemberController::class,
+            'statistics'
+        ]);
+
+        Route::post('/', [
+            LibraryMemberController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            LibraryMemberController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            LibraryMemberController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            LibraryMemberController::class,
+            'destroy'
+        ]);
+
+        Route::post('/{id}/status', [
+            LibraryMemberController::class,
+            'status'
+        ]);
+
+    });
+
+
+
+
+    Route::prefix('book-issues')->group(function () {
+
+        Route::get('/', [
+            BookIssueController::class,
+            'index'
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Specific routes BEFORE /{id}
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/statistics', [
+            BookIssueController::class,
+            'statistics'
+        ]);
+
+        Route::get('/overdue', [
+            BookIssueController::class,
+            'overdue'
+        ]);
+
+        Route::get('/member/{memberId}', [
+            BookIssueController::class,
+            'memberIssues'
+        ]);
+
+        Route::post('/', [
+            BookIssueController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            BookIssueController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            BookIssueController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            BookIssueController::class,
+            'destroy'
+        ]);
+
+    });
+
+
+
+    Route::prefix('book-returns')->group(function () {
+
+        Route::get('/', [
+            BookReturnController::class,
+            'index'
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Specific routes must come before /{id}
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/statistics', [
+            BookReturnController::class,
+            'statistics'
+        ]);
+
+        Route::get('/pending-fines', [
+            BookReturnController::class,
+            'pendingFines'
+        ]);
+
+        Route::get('/member/{memberId}', [
+            BookReturnController::class,
+            'memberReturns'
+        ]);
+
+        Route::post('/', [
+            BookReturnController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            BookReturnController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            BookReturnController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            BookReturnController::class,
+            'destroy'
+        ]);
+
+    });
+
+
+
+    Route::prefix('book-renewals')->group(function () {
+
+        Route::get('/', [
+            BookRenewalController::class,
+            'index'
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Specific routes BEFORE /{id}
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/statistics', [
+            BookRenewalController::class,
+            'statistics'
+        ]);
+
+        Route::get('/member/{memberId}', [
+            BookRenewalController::class,
+            'memberRenewals'
+        ]);
+
+        Route::get('/issue/{issueId}', [
+            BookRenewalController::class,
+            'issueRenewals'
+        ]);
+
+        Route::post('/', [
+            BookRenewalController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            BookRenewalController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            BookRenewalController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            BookRenewalController::class,
+            'destroy'
         ]);
 
     });

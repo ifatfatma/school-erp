@@ -278,15 +278,36 @@ export default [
                     permission: "authors.view",
                 },
                 {
-                    title: "Books",
-                    route: "/library/books",
-                    permission: "library.view",
+                    title: "Publishers",
+                    route: "/publishers",
+                    permission: "publishers.view",
                 },
                 {
-                    title: "Categories",
-                    route: "/book-categories",
-                    permission: "book_category.view",
+                    title: "Books",
+                    route: "/books",
+                    permission: "books.view",
                 },
+                {
+                    title: "Book Copies",
+                    route: "/book-copies",
+                    permission: "book_copies.view",
+                },{
+                    title: "Library Members",
+                    route: "/library-members",
+                    permission: "library_members.view",
+                },{
+                    title: "Book Issues",
+                    route: "/book-issues",
+                    permission: "book_issues.view",
+                },{
+                    title: "Book Return",
+                    route: "/book-returns",
+                    permission: "book_returns.view",
+                },{
+                    title: 'Book Renewal',
+                    route: '/book-renewals',
+                    permission: "book_renewals.view",
+                }
         ],
     },
 

@@ -729,6 +729,53 @@ const routes = [
                             import(
                                 "@/pages/book-categories/Index.vue"
                             )
+                    },{
+                        path: "/publishers",
+                        name: "publishers",
+                        component: () =>
+                            import(
+                                "@/pages/publishers/Index.vue"
+                            )
+                    },{
+                        path: "/books",
+                        name: "books",
+                        component: () =>
+                            import(
+                                "@/pages/books/Index.vue"
+                            )
+                    },{
+                            path: "/book-copies",
+                            name: "book-copies",
+                            component: () =>
+                                import(
+                                    "@/pages/book-copies/Index.vue"
+                                )
+                    },{
+                        path: "/library-members",
+                        name: "library-members",
+                        component: () =>
+                            import(
+                                "@/pages/library-members/Index.vue"
+                            )
+                    },{
+                        path: "/book-issues",
+                        name: "book-issues",
+                        component: () =>
+                            import(
+                                "@/pages/book-issues/Index.vue"
+                            )
+                    },{
+                        path: "/book-returns",
+                        name: "book-returns",
+                        component: () =>
+                            import(
+                                "@/pages/book-returns/Index.vue"
+                            )
+                    },{
+                        path: '/book-renewals',
+                        name: 'book-renewals',
+                        component: () =>
+                            import('@/pages/book-renewals/Index.vue')
                     }
         ],
     },

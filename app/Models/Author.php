@@ -74,11 +74,13 @@ class Author extends Model
 
     public function books()
     {
-        return $this->hasMany(
-            Book::class
-        );
+        return $this->belongsToMany(
+            Book::class,
+            'book_authors',
+            'author_id',
+            'book_id'
+        )->withTimestamps();
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -111,24 +113,25 @@ class Author extends Model
                 "%{$search}%"
             )
 
-            ->orWhere(
-                'code',
-                'like',
-                "%{$search}%"
-            )
+                ->orWhere(
+                    'code',
+                    'like',
+                    "%{$search}%"
+                )
 
-            ->orWhere(
-                'email',
-                'like',
-                "%{$search}%"
-            )
+                ->orWhere(
+                    'email',
+                    'like',
+                    "%{$search}%"
+                )
 
-            ->orWhere(
-                'phone',
-                'like',
-                "%{$search}%"
-            );
-
+                ->orWhere(
+                    'phone',
+                    'like',
+                    "%{$search}%"
+                );
         });
     }
+
+    
 }
