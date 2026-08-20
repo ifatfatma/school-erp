@@ -54,6 +54,7 @@ use App\Http\Controllers\Api\LibraryMemberController;
 use App\Http\Controllers\Api\BookIssueController;
 use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\BookRenewalController;
+use App\Http\Controllers\Api\SettingController;
 
 
 
@@ -1463,6 +1464,86 @@ Route::prefix('fee-receipts')->group(function () {
         Route::delete('/{id}', [
             BookRenewalController::class,
             'destroy'
+        ]);
+
+    });
+
+
+
+    Route::prefix('settings')->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | All Settings
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/', [
+            SettingController::class,
+            'index',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Defaults
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/create-defaults', [
+            SettingController::class,
+            'createDefaults',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Group
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/group/{group}', [
+            SettingController::class,
+            'group',
+        ]);
+
+        Route::get('/group/{group}/details', [
+            SettingController::class,
+            'groupDetails',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save Group
+        |--------------------------------------------------------------------------
+        */
+
+        Route::put('/group/{group}', [
+            SettingController::class,
+            'saveGroup',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Single Setting
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/{group}/{key}', [
+            SettingController::class,
+            'show',
+        ]);
+
+        Route::post('/', [
+            SettingController::class,
+            'store',
+        ]);
+
+        Route::delete('/{group}/{key}', [
+            SettingController::class,
+            'destroy',
         ]);
 
     });

@@ -776,9 +776,17 @@ const routes = [
                         name: 'book-renewals',
                         component: () =>
                             import('@/pages/book-renewals/Index.vue')
-                    }
+                    },{
+    path: '/settings',
+    name: 'settings',
+    component: () =>
+        import(
+            '@/pages/settings/Index.vue'
+        )
+}
         ],
     },
+    
     {
         path: "/login",
         name: "login",
