@@ -223,6 +223,24 @@ class BookIssue extends Model
     }
 
 
+
+
+
+public function renewals()
+{
+    return $this->hasMany(
+        BookRenewal::class,
+        'book_issue_id'
+    );
+}
+
+public function fine()
+{
+    return $this->hasOne(
+        LibraryFine::class,
+        'book_issue_id'
+    );
+}
     /*
     |--------------------------------------------------------------------------
     | Days Overdue

@@ -307,6 +307,18 @@ export default [
                     title: 'Book Renewal',
                     route: '/book-renewals',
                     permission: "book_renewals.view",
+                },{
+                    title: 'Lost / Damaged Books',
+                    route: '/lost-damaged-books',
+                    permission: "book_renewals.view",
+                },{
+                    title: 'Library Fines',
+                    route: '/library-fines',
+                    permission: "library_fines.view",
+                },{
+                    title: 'Library Reports',
+                    route: '/library-reports',
+                    permission: "library_reports.view",
                 }
         ],
     },

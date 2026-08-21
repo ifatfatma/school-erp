@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
-
+use App\Models\User;
 class LibraryMember extends Model
 {
     use HasFactory, SoftDeletes;
@@ -38,6 +38,18 @@ class LibraryMember extends Model
     ];
 
 
+    public function fineCollections()
+    {
+        return $this->hasMany(FineCollection::class);
+    }
+
+    public function bookIssues()
+{
+    return $this->hasMany(
+        BookIssue::class,
+        'library_member_id'
+    );
+}
     /*
     |--------------------------------------------------------------------------
     | School
@@ -76,7 +88,7 @@ class LibraryMember extends Model
     public function staff()
     {
         return $this->belongsTo(
-            Staff::class,
+            User::class,
             'staff_id'
         );
     }
