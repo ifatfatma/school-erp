@@ -777,13 +777,28 @@ const routes = [
                         component: () =>
                             import('@/pages/book-renewals/Index.vue')
                     },{
-    path: '/settings',
-    name: 'settings',
-    component: () =>
-        import(
-            '@/pages/settings/Index.vue'
-        )
-}
+                        path: '/library-reports',
+                        name: 'library-reports',
+                        component: () =>
+                            import('@/pages/library-reports/Index.vue')
+                    },{
+                        path: '/library-fines',
+                        name: 'library-fines',
+                        component: () =>
+                            import('@/pages/library-fines/Index.vue')
+                    },{
+                        path: '/lost-damaged-books',
+                        name: 'lost-damaged-books',
+                        component: () =>
+                            import('@/pages/lost-damaged-books/Index.vue')
+                    },{
+                        path: '/settings',
+                        name: 'settings',
+                        component: () =>
+                            import(
+                                '@/pages/settings/Index.vue'
+                            )
+                    }
         ],
     },
     

@@ -5,19 +5,29 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\BookCopy;
+use App\Models\LibraryMember;
 use App\Models\BookIssue;
 use App\Models\BookReturn;
 use App\Models\BookRenewal;
-use App\Models\LibraryMember;
+use App\Models\LostDamagedBook;
 use App\Models\LibraryFine;
 use App\Models\FineCollection;
-use App\Models\LostDamagedBook;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class LibraryReportController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | School ID
+    |--------------------------------------------------------------------------
+    */
+
+    protected function schoolId()
+    {
+        return auth()->user()->school_id;
+    }
+
+
     /*
     |--------------------------------------------------------------------------
     | Dashboard
@@ -26,9 +36,7 @@ class LibraryReportController extends Controller
 
     public function dashboard(Request $request)
     {
-        $user = auth()->user();
-
-        $schoolId = $user->school_id;
+        $schoolId = $this->schoolId();
 
         $books = Book::where(
             'school_id',
@@ -49,100 +57,115 @@ class LibraryReportController extends Controller
             'school_id',
             $schoolId
         )
-            ->where('status', 'Issued')
-            ->count();
+        ->where(
+            'status',
+            'Issued'
+        )
+        ->count();
 
-        $returned = BookIssue::where(
+        $returned = BookReturn::where(
             'school_id',
             $schoolId
-        )
-            ->where('status', 'Returned')
-            ->count();
+        )->count();
 
         $overdue = BookIssue::where(
             'school_id',
             $schoolId
         )
-            ->whereIn('status', [
-                'Issued',
-                'Overdue'
-            ])
-            ->whereDate(
-                'due_date',
-                '<',
-                today()
-            )
-            ->count();
-
-        $lost = LostDamagedBook::where(
-            'school_id',
-            $schoolId
+        ->where(
+            'status',
+            'Issued'
         )
-            ->where('type', 'Lost')
-            ->count();
-
-        $damaged = LostDamagedBook::where(
-            'school_id',
-            $schoolId
+        ->whereDate(
+            'due_date',
+            '<',
+            now()->toDateString()
         )
-            ->where('type', 'Damaged')
-            ->count();
-
-        $outstandingFine = LibraryFine::where(
-            'school_id',
-            $schoolId
-        )
-            ->whereIn('status', [
-                'Pending',
-                'Partially Paid'
-            ])
-            ->get()
-            ->sum(function ($fine) {
-
-                $paid = FineCollection::where(
-                    'library_fine_id',
-                    $fine->id
-                )->sum('amount');
-
-                return max(
-                    0,
-                    (float) $fine->payable_amount -
-                        (float) $paid
-                );
-            });
-
-        $fineCollected = FineCollection::where(
-            'school_id',
-            $schoolId
-        )->sum('amount');
-
-        $totalFines = LibraryFine::where(
-            'school_id',
-            $schoolId
-        )->sum('payable_amount');
+        ->count();
 
         $renewals = BookRenewal::where(
             'school_id',
             $schoolId
         )->count();
 
+        $lost = LostDamagedBook::where(
+            'school_id',
+            $schoolId
+        )
+        ->where(
+            'type',
+            'Lost'
+        )
+        ->count();
+
+        $damaged = LostDamagedBook::where(
+            'school_id',
+            $schoolId
+        )
+        ->where(
+            'type',
+            'Damaged'
+        )
+        ->count();
+
+        $totalFines = LibraryFine::where(
+            'school_id',
+            $schoolId
+        )->sum('payable_amount');
+
+        $fineCollected = FineCollection::where(
+            'school_id',
+            $schoolId
+        )->sum('amount');
+
+        $outstandingFine = LibraryFine::where(
+            'school_id',
+            $schoolId
+        )
+        ->whereIn(
+            'status',
+            [
+                'Pending',
+                'Partially Paid'
+            ]
+        )
+        ->get()
+        ->sum(function ($fine) use ($schoolId) {
+
+            $paid = FineCollection::where(
+                'school_id',
+                $schoolId
+            )
+            ->where(
+                'library_fine_id',
+                $fine->id
+            )
+            ->sum('amount');
+
+            return max(
+                0,
+                (float) $fine->payable_amount -
+                (float) $paid
+            );
+        });
+
         return response()->json([
-            'status' => 200,
+            'success' => true,
 
             'data' => [
-                'books' => $books,
-                'copies' => $copies,
-                'members' => $members,
-                'issued' => $issued,
-                'returned' => $returned,
-                'overdue' => $overdue,
-                'renewals' => $renewals,
-                'lost' => $lost,
-                'damaged' => $damaged,
+                'books' => (int) $books,
+                'copies' => (int) $copies,
+                'members' => (int) $members,
+                'issued' => (int) $issued,
+                'returned' => (int) $returned,
+                'overdue' => (int) $overdue,
+                'renewals' => (int) $renewals,
+                'lost' => (int) $lost,
+                'damaged' => (int) $damaged,
                 'total_fines' => (float) $totalFines,
                 'outstanding_fine' => (float) $outstandingFine,
                 'fine_collected' => (float) $fineCollected,
-            ],
+            ]
         ]);
     }
 
@@ -153,34 +176,170 @@ class LibraryReportController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function issuedBooks(Request $request)
-    {
-        $user = auth()->user();
+   public function issuedBooks(Request $request)
+{
+    $schoolId = auth()->user()->school_id;
 
-        $query = BookIssue::with([
-            'libraryMember',
-            'book',
-            'bookCopy',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
-            )
-            ->where('status', 'Issued');
+    $query = BookIssue::query()
+        ->where('school_id', $schoolId);
 
-        $this->applyIssueFilters(
-            $query,
-            $request
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('search')) {
+
+        $search = trim($request->search);
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where('issue_no', 'like', "%{$search}%")
+
+                ->orWhereHas('book', function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%");
+                })
+
+                ->orWhereHas('libraryMember', function ($q) use ($search) {
+                    $q->where('member_no', 'like', "%{$search}%")
+                      ->orWhere('name', 'like', "%{$search}%");
+                });
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Status
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('status')) {
+        $query->where(
+            'status',
+            $request->status
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Date Filter
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('from_date')) {
+        $query->whereDate(
+            'issue_date',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    if ($request->filled('to_date')) {
+        $query->whereDate(
+            'issue_date',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Overdue
+    |--------------------------------------------------------------------------
+    */
+    if (
+        $request->filled('overdue') &&
+        $request->overdue == '1'
+    ) {
+        $query
+            ->where('status', 'Issued')
+            ->whereDate(
+                'due_date',
+                '<',
+                now()->toDateString()
+            );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get Records
+    |--------------------------------------------------------------------------
+    */
+    $results = $query
+        ->latest('issue_date')
+        ->paginate(
+            $request->integer('per_page', 20)
         );
 
-        $items = $query
-            ->orderByDesc('id')
-            ->paginate(
-                $request->get('per_page', 20)
-            );
+    /*
+    |--------------------------------------------------------------------------
+    | Attach Correct Names Expected By Vue
+    |--------------------------------------------------------------------------
+    */
+    $results->getCollection()->transform(
+        function ($issue) use ($schoolId) {
 
-        return $this->paginateResponse($items);
-    }
+            /*
+            |--------------------------------------------------------------
+            | Member
+            |--------------------------------------------------------------
+            */
+
+            $issue->library_member =
+                LibraryMember::where(
+                    'school_id',
+                    $schoolId
+                )
+                ->where(
+                    'id',
+                    $issue->library_member_id
+                )
+                ->first();
+
+
+            /*
+            |--------------------------------------------------------------
+            | Book
+            |--------------------------------------------------------------
+            */
+
+            $issue->book =
+                Book::where(
+                    'school_id',
+                    $schoolId
+                )
+                ->where(
+                    'id',
+                    $issue->book_id
+                )
+                ->first();
+
+
+            /*
+            |--------------------------------------------------------------
+            | Book Copy
+            |--------------------------------------------------------------
+            */
+
+            $issue->book_copy =
+                BookCopy::where(
+                    'school_id',
+                    $schoolId
+                )
+                ->where(
+                    'id',
+                    $issue->book_copy_id
+                )
+                ->first();
+
+
+            return $issue;
+        }
+    );
+
+    return response()->json([
+        'success' => true,
+        'data' => $results
+    ]);
+}
 
 
     /*
@@ -190,33 +349,107 @@ class LibraryReportController extends Controller
     */
 
     public function returnedBooks(Request $request)
-    {
-        $user = auth()->user();
+{
+    $schoolId = auth()->user()->school_id;
 
-        $query = BookIssue::with([
+    $query = BookIssue::query()
+        ->where('school_id', $schoolId)
+        ->where('status', 'Returned');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('search')) {
+
+        $search = trim($request->search);
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where('issue_no', 'like', "%{$search}%")
+
+                ->orWhereHas('book', function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%");
+                })
+
+                ->orWhereHas('libraryMember', function ($q) use ($search) {
+                    $q->where('member_no', 'like', "%{$search}%")
+                      ->orWhere('name', 'like', "%{$search}%");
+                });
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Date Filter
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('from_date')) {
+        $query->whereDate(
+            'issue_date',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    if ($request->filled('to_date')) {
+        $query->whereDate(
+            'issue_date',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load Relationships
+    |--------------------------------------------------------------------------
+    */
+    $results = $query
+        ->with([
             'libraryMember',
             'book',
-            'bookCopy',
+            'bookCopy'
         ])
-            ->where(
-                'school_id',
-                $user->school_id
-            )
-            ->where('status', 'Returned');
-
-        $this->applyIssueFilters(
-            $query,
-            $request
+        ->latest('issue_date')
+        ->paginate(
+            $request->integer('per_page', 20)
         );
 
-        $items = $query
-            ->orderByDesc('id')
-            ->paginate(
-                $request->get('per_page', 20)
-            );
+    /*
+    |--------------------------------------------------------------------------
+    | Normalize Relationship Names For Vue
+    |--------------------------------------------------------------------------
+    */
+    $results->getCollection()->transform(function ($issue) {
 
-        return $this->paginateResponse($items);
-    }
+        // Vue expects library_member
+        $issue->setAttribute(
+            'library_member',
+            $issue->libraryMember
+        );
+
+        // Vue expects book
+        $issue->setAttribute(
+            'book',
+            $issue->book
+        );
+
+        // Vue expects book_copy
+        $issue->setAttribute(
+            'book_copy',
+            $issue->bookCopy
+        );
+
+        return $issue;
+    });
+
+    return response()->json([
+        'success' => true,
+        'data' => $results
+    ]);
+}
 
 
     /*
@@ -226,41 +459,214 @@ class LibraryReportController extends Controller
     */
 
     public function overdueBooks(Request $request)
-    {
-        $user = auth()->user();
+{
+    $schoolId = $this->schoolId();
 
-        $query = BookIssue::with([
-            'libraryMember',
-            'book',
-            'bookCopy',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
-            )
-            ->whereIn('status', [
-                'Issued',
-                'Overdue'
-            ])
-            ->whereDate(
-                'due_date',
-                '<',
-                today()
-            );
-
-        $this->applyIssueFilters(
-            $query,
-            $request
+    $query = BookIssue::query()
+        ->where('school_id', $schoolId)
+        ->where('status', 'Issued')
+        ->whereDate(
+            'due_date',
+            '<',
+            now()->toDateString()
         );
 
-        $items = $query
-            ->orderBy('due_date')
-            ->paginate(
-                $request->get('per_page', 20)
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('search')) {
+
+        $search = trim($request->search);
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where(
+                'issue_no',
+                'like',
+                "%{$search}%"
             );
 
-        return $this->paginateResponse($items);
+            $q->orWhereHas(
+                'book',
+                function ($q) use ($search) {
+
+                    $q->where(
+                        'title',
+                        'like',
+                        "%{$search}%"
+                    );
+                }
+            );
+
+            $q->orWhereHas(
+                'libraryMember',
+                function ($q) use ($search) {
+
+                    $q->where(
+                        'member_no',
+                        'like',
+                        "%{$search}%"
+                    );
+
+                    $q->orWhere(
+                        'name',
+                        'like',
+                        "%{$search}%"
+                    );
+                }
+            );
+        });
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | From Date
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('from_date')) {
+
+        $query->whereDate(
+            'due_date',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | To Date
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('to_date')) {
+
+        $query->whereDate(
+            'due_date',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    $results = $query
+        ->latest('due_date')
+        ->paginate(
+            $request->integer(
+                'per_page',
+                20
+            )
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Add Member / Book / Copy
+    |--------------------------------------------------------------------------
+    */
+
+    $results->getCollection()
+        ->transform(function ($issue) use ($schoolId) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Member
+            |--------------------------------------------------------------------------
+            */
+
+            $issue->library_member = null;
+
+            if (!empty($issue->library_member_id)) {
+
+                $issue->library_member =
+                    LibraryMember::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $issue->library_member_id
+                    )
+                    ->first();
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Book
+            |--------------------------------------------------------------------------
+            */
+
+            $issue->book = null;
+
+            if (!empty($issue->book_id)) {
+
+                $issue->book =
+                    Book::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $issue->book_id
+                    )
+                    ->first();
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Book Copy
+            |--------------------------------------------------------------------------
+            */
+
+            $issue->book_copy = null;
+
+            if (!empty($issue->book_copy_id)) {
+
+                $issue->book_copy =
+                    BookCopy::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $issue->book_copy_id
+                    )
+                    ->first();
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Backward Compatible Names
+            |--------------------------------------------------------------------------
+            */
+
+            $issue->member =
+                $issue->library_member;
+
+            $issue->copy =
+                $issue->book_copy;
+
+            return $issue;
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response
+    |--------------------------------------------------------------------------
+    */
+
+    return response()->json([
+        'success' => true,
+        'data' => $results
+    ]);
+}
 
 
     /*
@@ -270,43 +676,261 @@ class LibraryReportController extends Controller
     */
 
     public function renewals(Request $request)
-    {
-        $user = auth()->user();
+{
+    $schoolId = $this->schoolId();
 
-        $query = BookRenewal::with([
-            'bookIssue.libraryMember',
-            'bookIssue.book',
-            'bookIssue.bookCopy',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
+    $query = BookRenewal::query()
+        ->where(
+            'school_id',
+            $schoolId
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('search')) {
+
+        $search = trim(
+            $request->search
+        );
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where(
+                'renewal_no',
+                'like',
+                "%{$search}%"
+            )
+
+            ->orWhereHas(
+                'bookIssue',
+                function ($q) use ($search) {
+
+                    $q->where(
+                        'issue_no',
+                        'like',
+                        "%{$search}%"
+                    );
+                }
             );
-
-        if ($request->filled('from_date')) {
-            $query->whereDate(
-                'renewal_date',
-                '>=',
-                $request->from_date
-            );
-        }
-
-        if ($request->filled('to_date')) {
-            $query->whereDate(
-                'renewal_date',
-                '<=',
-                $request->to_date
-            );
-        }
-
-        $items = $query
-            ->orderByDesc('id')
-            ->paginate(
-                $request->get('per_page', 20)
-            );
-
-        return $this->paginateResponse($items);
+        });
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | From Date
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('from_date')) {
+
+        $query->whereDate(
+            'renewal_date',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | To Date
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('to_date')) {
+
+        $query->whereDate(
+            'renewal_date',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    $results = $query
+        ->latest('renewal_date')
+        ->paginate(
+            $request->integer(
+                'per_page',
+                20
+            )
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prepare Renewal Data
+    |--------------------------------------------------------------------------
+    */
+
+    $results->getCollection()
+        ->transform(function ($renewal) use ($schoolId) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Default
+            |--------------------------------------------------------------------------
+            */
+
+            $renewal->book_issue = null;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get Book Issue
+            |--------------------------------------------------------------------------
+            */
+
+            if (!empty($renewal->book_issue_id)) {
+
+                $issue =
+                    BookIssue::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $renewal->book_issue_id
+                    )
+                    ->first();
+
+
+                if ($issue) {
+
+                    /*
+                    |----------------------------------------------------------
+                    | Library Member
+                    |----------------------------------------------------------
+                    */
+
+                    $issue->library_member = null;
+
+                    if (
+                        !empty(
+                            $issue->library_member_id
+                        )
+                    ) {
+
+                        $issue->library_member =
+                            LibraryMember::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->library_member_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Book
+                    |----------------------------------------------------------
+                    */
+
+                    $issue->book = null;
+
+                    if (
+                        !empty(
+                            $issue->book_id
+                        )
+                    ) {
+
+                        $issue->book =
+                            Book::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->book_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Book Copy
+                    |----------------------------------------------------------
+                    */
+
+                    $issue->book_copy = null;
+
+                    if (
+                        !empty(
+                            $issue->book_copy_id
+                        )
+                    ) {
+
+                        $issue->book_copy =
+                            BookCopy::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->book_copy_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Attach Issue
+                    |----------------------------------------------------------
+                    */
+
+                    $renewal->book_issue =
+                        $issue;
+                }
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Backward Compatible Fields
+            |--------------------------------------------------------------------------
+            */
+
+            $renewal->issue =
+                $renewal->book_issue;
+
+            $renewal->member =
+                $renewal->book_issue?->library_member;
+
+            $renewal->book =
+                $renewal->book_issue?->book;
+
+            $renewal->copy =
+                $renewal->book_issue?->book_copy;
+
+
+            return $renewal;
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response
+    |--------------------------------------------------------------------------
+    */
+
+    return response()->json([
+        'success' => true,
+        'data' => $results
+    ]);
+}
 
 
     /*
@@ -315,59 +939,371 @@ class LibraryReportController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function lostDamaged(Request $request)
-    {
-        $user = auth()->user();
+  public function lostDamaged(Request $request)
+{
+    $schoolId = $this->schoolId();
 
-        $query = LostDamagedBook::with([
-            'bookIssue',
-            'bookCopy',
-            'libraryMember',
-            'reportedBy',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
-            );
+    $query = LostDamagedBook::query()
+        ->where(
+            'school_id',
+            $schoolId
+        );
 
-        if ($request->filled('type')) {
-            $query->where(
-                'type',
-                $request->type
-            );
-        }
 
-        if ($request->filled('status')) {
-            $query->where(
-                'status',
-                $request->status
-            );
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | Type
+    |--------------------------------------------------------------------------
+    */
 
-        if ($request->filled('from_date')) {
-            $query->whereDate(
-                'reported_date',
-                '>=',
-                $request->from_date
-            );
-        }
+    if ($request->filled('type')) {
 
-        if ($request->filled('to_date')) {
-            $query->whereDate(
-                'reported_date',
-                '<=',
-                $request->to_date
-            );
-        }
-
-        $items = $query
-            ->orderByDesc('id')
-            ->paginate(
-                $request->get('per_page', 20)
-            );
-
-        return $this->paginateResponse($items);
+        $query->where(
+            'type',
+            $request->type
+        );
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('search')) {
+
+        $search = trim(
+            $request->search
+        );
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where(
+                'type',
+                'like',
+                "%{$search}%"
+            )
+
+            ->orWhereHas(
+                'book',
+                function ($q) use ($search) {
+
+                    $q->where(
+                        'title',
+                        'like',
+                        "%{$search}%"
+                    );
+                }
+            )
+
+            ->orWhereHas(
+                'libraryMember',
+                function ($q) use ($search) {
+
+                    $q->where(
+                        'member_no',
+                        'like',
+                        "%{$search}%"
+                    );
+                }
+            );
+
+        });
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | From Date
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('from_date')) {
+
+        $query->whereDate(
+            'created_at',
+            '>=',
+            $request->from_date
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | To Date
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('to_date')) {
+
+        $query->whereDate(
+            'created_at',
+            '<=',
+            $request->to_date
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    $results = $query
+        ->latest()
+        ->paginate(
+            $request->integer(
+                'per_page',
+                20
+            )
+        );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prepare Response
+    |--------------------------------------------------------------------------
+    */
+
+    $results->getCollection()
+        ->transform(function ($item) use ($schoolId) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Default values
+            |--------------------------------------------------------------------------
+            */
+
+            $item->library_member = null;
+            $item->book = null;
+            $item->book_copy = null;
+            $item->book_issue = null;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Library Member
+            |--------------------------------------------------------------------------
+            */
+
+            if (!empty($item->library_member_id)) {
+
+                $item->library_member =
+                    LibraryMember::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $item->library_member_id
+                    )
+                    ->first();
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Book
+            |--------------------------------------------------------------------------
+            */
+
+            if (!empty($item->book_id)) {
+
+                $item->book =
+                    Book::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $item->book_id
+                    )
+                    ->first();
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Book Copy
+            |--------------------------------------------------------------------------
+            */
+
+            if (!empty($item->book_copy_id)) {
+
+                $item->book_copy =
+                    BookCopy::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $item->book_copy_id
+                    )
+                    ->first();
+
+
+                /*
+                |--------------------------------------------------------------
+                | If Book ID is not directly stored on Lost/Damaged record,
+                | get it from the copy.
+                |--------------------------------------------------------------
+                */
+
+                if (
+                    !$item->book &&
+                    $item->book_copy &&
+                    !empty($item->book_copy->book_id)
+                ) {
+
+                    $item->book =
+                        Book::where(
+                            'school_id',
+                            $schoolId
+                        )
+                        ->where(
+                            'id',
+                            $item->book_copy->book_id
+                        )
+                        ->first();
+                }
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Book Issue
+            |--------------------------------------------------------------------------
+            */
+
+            if (!empty($item->book_issue_id)) {
+
+                $issue =
+                    BookIssue::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $item->book_issue_id
+                    )
+                    ->first();
+
+
+                if ($issue) {
+
+                    /*
+                    |----------------------------------------------------------
+                    | Issue Member
+                    |----------------------------------------------------------
+                    */
+
+                    if (
+                        !$item->library_member &&
+                        !empty($issue->library_member_id)
+                    ) {
+
+                        $item->library_member =
+                            LibraryMember::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->library_member_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Issue Book
+                    |----------------------------------------------------------
+                    */
+
+                    if (
+                        !$item->book &&
+                        !empty($issue->book_id)
+                    ) {
+
+                        $item->book =
+                            Book::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->book_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Issue Copy
+                    |----------------------------------------------------------
+                    */
+
+                    if (
+                        !$item->book_copy &&
+                        !empty($issue->book_copy_id)
+                    ) {
+
+                        $item->book_copy =
+                            BookCopy::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->book_copy_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Add Issue
+                    |----------------------------------------------------------
+                    */
+
+                    $item->book_issue = $issue;
+                }
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Keep backward-compatible names
+            |--------------------------------------------------------------------------
+            */
+
+            $item->member =
+                $item->library_member;
+
+            $item->copy =
+                $item->book_copy;
+
+
+            return $item;
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response
+    |--------------------------------------------------------------------------
+    */
+
+    return response()->json([
+        'success' => true,
+        'data' => $results
+    ]);
+}
 
 
     /*
@@ -377,61 +1313,255 @@ class LibraryReportController extends Controller
     */
 
     public function outstandingFines(Request $request)
-    {
-        $user = auth()->user();
+{
+    $schoolId = $this->schoolId();
 
-        $query = LibraryFine::with([
-            'bookIssue.libraryMember',
-            'bookIssue.book',
-            'bookIssue.bookCopy',
-            'libraryMember',
-            'collections',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
-            )
-            ->whereIn('status', [
-                'Pending',
-                'Partially Paid',
-            ])
-            ->where(
-                'due_amount',
-                '>',
-                0
-            );
+    $query = LibraryFine::query()
+        ->where('school_id', $schoolId)
+        ->whereIn('status', [
+            'Pending',
+            'Partially Paid'
+        ]);
 
-        if ($request->filled('fine_type')) {
-            $query->where(
-                'fine_type',
-                $request->fine_type
-            );
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | Fine Type
+    |--------------------------------------------------------------------------
+    */
 
-        if ($request->filled('from_date')) {
-            $query->whereDate(
-                'fine_date',
-                '>=',
-                $request->from_date
-            );
-        }
+    if ($request->filled('fine_type')) {
 
-        if ($request->filled('to_date')) {
-            $query->whereDate(
-                'fine_date',
-                '<=',
-                $request->to_date
-            );
-        }
-
-        $items = $query
-            ->orderByDesc('id')
-            ->paginate(
-                $request->get('per_page', 20)
-            );
-
-        return $this->paginateResponse($items);
+        $query->where(
+            'fine_type',
+            $request->fine_type
+        );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Date Filter
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('from_date')) {
+
+        $query->whereDate(
+            'created_at',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    if ($request->filled('to_date')) {
+
+        $query->whereDate(
+            'created_at',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    $results = $query
+        ->latest()
+        ->paginate(
+            $request->integer(
+                'per_page',
+                20
+            )
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prepare Data
+    |--------------------------------------------------------------------------
+    */
+
+    $results->getCollection()
+        ->transform(function ($fine) use ($schoolId) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Library Member
+            |--------------------------------------------------------------------------
+            */
+
+            $fine->library_member = null;
+
+            if (!empty($fine->library_member_id)) {
+
+                $fine->library_member =
+                    LibraryMember::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $fine->library_member_id
+                    )
+                    ->first();
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Book Issue
+            |--------------------------------------------------------------------------
+            */
+
+            $fine->book_issue = null;
+
+            if (!empty($fine->book_issue_id)) {
+
+                $issue =
+                    BookIssue::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $fine->book_issue_id
+                    )
+                    ->first();
+
+                if ($issue) {
+
+                    /*
+                    |----------------------------------------------------------
+                    | Attach Book
+                    |----------------------------------------------------------
+                    */
+
+                    $issue->book = null;
+
+                    if (!empty($issue->book_id)) {
+
+                        $issue->book =
+                            Book::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->book_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Attach Copy
+                    |----------------------------------------------------------
+                    */
+
+                    $issue->book_copy = null;
+
+                    if (!empty($issue->book_copy_id)) {
+
+                        $issue->book_copy =
+                            BookCopy::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->book_copy_id
+                            )
+                            ->first();
+                    }
+
+
+                    /*
+                    |----------------------------------------------------------
+                    | Attach Member To Issue
+                    |----------------------------------------------------------
+                    */
+
+                    $issue->library_member = null;
+
+                    if (!empty($issue->library_member_id)) {
+
+                        $issue->library_member =
+                            LibraryMember::where(
+                                'school_id',
+                                $schoolId
+                            )
+                            ->where(
+                                'id',
+                                $issue->library_member_id
+                            )
+                            ->first();
+                    }
+
+
+                    $fine->book_issue = $issue;
+                }
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Paid Amount
+            |--------------------------------------------------------------------------
+            */
+
+            $paid = FineCollection::where(
+                'school_id',
+                $schoolId
+            )
+            ->where(
+                'library_fine_id',
+                $fine->id
+            )
+            ->sum('amount');
+
+
+            $fine->paid_amount =
+                (float) $paid;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Due Amount
+            |--------------------------------------------------------------------------
+            |
+            | Do NOT use a database column called due_amount.
+            | Calculate it from payable_amount - paid amount.
+            |
+            |--------------------------------------------------------------------------
+            */
+
+            $payable =
+                (float) $fine->payable_amount;
+
+            $fine->due_amount =
+                max(
+                    0,
+                    $payable - (float) $paid
+                );
+
+
+            return $fine;
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response
+    |--------------------------------------------------------------------------
+    */
+
+    return response()->json([
+        'success' => true,
+        'data' => $results
+    ]);
+}
 
 
     /*
@@ -441,264 +1571,174 @@ class LibraryReportController extends Controller
     */
 
     public function fineCollection(Request $request)
-    {
-        $user = auth()->user();
+{
+    $schoolId = $this->schoolId();
 
-        $query = FineCollection::with([
-            'libraryFine',
-            'libraryMember',
-            'collector',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
-            );
-
-        if ($request->filled('from_date')) {
-            $query->whereDate(
-                'payment_date',
-                '>=',
-                $request->from_date
-            );
-        }
-
-        if ($request->filled('to_date')) {
-            $query->whereDate(
-                'payment_date',
-                '<=',
-                $request->to_date
-            );
-        }
-
-        if ($request->filled('payment_method')) {
-            $query->where(
-                'payment_method',
-                $request->payment_method
-            );
-        }
-
-        $items = $query
-            ->orderByDesc('id')
-            ->paginate(
-                $request->get('per_page', 20)
-            );
-
-        return $this->paginateResponse($items);
-    }
-
+    $query = FineCollection::query()
+        ->where('school_id', $schoolId);
 
     /*
     |--------------------------------------------------------------------------
-    | Member History
+    | Payment Method
     |--------------------------------------------------------------------------
     */
+    if ($request->filled('payment_method')) {
 
-    public function memberHistory(
-        Request $request,
-        $memberId
-    ) {
-        $user = auth()->user();
-
-        $member = LibraryMember::where(
-            'school_id',
-            $user->school_id
-        )
-            ->with([
-                'student',
-                'staff',
-            ])
-            ->findOrFail($memberId);
-
-        $issues = BookIssue::with([
-            'book',
-            'bookCopy',
-            'renewals',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
-            )
-            ->where(
-                'library_member_id',
-                $member->id
-            )
-            ->orderByDesc('id')
-            ->paginate(
-                $request->get('per_page', 20)
-            );
-
-        $fines = LibraryFine::with([
-            'collections',
-        ])
-            ->where(
-                'school_id',
-                $user->school_id
-            )
-            ->where(
-                'library_member_id',
-                $member->id
-            )
-            ->orderByDesc('id')
-            ->get();
-
-        $totalFine = $fines->sum(
-            fn($fine) => (float) $fine->amount
+        $query->where(
+            'payment_mode',
+            $request->payment_method
         );
-
-        $paidFine = $fines->sum(
-            fn($fine) => (float) $fine->paid_amount
-        );
-
-        $dueFine = $fines->sum(
-            fn($fine) => (float) $fine->due_amount
-        );
-
-        return response()->json([
-            'status' => 200,
-
-            'data' => [
-                'member' => $member,
-
-                'summary' => [
-                    'total_issues' => $issues->total(),
-                    'total_fine' => $totalFine,
-                    'paid_fine' => $paidFine,
-                    'due_fine' => $dueFine,
-                ],
-
-                'issues' => $issues,
-
-                'fines' => $fines,
-            ],
-        ]);
     }
-
 
     /*
     |--------------------------------------------------------------------------
-    | Apply Issue Filters
+    | From Date
     |--------------------------------------------------------------------------
     */
+    if ($request->filled('from_date')) {
 
-    private function applyIssueFilters(
-        $query,
-        Request $request
-    ) {
-        if ($request->filled('search')) {
+        $query->whereDate(
+            'collection_date',
+            '>=',
+            $request->from_date
+        );
+    }
 
-            $search = trim(
-                $request->search
-            );
+    /*
+    |--------------------------------------------------------------------------
+    | To Date
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('to_date')) {
 
-            $query->where(function ($q) use ($search) {
+        $query->whereDate(
+            'collection_date',
+            '<=',
+            $request->to_date
+        );
+    }
 
-                $q->where(
-                    'issue_no',
-                    'like',
-                    "%{$search}%"
-                )
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+    $results = $query
+        ->latest('collection_date')
+        ->paginate(
+            $request->integer('per_page', 20)
+        );
 
-                    ->orWhereHas(
-                        'libraryMember',
-                        function ($q) use ($search) {
+    /*
+    |--------------------------------------------------------------------------
+    | Prepare Report Data
+    |--------------------------------------------------------------------------
+    */
+    $results->getCollection()->transform(
+        function ($collection) use ($schoolId) {
 
-                            $q->where(
-                                'member_no',
-                                'like',
-                                "%{$search}%"
-                            );
-                        }
+            /*
+            |--------------------------------------------------------------------------
+            | Library Fine
+            |--------------------------------------------------------------------------
+            */
+
+            $collection->library_fine = null;
+
+            if (!empty($collection->library_fine_id)) {
+
+                $collection->library_fine =
+                    LibraryFine::where(
+                        'school_id',
+                        $schoolId
                     )
-
-                    ->orWhereHas(
-                        'book',
-                        function ($q) use ($search) {
-
-                            $q->where(
-                                'title',
-                                'like',
-                                "%{$search}%"
-                            );
-                        }
+                    ->where(
+                        'id',
+                        $collection->library_fine_id
                     )
+                    ->first();
+            }
 
-                    ->orWhereHas(
-                        'bookCopy',
-                        function ($q) use ($search) {
+            /*
+            |--------------------------------------------------------------------------
+            | Library Member
+            |--------------------------------------------------------------------------
+            */
 
-                            $q->where(
-                                'accession_no',
-                                'like',
-                                "%{$search}%"
-                            )
+            $collection->library_member = null;
 
-                                ->orWhere(
-                                    'barcode',
-                                    'like',
-                                    "%{$search}%"
-                                );
-                        }
-                    );
-            });
+            if (!empty($collection->library_member_id)) {
+
+                $collection->library_member =
+                    LibraryMember::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $collection->library_member_id
+                    )
+                    ->first();
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Normalize Fields For Vue
+            |--------------------------------------------------------------------------
+            */
+
+            // Vue expects payment_date
+            $collection->payment_date =
+                $collection->collection_date;
+
+            // Vue expects payment_method
+            $collection->payment_method =
+                $collection->payment_mode;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reference Number
+            |--------------------------------------------------------------------------
+            |
+            | Use whichever field exists in your FineCollection model/table.
+            |
+            */
+
+            $collection->reference_no =
+                $collection->reference_no
+                ?? $collection->transaction_no
+                ?? $collection->receipt_no
+                ?? null;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Collector
+            |--------------------------------------------------------------------------
+            */
+
+            $collection->collector = null;
+
+            if (!empty($collection->collected_by)) {
+
+                $collection->collector =
+                    \App\Models\User::where(
+                        'school_id',
+                        $schoolId
+                    )
+                    ->where(
+                        'id',
+                        $collection->collected_by
+                    )
+                    ->first();
+            }
+
+            return $collection;
         }
+    );
 
-        if ($request->filled('member_id')) {
-
-            $query->where(
-                'library_member_id',
-                $request->member_id
-            );
-        }
-
-        if ($request->filled('book_id')) {
-
-            $query->where(
-                'book_id',
-                $request->book_id
-            );
-        }
-
-        if ($request->filled('from_date')) {
-
-            $query->whereDate(
-                'issue_date',
-                '>=',
-                $request->from_date
-            );
-        }
-
-        if ($request->filled('to_date')) {
-
-            $query->whereDate(
-                'issue_date',
-                '<=',
-                $request->to_date
-            );
-        }
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Pagination Response
-    |--------------------------------------------------------------------------
-    */
-
-    private function paginateResponse($items)
-    {
-        return response()->json([
-            'status' => 200,
-
-            'data' => $items->items(),
-
-            'pagination' => [
-                'total' => $items->total(),
-                'per_page' => $items->perPage(),
-                'current_page' => $items->currentPage(),
-                'last_page' => $items->lastPage(),
-                'from' => $items->firstItem(),
-                'to' => $items->lastItem(),
-            ],
-        ]);
-    }
+    return response()->json([
+        'success' => true,
+        'data' => $results
+    ]);
+}
 }

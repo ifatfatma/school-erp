@@ -55,6 +55,7 @@ use App\Http\Controllers\Api\BookIssueController;
 use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\BookRenewalController;
 use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\LibraryReportController;
 
 
 
@@ -1467,6 +1468,50 @@ Route::prefix('fee-receipts')->group(function () {
         ]);
 
     });
+
+    Route::prefix('library-reports')->group(function () {
+
+    Route::get(
+        '/dashboard',
+        [LibraryReportController::class, 'dashboard']
+    );
+    Route::get(
+            '/issued-books',
+            [LibraryReportController::class, 'issuedBooks']
+        );
+
+        Route::get(
+            '/returned-books',
+            [LibraryReportController::class, 'returnedBooks']
+        );
+
+        Route::get(
+            '/overdue-books',
+            [LibraryReportController::class, 'overdueBooks']
+        );
+
+        Route::get(
+            '/renewals',
+            [LibraryReportController::class, 'renewals']
+        );
+
+        Route::get(
+            '/lost-damaged',
+            [LibraryReportController::class, 'lostDamaged']
+        );
+
+        Route::get(
+            '/outstanding-fines',
+            [LibraryReportController::class, 'outstandingFines']
+        );
+
+        Route::get(
+            '/fine-collection',
+            [LibraryReportController::class, 'fineCollection']
+        );
+
+
+});
 
 
 
