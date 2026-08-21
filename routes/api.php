@@ -54,9 +54,7 @@ use App\Http\Controllers\Api\LibraryMemberController;
 use App\Http\Controllers\Api\BookIssueController;
 use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\BookRenewalController;
-use App\Http\Controllers\Api\LostDamagedBookController;
-use App\Http\Controllers\Api\LibraryFineController;
-use App\Http\Controllers\Api\LibraryReportController;
+use App\Http\Controllers\Api\SettingController;
 
 
 
@@ -1472,301 +1470,84 @@ Route::prefix('fee-receipts')->group(function () {
 
 
 
-    Route::prefix('lost-damaged-books')->group(function () {
+    Route::prefix('settings')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | List
+        | All Settings
         |--------------------------------------------------------------------------
         */
 
         Route::get('/', [
-            LostDamagedBookController::class,
+            SettingController::class,
             'index',
         ]);
 
 
         /*
         |--------------------------------------------------------------------------
-        | Specific routes MUST come before /{id}
+        | Defaults
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/statistics', [
-            LostDamagedBookController::class,
-            'statistics',
-        ]);
-
-        Route::get('/pending-charges', [
-            LostDamagedBookController::class,
-            'pendingCharges',
-        ]);
-
-        Route::get('/lost', [
-            LostDamagedBookController::class,
-            'lostBooks',
-        ]);
-
-        Route::get('/damaged', [
-            LostDamagedBookController::class,
-            'damagedBooks',
-        ]);
-
-        Route::get('/member/{memberId}', [
-            LostDamagedBookController::class,
-            'memberHistory',
-        ]);
-
-        Route::get('/copy/{copyId}', [
-            LostDamagedBookController::class,
-            'copyHistory',
+        Route::post('/create-defaults', [
+            SettingController::class,
+            'createDefaults',
         ]);
 
 
         /*
         |--------------------------------------------------------------------------
-        | Create
+        | Group
         |--------------------------------------------------------------------------
         */
 
-        Route::post('/', [
-            LostDamagedBookController::class,
-            'store',
+        Route::get('/group/{group}', [
+            SettingController::class,
+            'group',
+        ]);
+
+        Route::get('/group/{group}/details', [
+            SettingController::class,
+            'groupDetails',
         ]);
 
 
         /*
         |--------------------------------------------------------------------------
-        | Show / Update / Delete
+        | Save Group
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/{id}', [
-            LostDamagedBookController::class,
+        Route::put('/group/{group}', [
+            SettingController::class,
+            'saveGroup',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Single Setting
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/{group}/{key}', [
+            SettingController::class,
             'show',
         ]);
 
-        Route::put('/{id}', [
-            LostDamagedBookController::class,
-            'update',
+        Route::post('/', [
+            SettingController::class,
+            'store',
         ]);
 
-        Route::delete('/{id}', [
-            LostDamagedBookController::class,
+        Route::delete('/{group}/{key}', [
+            SettingController::class,
             'destroy',
         ]);
 
     });
 
-
-
-    Route::prefix('library-fines')->group(function () {
-
-        /*
-        |--------------------------------------------------------------------------
-        | List
-        |--------------------------------------------------------------------------
-        */
-
-        Route::get('/', [
-            LibraryFineController::class,
-            'index',
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Specific routes
-        |--------------------------------------------------------------------------
-        |
-        | Keep these BEFORE /{id}
-        |
-        */
-
-        Route::get('/statistics', [
-            LibraryFineController::class,
-            'statistics',
-        ]);
-
-        Route::get('/pending', [
-            LibraryFineController::class,
-            'pendingFines',
-        ]);
-
-        Route::get('/overdue', [
-            LibraryFineController::class,
-            'overdueFines',
-        ]);
-
-        Route::get('/lost-damaged', [
-            LibraryFineController::class,
-            'lostDamagedFines',
-        ]);
-
-        Route::get('/member/{memberId}', [
-            LibraryFineController::class,
-            'memberFines',
-        ]);
-
-        Route::get('/issue/{issueId}', [
-            LibraryFineController::class,
-            'issueFines',
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Create
-        |--------------------------------------------------------------------------
-        */
-
-        Route::post('/', [
-            LibraryFineController::class,
-            'store',
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Show / Update / Delete
-        |--------------------------------------------------------------------------
-        */
-
-        Route::get('/{id}', [
-            LibraryFineController::class,
-            'show',
-        ]);
-
-        Route::put('/{id}', [
-            LibraryFineController::class,
-            'update',
-        ]);
-
-        Route::delete('/{id}', [
-            LibraryFineController::class,
-            'destroy',
-        ]);
-
-    });
-
-
-
-    /*
-|--------------------------------------------------------------------------
-| Library Reports
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('library-reports')->group(function () {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/dashboard',
-        [LibraryReportController::class, 'dashboard']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Issued Books
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/issued-books',
-        [LibraryReportController::class, 'issuedBooks']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Returned Books
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/returned-books',
-        [LibraryReportController::class, 'returnedBooks']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Overdue Books
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/overdue-books',
-        [LibraryReportController::class, 'overdueBooks']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Renewals
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/renewals',
-        [LibraryReportController::class, 'renewals']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Lost / Damaged
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/lost-damaged',
-        [LibraryReportController::class, 'lostDamaged']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Outstanding Fines
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/outstanding-fines',
-        [LibraryReportController::class, 'outstandingFines']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Fine Collection
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/fine-collection',
-        [LibraryReportController::class, 'fineCollection']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Member History
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/member/{memberId}',
-        [LibraryReportController::class, 'memberHistory']
-    );
-
-});
 
 
 });
