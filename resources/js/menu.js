@@ -328,19 +328,46 @@ export default [
         icon: "bi bi-box-seam",
         children: [
             {
+                    title: 'Categories',
+                    route: '/inventory/categories',
+                    permission: "categories.view",
+            },
+            {
+                    title: 'Units',
+                    route: '/inventory/units',
+                    permission: "units.view",
+            },
+            {
+                    title: 'Suppliers',
+                    route: '/inventory/suppliers',
+                    permission: "suppliers.view",
+            },
+            {
                 title: "Items",
                 route: "/inventory/items",
                 permission: "inventory.view",
             },
             {
-                title: "Suppliers",
-                route: "/inventory/suppliers",
-                permission: "supplier.view",
-            },
-            {
                 title: "Purchases",
                 route: "/inventory/purchases",
                 permission: "purchase.view",
+            },
+            {
+                title: "Stock Ins",
+                route: "/inventory/stock-ins",
+                permission: "stock_ins.view",
+            },{
+                title: "Stock Movements",
+                route: "/inventory/stockmovements",
+                permission: "stock_movements.view",
+            },{
+                title: "Inventory Dashboard",
+                route: "/inventory/dashboard",
+                permission: "inventory_dashboard.view",
+            },{
+                title: "Stock Outs",
+                route: "/inventory/stock-outs",
+                permission: "inventory_stock_outs.view",
             },
         ],
     },
@@ -348,8 +375,13 @@ export default [
     {
         title: "Transport",
         icon: "bi bi-bus-front",
-        route: "/transport",
-        permission: "transport.view",
+        children: [
+                {
+                title: "Vehicles",
+                route: "/transport/vehicles",
+                permission: "transport_vehicles.view",
+                },
+        ]
     },
 
     {

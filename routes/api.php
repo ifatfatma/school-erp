@@ -56,6 +56,19 @@ use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\BookRenewalController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\LibraryReportController;
+use App\Http\Controllers\Api\Inventory\InventoryItemController;
+use App\Http\Controllers\Api\Inventory\InventoryPurchaseController;
+use App\Http\Controllers\Api\Inventory\InventorySupplierController;
+use App\Http\Controllers\Api\Inventory\InventoryStockMovementController;
+use App\Http\Controllers\Api\Inventory\InventoryCategoryController;
+use App\Http\Controllers\Api\Inventory\InventoryUnitController;
+use App\Http\Controllers\Api\Inventory\InventoryStockInController;
+use App\Http\Controllers\Api\Inventory\InventoryStockOutController;
+use App\Http\Controllers\Api\Inventory\InventoryStockAdjustmentController;
+use App\Http\Controllers\Api\Inventory\InventoryDashboardController;
+use App\Http\Controllers\Api\Transport\TransportVehicleController;
+use App\Http\Controllers\Api\Transport\TransportDriverController;
+use App\Http\Controllers\Api\Transport\TransportRouteController;
 
 
 
@@ -66,8 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
     Route::get(
-    'academic-sessions/active',
-    [AcademicSessionController::class, 'active']
+        'academic-sessions/active',
+        [AcademicSessionController::class, 'active']
     );
 
     Route::apiResource(
@@ -76,27 +89,27 @@ Route::middleware('auth:sanctum')->group(function () {
     );
 
     Route::get(
-    'classes/active',
-    [SchoolClassController::class, 'active']
+        'classes/active',
+        [SchoolClassController::class, 'active']
     );
     Route::apiResource('classes', SchoolClassController::class);
 
     Route::get(
-    'subjects/active',
-    [SubjectController::class, 'active']
+        'subjects/active',
+        [SubjectController::class, 'active']
     );
     Route::apiResource('subjects', SubjectController::class);
 
     Route::apiResource('timetables', TimetableController::class);
     Route::get(
-    'sections/active',
-    [SectionController::class, 'active']
+        'sections/active',
+        [SectionController::class, 'active']
     );
     Route::apiResource('sections', SectionController::class);
     Route::apiResource('schools', SchoolController::class);
     Route::get(
-    'teachers/active',
-    [TeacherController::class, 'active']
+        'teachers/active',
+        [TeacherController::class, 'active']
     );
     Route::apiResource('teachers', TeacherController::class);
     Route::apiResource('leave-types', LeaveTypeController::class);
@@ -129,249 +142,242 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('exams', ExamController::class);
 
 
-Route::get(
-    'exam-schedules/active',
-    [ExamScheduleController::class, 'active']
-);
-
-Route::apiResource(
-    'exam-schedules',
-    ExamScheduleController::class
-);
-
-
-Route::get(
-    'exam-subjects/active',
-    [ExamSubjectController::class, 'active']
-);
-
-Route::get(
-    'exam-subjects/exam/{exam}/class/{class}',
-    [ExamSubjectController::class, 'byExamAndClass']
-);
-
-Route::apiResource(
-    'exam-subjects',
-    ExamSubjectController::class
-);
-
-
-
-Route::prefix('exam-marks')->group(function () {
-
-    // Load marks entry grid
     Route::get(
-        'load',
-        [ExamMarkController::class, 'load']
+        'exam-schedules/active',
+        [ExamScheduleController::class, 'active']
     );
 
-    // Save all marks
-    Route::post(
-        'save',
-        [ExamMarkController::class, 'save']
+    Route::apiResource(
+        'exam-schedules',
+        ExamScheduleController::class
     );
 
-    // View a student's marks
+
     Route::get(
-        'student/{student}',
-        [ExamMarkController::class, 'student']
+        'exam-subjects/active',
+        [ExamSubjectController::class, 'active']
     );
 
-    // Lock Marks
-    Route::patch(
-        'lock/{exam}',
-        [ExamMarkController::class, 'lock']
+    Route::get(
+        'exam-subjects/exam/{exam}/class/{class}',
+        [ExamSubjectController::class, 'byExamAndClass']
     );
 
-    // Unlock Marks
-    Route::patch(
-        'unlock/{exam}',
-        [ExamMarkController::class, 'unlock']
+    Route::apiResource(
+        'exam-subjects',
+        ExamSubjectController::class
     );
 
-});
+
+
+    Route::prefix('exam-marks')->group(function () {
+
+        // Load marks entry grid
+        Route::get(
+            'load',
+            [ExamMarkController::class, 'load']
+        );
+
+        // Save all marks
+        Route::post(
+            'save',
+            [ExamMarkController::class, 'save']
+        );
+
+        // View a student's marks
+        Route::get(
+            'student/{student}',
+            [ExamMarkController::class, 'student']
+        );
+
+        // Lock Marks
+        Route::patch(
+            'lock/{exam}',
+            [ExamMarkController::class, 'lock']
+        );
+
+        // Unlock Marks
+        Route::patch(
+            'unlock/{exam}',
+            [ExamMarkController::class, 'unlock']
+        );
+    });
 
 
 
 
-Route::get(
-    'report-cards/student/{student}/exam/{exam}',
-    [ReportCardController::class, 'student']
-);
+    Route::get(
+        'report-cards/student/{student}/exam/{exam}',
+        [ReportCardController::class, 'student']
+    );
     // Optional restore route
     Route::post('schools/{id}/restore', [SchoolController::class, 'restore'])->name('schools.restore');
     Route::get(
-    'result-grades/active',
-    [ResultGradeController::class, 'active']
-);
+        'result-grades/active',
+        [ResultGradeController::class, 'active']
+    );
 
-Route::apiResource(
-    'result-grades',
-    ResultGradeController::class
-);
+    Route::apiResource(
+        'result-grades',
+        ResultGradeController::class
+    );
 
 
 
-Route::post(
+    Route::post(
         '/exam-ranks/calculate',
         [ExamRankController::class, 'calculate']
     );
 
 
 
-Route::prefix('fee-collection')->group(function () {
+    Route::prefix('fee-collection')->group(function () {
 
-    Route::get('/students', [
-        FeeCollectionController::class,
-        'students'
-    ]);
+        Route::get('/students', [
+            FeeCollectionController::class,
+            'students'
+        ]);
 
-    Route::get('/student/{student}/dues', [
-        FeeCollectionController::class,
-        'dues'
-    ]);
+        Route::get('/student/{student}/dues', [
+            FeeCollectionController::class,
+            'dues'
+        ]);
 
-    Route::post('/collect', [
-        FeeCollectionController::class,
-        'collect'
-    ]);
+        Route::post('/collect', [
+            FeeCollectionController::class,
+            'collect'
+        ]);
 
-    Route::get('/{payment}', [
-        FeeCollectionController::class,
-        'show'
-    ]);
+        Route::get('/{payment}', [
+            FeeCollectionController::class,
+            'show'
+        ]);
 
-    Route::get('/{payment}/receipt', [
-        FeeCollectionController::class,
-        'receipt'
-    ]);
-
-});
-
-
-
-Route::prefix('fee-types')->group(function () {
-
-    Route::get('/', [
-        FeeTypeController::class,
-        'index'
-    ]);
-
-    Route::post('/', [
-        FeeTypeController::class,
-        'store'
-    ]);
-
-    Route::get('/{id}', [
-        FeeTypeController::class,
-        'show'
-    ]);
-
-    Route::put('/{id}', [
-        FeeTypeController::class,
-        'update'
-    ]);
-
-    Route::delete('/{id}', [
-        FeeTypeController::class,
-        'destroy'
-    ]);
-
-});
-
-
-Route::prefix('fee-structures')->group(function () {
-
-    Route::get('/', [
-        FeeStructureController::class,
-        'index'
-    ]);
-
-    Route::post('/', [
-        FeeStructureController::class,
-        'store'
-    ]);
-
-    Route::get('/{id}', [
-        FeeStructureController::class,
-        'show'
-    ]);
-
-    Route::put('/{id}', [
-        FeeStructureController::class,
-        'update'
-    ]);
-
-    Route::delete('/{id}', [
-        FeeStructureController::class,
-        'destroy'
-    ]);
-
-});
-
-
-Route::prefix('fee-assignments')->group(function () {
-
-    Route::get('/', [
-        FeeAssignmentController::class,
-        'index'
-    ]);
-
-    Route::get('/students', [
-        FeeAssignmentController::class,
-        'students'
-    ]);
-
-    Route::post('/assign', [
-        FeeAssignmentController::class,
-        'assign'
-    ]);
-
-    Route::delete('/{id}', [
-        FeeAssignmentController::class,
-        'destroy'
-    ]);
-
-});
-
-
-Route::prefix('fee-dues')->group(function () {
-
-    Route::get('/', [
-        FeeDueController::class,
-        'index'
-    ]);
-
-    Route::get('/summary', [
-        FeeDueController::class,
-        'summary'
-    ]);
-
-    Route::get('/{id}', [
-        FeeDueController::class,
-        'show'
-    ]);
-
-});
+        Route::get('/{payment}/receipt', [
+            FeeCollectionController::class,
+            'receipt'
+        ]);
+    });
 
 
 
-Route::prefix('payment-history')->group(function () {
+    Route::prefix('fee-types')->group(function () {
 
-    Route::get('/', [
-        PaymentHistoryController::class,
-        'index'
-    ]);
+        Route::get('/', [
+            FeeTypeController::class,
+            'index'
+        ]);
 
-    Route::get('/{id}', [
-        PaymentHistoryController::class,
-        'show'
-    ]);
+        Route::post('/', [
+            FeeTypeController::class,
+            'store'
+        ]);
 
-});
+        Route::get('/{id}', [
+            FeeTypeController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            FeeTypeController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            FeeTypeController::class,
+            'destroy'
+        ]);
+    });
 
 
-Route::prefix('fee-receipts')->group(function () {
+    Route::prefix('fee-structures')->group(function () {
+
+        Route::get('/', [
+            FeeStructureController::class,
+            'index'
+        ]);
+
+        Route::post('/', [
+            FeeStructureController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            FeeStructureController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            FeeStructureController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            FeeStructureController::class,
+            'destroy'
+        ]);
+    });
+
+
+    Route::prefix('fee-assignments')->group(function () {
+
+        Route::get('/', [
+            FeeAssignmentController::class,
+            'index'
+        ]);
+
+        Route::get('/students', [
+            FeeAssignmentController::class,
+            'students'
+        ]);
+
+        Route::post('/assign', [
+            FeeAssignmentController::class,
+            'assign'
+        ]);
+
+        Route::delete('/{id}', [
+            FeeAssignmentController::class,
+            'destroy'
+        ]);
+    });
+
+
+    Route::prefix('fee-dues')->group(function () {
+
+        Route::get('/', [
+            FeeDueController::class,
+            'index'
+        ]);
+
+        Route::get('/summary', [
+            FeeDueController::class,
+            'summary'
+        ]);
+
+        Route::get('/{id}', [
+            FeeDueController::class,
+            'show'
+        ]);
+    });
+
+
+
+    Route::prefix('payment-history')->group(function () {
+
+        Route::get('/', [
+            PaymentHistoryController::class,
+            'index'
+        ]);
+
+        Route::get('/{id}', [
+            PaymentHistoryController::class,
+            'show'
+        ]);
+    });
+
+
+    Route::prefix('fee-receipts')->group(function () {
 
         Route::get('/', [
             FeeReceiptController::class,
@@ -392,7 +398,6 @@ Route::prefix('fee-receipts')->group(function () {
             FeeReceiptController::class,
             'download'
         ]);
-
     });
 
     Route::prefix('discounts')->group(function () {
@@ -426,7 +431,6 @@ Route::prefix('fee-receipts')->group(function () {
             DiscountController::class,
             'toggleStatus'
         ]);
-
     });
 
     Route::prefix('late-fees')->group(function () {
@@ -460,7 +464,6 @@ Route::prefix('fee-receipts')->group(function () {
             LateFeeController::class,
             'toggleStatus'
         ]);
-
     });
 
     Route::prefix('expense-categories')->group(function () {
@@ -494,7 +497,6 @@ Route::prefix('fee-receipts')->group(function () {
             ExpenseCategoryController::class,
             'toggleStatus'
         ]);
-
     });
 
     Route::prefix('expenses')->group(function () {
@@ -533,7 +535,6 @@ Route::prefix('fee-receipts')->group(function () {
             ExpenseController::class,
             'status'
         ]);
-
     });
 
     Route::prefix('expense-payments')->group(function () {
@@ -562,7 +563,6 @@ Route::prefix('fee-receipts')->group(function () {
             ExpensePaymentController::class,
             'destroy'
         ]);
-
     });
 
 
@@ -619,7 +619,6 @@ Route::prefix('fee-receipts')->group(function () {
         '/recurring-expenses/{id}/toggle-auto-create',
         [RecurringExpenseController::class, 'toggleAutoCreate']
     );
-
     Route::prefix('expense-reports')->group(function () {
 
         Route::get('/', [
@@ -641,11 +640,7 @@ Route::prefix('fee-receipts')->group(function () {
             ExpenseReportController::class,
             'dailySummary'
         ]);
-
-
     });
-
-
     Route::prefix('income-categories')->group(function () {
 
         Route::get('/', [
@@ -685,11 +680,7 @@ Route::prefix('fee-receipts')->group(function () {
             IncomeCategoryController::class,
             'status'
         ]);
-
     });
-
-
-
     Route::prefix('incomes')->group(function () {
 
         /*
@@ -788,11 +779,7 @@ Route::prefix('fee-receipts')->group(function () {
             IncomeController::class,
             'status'
         ]);
-
     });
-
-
-
     Route::prefix('income-payments')->group(function () {
 
         Route::get('/', [
@@ -835,9 +822,6 @@ Route::prefix('fee-receipts')->group(function () {
             'status'
         ]);
     });
-
-
-
     Route::prefix('recurring-incomes')->group(function () {
 
         /*
@@ -937,11 +921,7 @@ Route::prefix('fee-receipts')->group(function () {
             RecurringIncomeController::class,
             'generate'
         ]);
-
     });
-
-
-
     Route::prefix('income-reports')->group(function () {
 
         Route::get('/summary', [
@@ -973,15 +953,7 @@ Route::prefix('fee-receipts')->group(function () {
             IncomeReportController::class,
             'paymentMethodWise'
         ]);
-
-
-
-
     });
-
-
-
-
     Route::prefix('authors')->group(function () {
 
         /*
@@ -1068,11 +1040,7 @@ Route::prefix('fee-receipts')->group(function () {
             AuthorController::class,
             'status'
         ]);
-
     });
-
-
-
     Route::prefix('book-categories')->group(function () {
 
         Route::get('/', [
@@ -1109,11 +1077,7 @@ Route::prefix('fee-receipts')->group(function () {
             BookCategoryController::class,
             'status'
         ]);
-
     });
-
-
-
     Route::prefix('publishers')->group(function () {
 
         Route::get('/', [
@@ -1153,12 +1117,7 @@ Route::prefix('fee-receipts')->group(function () {
             PublisherController::class,
             'status'
         ]);
-
     });
-
-
-
-
     Route::prefix('books')->group(function () {
 
         Route::get('/', [
@@ -1196,11 +1155,7 @@ Route::prefix('fee-receipts')->group(function () {
             BookController::class,
             'status'
         ]);
-
     });
-
-
-
     Route::prefix('book-copies')->group(function () {
 
         Route::get('/', [
@@ -1260,11 +1215,7 @@ Route::prefix('fee-receipts')->group(function () {
             BookCopyController::class,
             'condition'
         ]);
-
     });
-
-
-
     Route::prefix('library-members')->group(function () {
 
         Route::get('/', [
@@ -1309,12 +1260,7 @@ Route::prefix('fee-receipts')->group(function () {
             LibraryMemberController::class,
             'status'
         ]);
-
     });
-
-
-
-
     Route::prefix('book-issues')->group(function () {
 
         Route::get('/', [
@@ -1362,11 +1308,7 @@ Route::prefix('fee-receipts')->group(function () {
             BookIssueController::class,
             'destroy'
         ]);
-
     });
-
-
-
     Route::prefix('book-returns')->group(function () {
 
         Route::get('/', [
@@ -1414,11 +1356,7 @@ Route::prefix('fee-receipts')->group(function () {
             BookReturnController::class,
             'destroy'
         ]);
-
     });
-
-
-
     Route::prefix('book-renewals')->group(function () {
 
         Route::get('/', [
@@ -1466,16 +1404,14 @@ Route::prefix('fee-receipts')->group(function () {
             BookRenewalController::class,
             'destroy'
         ]);
-
     });
-
     Route::prefix('library-reports')->group(function () {
 
-    Route::get(
-        '/dashboard',
-        [LibraryReportController::class, 'dashboard']
-    );
-    Route::get(
+        Route::get(
+            '/dashboard',
+            [LibraryReportController::class, 'dashboard']
+        );
+        Route::get(
             '/issued-books',
             [LibraryReportController::class, 'issuedBooks']
         );
@@ -1509,12 +1445,7 @@ Route::prefix('fee-receipts')->group(function () {
             '/fine-collection',
             [LibraryReportController::class, 'fineCollection']
         );
-
-
-});
-
-
-
+    });
     Route::prefix('settings')->group(function () {
 
         /*
@@ -1590,9 +1521,434 @@ Route::prefix('fee-receipts')->group(function () {
             SettingController::class,
             'destroy',
         ]);
+    });
+    Route::prefix('inventory/items')
+        ->group(function () {
 
+            Route::get(
+                '/',
+                [InventoryItemController::class, 'index']
+            );
+
+            Route::post(
+                '/',
+                [InventoryItemController::class, 'store']
+            );
+
+            Route::get(
+                '/search',
+                [InventoryItemController::class, 'search']
+            );
+
+            Route::get(
+                '/low-stock',
+                [InventoryItemController::class, 'lowStock']
+            );
+
+            Route::get(
+                '/{id}',
+                [InventoryItemController::class, 'show']
+            );
+
+            Route::put(
+                '/{id}',
+                [InventoryItemController::class, 'update']
+            );
+
+            Route::delete(
+                '/{id}',
+                [InventoryItemController::class, 'destroy']
+            );
+        });
+
+    Route::prefix('inventory/purchases')
+        ->group(function () {
+
+            Route::get(
+                '/',
+                [InventoryPurchaseController::class, 'index']
+            );
+
+            Route::post(
+                '/',
+                [InventoryPurchaseController::class, 'store']
+            );
+
+            Route::get(
+                '/{id}',
+                [InventoryPurchaseController::class, 'show']
+            );
+
+            Route::delete(
+                '/{id}',
+                [InventoryPurchaseController::class, 'destroy']
+            );
+        });
+
+
+    Route::prefix('inventory/suppliers')
+        ->group(function () {
+
+            Route::get(
+                '/',
+                [InventorySupplierController::class, 'index']
+            );
+
+            Route::post(
+                '/',
+                [InventorySupplierController::class, 'store']
+            );
+
+            Route::get(
+                '/{id}',
+                [InventorySupplierController::class, 'show']
+            );
+
+            Route::put(
+                '/{id}',
+                [InventorySupplierController::class, 'update']
+            );
+
+            Route::delete(
+                '/{id}',
+                [InventorySupplierController::class, 'destroy']
+            );
+        });
+
+
+    Route::prefix('inventory/stock-movements')
+        ->group(function () {
+
+            Route::get(
+                '/',
+                [InventoryStockMovementController::class, 'index']
+            );
+
+            Route::get(
+                '/item/{itemId}',
+                [InventoryStockMovementController::class, 'itemLedger']
+            );
+
+            Route::get(
+                '/{id}',
+                [InventoryStockMovementController::class, 'show']
+            );
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Inventory Categories
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('inventory/categories')->group(function () {
+
+        Route::get('/', [
+            InventoryCategoryController::class,
+            'index'
+        ]);
+
+        Route::post('/', [
+            InventoryCategoryController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            InventoryCategoryController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            InventoryCategoryController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            InventoryCategoryController::class,
+            'destroy'
+        ]);
+    });
+    Route::prefix('inventory/units')->group(function () {
+
+        Route::get('/', [
+            InventoryUnitController::class,
+            'index'
+        ]);
+
+        Route::post('/', [
+            InventoryUnitController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            InventoryUnitController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            InventoryUnitController::class,
+            'update'
+        ]);
+
+        Route::post('/{id}/status', [
+            InventoryUnitController::class,
+            'status'
+        ]);
+
+        Route::delete('/{id}', [
+            InventoryUnitController::class,
+            'destroy'
+        ]);
     });
 
 
+    Route::prefix('inventory/stock-ins')->group(function () {
+
+        Route::get('/form-data', [
+            InventoryStockInController::class,
+            'formData'
+        ]);
+
+        Route::get('/', [
+            InventoryStockInController::class,
+            'index'
+        ]);
+
+        Route::post('/', [
+            InventoryStockInController::class,
+            'store'
+        ]);
+
+        Route::get('/{id}', [
+            InventoryStockInController::class,
+            'show'
+        ]);
+
+        Route::put('/{id}', [
+            InventoryStockInController::class,
+            'update'
+        ]);
+
+        Route::delete('/{id}', [
+            InventoryStockInController::class,
+            'destroy'
+        ]);
+    });
+
+    Route::prefix('inventory/stock-outs')->group(function () {
+
+    Route::get(
+        '/form-data',
+        [
+            InventoryStockOutController::class,
+            'formData'
+        ]
+    );
+
+    Route::get(
+        '/',
+        [
+            InventoryStockOutController::class,
+            'index'
+        ]
+    );
+
+    Route::post(
+        '/',
+        [
+            InventoryStockOutController::class,
+            'store'
+        ]
+    );
+
+    Route::get(
+        '/{id}',
+        [
+            InventoryStockOutController::class,
+            'show'
+        ]
+    );
+
+});
+
+
+
+Route::prefix('inventory/stock-adjustments')->group(function () {
+
+    Route::get(
+        '/items',
+        [
+            InventoryStockAdjustmentController::class,
+            'items'
+        ]
+    );
+
+    Route::get(
+        '/',
+        [
+            InventoryStockAdjustmentController::class,
+            'index'
+        ]
+    );
+
+    Route::post(
+        '/',
+        [
+            InventoryStockAdjustmentController::class,
+            'store'
+        ]
+    );
+
+});
+
+Route::prefix('inventory/dashboard')->group(function () {
+
+    Route::get(
+        '/',
+        [
+            InventoryDashboardController::class,
+            'index'
+        ]
+    );
+
+    Route::get(
+        '/summary',
+        [
+            InventoryDashboardController::class,
+            'summary'
+        ]
+    );
+
+    Route::get(
+        '/categories',
+        [
+            InventoryDashboardController::class,
+            'categories'
+        ]
+    );
+
+});
+
+
+Route::prefix('transport/vehicles')->group(function () {
+
+    Route::get(
+        '/',
+        [
+            TransportVehicleController::class,
+            'index'
+        ]
+    );
+
+    Route::post(
+        '/',
+        [
+            TransportVehicleController::class,
+            'store'
+        ]
+    );
+
+    Route::get(
+        '/{id}',
+        [
+            TransportVehicleController::class,
+            'show'
+        ]
+    );
+
+    Route::put(
+        '/{id}',
+        [
+            TransportVehicleController::class,
+            'update'
+        ]
+    );
+
+    Route::delete(
+        '/{id}',
+        [
+            TransportVehicleController::class,
+            'destroy'
+        ]
+    );
+
+    Route::post(
+        '/{id}/status',
+        [
+            TransportVehicleController::class,
+            'status'
+        ]
+    );
+
+});
+
+Route::prefix('transport/drivers')->group(function () {
+
+    Route::get(
+        '/',
+        [TransportDriverController::class, 'index']
+    );
+
+    Route::post(
+        '/',
+        [TransportDriverController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportDriverController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportDriverController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportDriverController::class, 'destroy']
+    );
+
+    Route::post(
+        '/{id}/status',
+        [TransportDriverController::class, 'status']
+    );
+
+});
+
+
+Route::prefix('transport/routes')->group(function () {
+
+    Route::get(
+        '/',
+        [TransportRouteController::class, 'index']
+    );
+
+    Route::post(
+        '/',
+        [TransportRouteController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportRouteController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportRouteController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportRouteController::class, 'destroy']
+    );
+
+    Route::post(
+        '/{id}/status',
+        [TransportRouteController::class, 'status']
+    );
+
+});
 
 });

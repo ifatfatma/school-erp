@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 15, 2026 at 05:28 PM
+-- Generation Time: Aug 28, 2026 at 06:12 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -121,6 +121,63 @@ INSERT INTO `authors` (`id`, `school_id`, `name`, `code`, `email`, `phone`, `bio
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `books`
+--
+
+CREATE TABLE `books` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `category_id` bigint(20) UNSIGNED NOT NULL,
+  `publisher_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `book_code` varchar(255) NOT NULL,
+  `isbn` varchar(255) DEFAULT NULL,
+  `edition` varchar(255) DEFAULT NULL,
+  `language` varchar(255) DEFAULT NULL,
+  `publication_year` smallint(5) UNSIGNED DEFAULT NULL,
+  `pages` int(10) UNSIGNED DEFAULT NULL,
+  `price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `description` text DEFAULT NULL,
+  `cover_image` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `books`
+--
+
+INSERT INTO `books` (`id`, `school_id`, `category_id`, `publisher_id`, `title`, `book_code`, `isbn`, `edition`, `language`, `publication_year`, `pages`, `price`, `description`, `cover_image`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 2, 1, 'Jungle Book', 'JUN001', 'ISBN01', '1st Edition', 'Hindi', 2026, 500, 500.00, 'test', NULL, 1, 1, 1, '2026-08-16 08:55:25', '2026-08-16 08:55:25', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `book_authors`
+--
+
+CREATE TABLE `book_authors` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `book_id` bigint(20) UNSIGNED NOT NULL,
+  `author_id` bigint(20) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `book_authors`
+--
+
+INSERT INTO `book_authors` (`id`, `book_id`, `author_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '2026-08-16 08:55:25', '2026-08-16 08:55:25');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `book_categories`
 --
 
@@ -145,6 +202,139 @@ CREATE TABLE `book_categories` (
 INSERT INTO `book_categories` (`id`, `school_id`, `name`, `code`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
 (1, 1, 'Hindi', 'H01', NULL, 1, 1, 1, '2026-08-15 09:55:45', '2026-08-15 09:55:45', NULL),
 (2, 1, 'English', 'ENG01', NULL, 1, 1, 1, '2026-08-15 09:55:56', '2026-08-15 09:55:56', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `book_copies`
+--
+
+CREATE TABLE `book_copies` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `book_id` bigint(20) UNSIGNED NOT NULL,
+  `accession_no` varchar(255) NOT NULL,
+  `barcode` varchar(255) DEFAULT NULL,
+  `copy_no` varchar(255) DEFAULT NULL,
+  `shelf_no` varchar(255) DEFAULT NULL,
+  `rack_no` varchar(255) DEFAULT NULL,
+  `purchase_date` date DEFAULT NULL,
+  `purchase_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `condition` enum('New','Good','Fair','Damaged','Lost') NOT NULL DEFAULT 'New',
+  `status` enum('Available','Issued','Reserved','Lost','Damaged','Maintenance') NOT NULL DEFAULT 'Available',
+  `notes` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `book_copies`
+--
+
+INSERT INTO `book_copies` (`id`, `school_id`, `book_id`, `accession_no`, `barcode`, `copy_no`, `shelf_no`, `rack_no`, `purchase_date`, `purchase_price`, `condition`, `status`, `notes`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 'LIB-0001', '100091', NULL, 'S-01', 'E-01', '2026-08-16', 500.00, 'New', 'Issued', NULL, 1, 1, '2026-08-16 09:55:38', '2026-08-21 08:19:01', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `book_issues`
+--
+
+CREATE TABLE `book_issues` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `library_member_id` bigint(20) UNSIGNED NOT NULL,
+  `book_id` bigint(20) UNSIGNED NOT NULL,
+  `book_copy_id` bigint(20) UNSIGNED NOT NULL,
+  `issue_no` varchar(255) NOT NULL,
+  `issue_date` date NOT NULL,
+  `due_date` date NOT NULL,
+  `return_date` date DEFAULT NULL,
+  `status` enum('Issued','Returned','Overdue','Lost','Damaged') NOT NULL DEFAULT 'Issued',
+  `notes` text DEFAULT NULL,
+  `issued_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `returned_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `book_issues`
+--
+
+INSERT INTO `book_issues` (`id`, `school_id`, `library_member_id`, `book_id`, `book_copy_id`, `issue_no`, `issue_date`, `due_date`, `return_date`, `status`, `notes`, `issued_by`, `returned_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 1, 1, 'ISS-202608-0001', '2026-08-19', '2026-09-02', '2026-08-19', 'Returned', 'test', 1, NULL, '2026-08-19 08:58:54', '2026-08-19 09:06:22', NULL),
+(2, 1, 1, 1, 1, 'ISS-202608-0002', '2026-08-01', '2026-10-04', NULL, 'Issued', NULL, 1, NULL, '2026-08-21 08:19:01', '2026-08-21 08:19:25', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `book_renewals`
+--
+
+CREATE TABLE `book_renewals` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `book_issue_id` bigint(20) UNSIGNED NOT NULL,
+  `library_member_id` bigint(20) UNSIGNED NOT NULL,
+  `book_id` bigint(20) UNSIGNED NOT NULL,
+  `book_copy_id` bigint(20) UNSIGNED NOT NULL,
+  `renewal_no` varchar(255) NOT NULL,
+  `renewal_date` date NOT NULL,
+  `old_due_date` date NOT NULL,
+  `new_due_date` date NOT NULL,
+  `renewal_count` int(10) UNSIGNED NOT NULL DEFAULT 1,
+  `remarks` text DEFAULT NULL,
+  `renewed_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `book_renewals`
+--
+
+INSERT INTO `book_renewals` (`id`, `school_id`, `book_issue_id`, `library_member_id`, `book_id`, `book_copy_id`, `renewal_no`, `renewal_date`, `old_due_date`, `new_due_date`, `renewal_count`, `remarks`, `renewed_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 2, 1, 1, 1, 'REN-202608-0001', '2026-08-21', '2026-09-20', '2026-10-04', 1, NULL, 1, '2026-08-21 08:19:25', '2026-08-21 08:19:25', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `book_returns`
+--
+
+CREATE TABLE `book_returns` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `book_issue_id` bigint(20) UNSIGNED NOT NULL,
+  `library_member_id` bigint(20) UNSIGNED NOT NULL,
+  `book_id` bigint(20) UNSIGNED NOT NULL,
+  `book_copy_id` bigint(20) UNSIGNED NOT NULL,
+  `return_no` varchar(255) NOT NULL,
+  `return_date` date NOT NULL,
+  `due_date` date NOT NULL,
+  `overdue_days` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `fine_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `fine_status` enum('No Fine','Pending','Paid') NOT NULL DEFAULT 'No Fine',
+  `book_condition` enum('Good','Damaged','Lost') NOT NULL DEFAULT 'Good',
+  `remarks` text DEFAULT NULL,
+  `returned_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `book_returns`
+--
+
+INSERT INTO `book_returns` (`id`, `school_id`, `book_issue_id`, `library_member_id`, `book_id`, `book_copy_id`, `return_no`, `return_date`, `due_date`, `overdue_days`, `fine_amount`, `fine_status`, `book_condition`, `remarks`, `returned_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 1, 1, 1, 'RET-202608-0001', '2026-08-19', '2026-09-02', 0, 0.00, 'No Fine', 'Good', NULL, 1, '2026-08-19 09:06:22', '2026-08-19 09:06:22', NULL);
 
 -- --------------------------------------------------------
 
@@ -653,6 +843,30 @@ INSERT INTO `fee_types` (`id`, `school_id`, `name`, `code`, `frequency`, `descri
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `fine_collections`
+--
+
+CREATE TABLE `fine_collections` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `library_fine_id` bigint(20) UNSIGNED NOT NULL,
+  `library_member_id` bigint(20) UNSIGNED NOT NULL,
+  `collection_no` varchar(255) NOT NULL,
+  `receipt_no` varchar(255) DEFAULT NULL,
+  `collection_date` date NOT NULL,
+  `amount` decimal(12,2) NOT NULL,
+  `payment_mode` enum('Cash','Card','Bank Transfer','UPI','Cheque','Online') NOT NULL DEFAULT 'Cash',
+  `transaction_no` varchar(255) DEFAULT NULL,
+  `collected_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `grades`
 --
 
@@ -814,6 +1028,317 @@ INSERT INTO `income_payments` (`id`, `school_id`, `income_id`, `receipt_no`, `pa
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `inventory_categories`
+--
+
+CREATE TABLE `inventory_categories` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_categories`
+--
+
+INSERT INTO `inventory_categories` (`id`, `school_id`, `name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Statiotnery', 'STATS', NULL, 1, '2026-08-27 06:49:13', '2026-08-27 06:49:28', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_items`
+--
+
+CREATE TABLE `inventory_items` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_category_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_unit_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_supplier_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `sku` varchar(255) DEFAULT NULL,
+  `barcode` varchar(255) DEFAULT NULL,
+  `opening_stock` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `reorder_level` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `cost_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `sale_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_items`
+--
+
+INSERT INTO `inventory_items` (`id`, `school_id`, `inventory_category_id`, `inventory_unit_id`, `inventory_supplier_id`, `name`, `sku`, `barcode`, `opening_stock`, `reorder_level`, `cost_price`, `sale_price`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 1, 1, 'Item 1', 'ss', 'ss', 100.00, 20.00, 11.00, 22.00, 1, '2026-08-27 09:03:09', '2026-08-27 09:03:27', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_purchases`
+--
+
+CREATE TABLE `inventory_purchases` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_supplier_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `purchase_no` varchar(255) NOT NULL,
+  `purchase_date` date NOT NULL,
+  `invoice_no` varchar(255) DEFAULT NULL,
+  `subtotal` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `discount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `tax` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `notes` text DEFAULT NULL,
+  `status` varchar(255) NOT NULL DEFAULT 'Received',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_purchases`
+--
+
+INSERT INTO `inventory_purchases` (`id`, `school_id`, `inventory_supplier_id`, `purchase_no`, `purchase_date`, `invoice_no`, `subtotal`, `discount`, `tax`, `total_amount`, `notes`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 'PUR-202608-0001', '2026-08-27', 'INV001', 22.00, 0.00, 0.00, 22.00, NULL, 'Received', '2026-08-27 09:34:29', '2026-08-27 09:34:29', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_purchase_items`
+--
+
+CREATE TABLE `inventory_purchase_items` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_purchase_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_item_id` bigint(20) UNSIGNED NOT NULL,
+  `quantity` decimal(12,2) NOT NULL,
+  `unit_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `discount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `tax` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `total` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_purchase_items`
+--
+
+INSERT INTO `inventory_purchase_items` (`id`, `school_id`, `inventory_purchase_id`, `inventory_item_id`, `quantity`, `unit_price`, `discount`, `tax`, `total`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1.00, 11.00, 0.00, 0.00, 11.00, '2026-08-27 09:34:29', '2026-08-27 09:34:29'),
+(2, 1, 1, 1, 1.00, 11.00, 0.00, 0.00, 11.00, '2026-08-27 09:34:29', '2026-08-27 09:34:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_stock_ins`
+--
+
+CREATE TABLE `inventory_stock_ins` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_supplier_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `stock_in_no` varchar(255) NOT NULL,
+  `stock_in_date` date NOT NULL,
+  `invoice_no` varchar(255) DEFAULT NULL,
+  `subtotal` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `discount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `tax` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `status` varchar(255) NOT NULL DEFAULT 'Received',
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_stock_ins`
+--
+
+INSERT INTO `inventory_stock_ins` (`id`, `school_id`, `inventory_supplier_id`, `stock_in_no`, `stock_in_date`, `invoice_no`, `subtotal`, `discount`, `tax`, `total_amount`, `status`, `remarks`, `created_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 'STI-202608-0001', '2026-08-27', 'INV001', 22.00, 0.00, 0.00, 22.00, 'Received', NULL, 1, '2026-08-27 10:28:32', '2026-08-27 10:28:32', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_stock_in_items`
+--
+
+CREATE TABLE `inventory_stock_in_items` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_stock_in_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_item_id` bigint(20) UNSIGNED NOT NULL,
+  `quantity` decimal(12,2) NOT NULL,
+  `unit_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `discount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `tax` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `total` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_stock_in_items`
+--
+
+INSERT INTO `inventory_stock_in_items` (`id`, `school_id`, `inventory_stock_in_id`, `inventory_item_id`, `quantity`, `unit_price`, `discount`, `tax`, `total`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1.00, 11.00, 0.00, 0.00, 11.00, '2026-08-27 10:28:32', '2026-08-27 10:28:32'),
+(2, 1, 1, 1, 1.00, 11.00, 0.00, 0.00, 11.00, '2026-08-27 10:28:32', '2026-08-27 10:28:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_stock_movements`
+--
+
+CREATE TABLE `inventory_stock_movements` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_item_id` bigint(20) UNSIGNED NOT NULL,
+  `movement_no` varchar(255) NOT NULL,
+  `movement_type` varchar(255) NOT NULL,
+  `quantity` decimal(12,2) NOT NULL,
+  `unit_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `stock_before` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `stock_after` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `movement_date` date NOT NULL,
+  `reference_type` varchar(255) DEFAULT NULL,
+  `reference_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_stock_movements`
+--
+
+INSERT INTO `inventory_stock_movements` (`id`, `school_id`, `inventory_item_id`, `movement_no`, `movement_type`, `quantity`, `unit_price`, `total_amount`, `stock_before`, `stock_after`, `movement_date`, `reference_type`, `reference_id`, `remarks`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'MOV-202608-000001', 'IN', 1.00, 11.00, 11.00, 100.00, 101.00, '2026-08-27', 'StockIn', 1, NULL, 1, '2026-08-27 10:28:32', '2026-08-27 10:28:32'),
+(2, 1, 1, 'MOV-202608-000002', 'IN', 1.00, 11.00, 11.00, 101.00, 102.00, '2026-08-27', 'StockIn', 1, NULL, 1, '2026-08-27 10:28:32', '2026-08-27 10:28:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_stock_outs`
+--
+
+CREATE TABLE `inventory_stock_outs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `stock_out_no` varchar(255) NOT NULL,
+  `stock_out_date` date NOT NULL,
+  `reference_no` varchar(255) DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `total_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `status` varchar(255) NOT NULL DEFAULT 'Issued',
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_stock_out_items`
+--
+
+CREATE TABLE `inventory_stock_out_items` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_stock_out_id` bigint(20) UNSIGNED NOT NULL,
+  `inventory_item_id` bigint(20) UNSIGNED NOT NULL,
+  `quantity` decimal(12,2) NOT NULL,
+  `unit_price` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `discount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `tax` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `total` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_suppliers`
+--
+
+CREATE TABLE `inventory_suppliers` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(100) DEFAULT NULL,
+  `contact_person` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(255) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  `tax_number` varchar(100) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_suppliers`
+--
+
+INSERT INTO `inventory_suppliers` (`id`, `school_id`, `name`, `code`, `contact_person`, `phone`, `email`, `address`, `city`, `state`, `country`, `tax_number`, `notes`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'SN Enterprise', 'SN001', 'Hamid Hussain', '9007963060', 'sn@gmail.com', 'supplier address goes here', 'kolkata', 'West Bengal', 'India', NULL, NULL, 1, '2026-08-27 08:10:17', '2026-08-27 08:10:17', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_units`
+--
+
+CREATE TABLE `inventory_units` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(100) DEFAULT NULL,
+  `short_name` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_units`
+--
+
+INSERT INTO `inventory_units` (`id`, `school_id`, `name`, `code`, `short_name`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Piece', 'PCS', NULL, NULL, 1, '2026-08-27 07:09:47', '2026-08-27 07:09:47', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `jobs`
 --
 
@@ -929,6 +1454,98 @@ CREATE TABLE `leave_types` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `library_fines`
+--
+
+CREATE TABLE `library_fines` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `library_member_id` bigint(20) UNSIGNED NOT NULL,
+  `book_issue_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `book_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `book_copy_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `lost_damaged_book_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `fine_no` varchar(255) NOT NULL,
+  `fine_date` date NOT NULL,
+  `fine_type` enum('Overdue','Lost','Damaged','Other') NOT NULL,
+  `description` text DEFAULT NULL,
+  `overdue_days` int(11) NOT NULL DEFAULT 0,
+  `fine_per_day` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `fine_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `waiver_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `payable_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `status` enum('Pending','Partially Paid','Paid','Waived') NOT NULL DEFAULT 'Pending',
+  `remarks` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `library_members`
+--
+
+CREATE TABLE `library_members` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `member_no` varchar(255) NOT NULL,
+  `member_type` enum('Student','Staff') NOT NULL,
+  `student_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `staff_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `membership_date` date NOT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `issue_limit` int(10) UNSIGNED NOT NULL DEFAULT 3,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `library_members`
+--
+
+INSERT INTO `library_members` (`id`, `school_id`, `member_no`, `member_type`, `student_id`, `staff_id`, `phone`, `email`, `membership_date`, `expiry_date`, `issue_limit`, `status`, `notes`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'LIB-STU-001', 'Student', 1, NULL, '9007963069', 'ahmed@gmail.com', '2026-08-16', '2027-03-16', 3, 1, NULL, 1, 1, '2026-08-16 10:31:53', '2026-08-16 10:31:53', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lost_damaged_books`
+--
+
+CREATE TABLE `lost_damaged_books` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `book_issue_id` bigint(20) UNSIGNED NOT NULL,
+  `book_copy_id` bigint(20) UNSIGNED NOT NULL,
+  `library_member_id` bigint(20) UNSIGNED NOT NULL,
+  `type` enum('Lost','Damaged') NOT NULL,
+  `reported_date` date NOT NULL,
+  `book_value` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `fine_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `description` text DEFAULT NULL,
+  `status` enum('Reported','Resolved','Cancelled') NOT NULL DEFAULT 'Reported',
+  `reported_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `resolved_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `migrations`
 --
 
@@ -992,7 +1609,30 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (54, '2026_08_15_133453_create_income_payments_table', 39),
 (55, '2026_08_15_140013_create_recurring_incomes_table', 40),
 (56, '2026_08_15_144646_create_book_categories_table', 41),
-(57, '2026_08_15_150001_create_authors_table', 42);
+(57, '2026_08_15_150001_create_authors_table', 42),
+(58, '2026_08_16_052559_create_publishers_table', 43),
+(59, '2026_08_16_142119_create_books_table', 44),
+(60, '2026_08_16_142342_create_book_authors_table', 45),
+(61, '2026_08_16_142804_create_book_copies_table', 46),
+(62, '2026_08_16_152641_create_library_members_table', 47),
+(63, '2026_08_17_142817_create_book_issues_table', 48),
+(65, '2026_08_17_152438_create_book_returns_table', 49),
+(67, '2026_08_17_160111_create_book_renewals_table', 50),
+(68, '2026_08_19_150906_create_lost_damaged_books_table', 51),
+(69, '2026_08_20_015236_create_settings_table', 52),
+(70, '2026_08_21_145132_create_inventory_categories_table', 53),
+(71, '2026_08_21_145445_create_inventory_units_table', 54),
+(73, '2026_08_24_152141_create_inventory_stock_ins_table', 56),
+(74, '2026_08_24_152256_create_inventory_stock_in_items_table', 57),
+(75, '2026_08_24_153936_create_inventory_purchase_items_table', 58),
+(76, '2026_08_27_123855_add_code_description_status_to_inventory_units_table', 59),
+(77, '2026_08_21_150843_create_inventory_suppliers_table', 60),
+(78, '2026_08_21_151157_create_inventory_stock_movements_table', 61),
+(79, '2026_08_28_151504_create_transport_vehicles_table', 62),
+(80, '2026_08_28_154758_create_transport_drivers_table', 63),
+(81, '2026_08_28_160119_create_transport_routes_table', 64),
+(82, '2026_08_28_160122_create_transport_route_stops_table', 65),
+(83, '2026_08_28_160727_create_transport_students_table', 66);
 
 -- --------------------------------------------------------
 
@@ -1098,7 +1738,39 @@ CREATE TABLE `personal_access_tokens` (
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(4, 'App\\Models\\User', 1, 'admin', '2abb3df2e8fa98c68f4e2b3723deb610d4c67b0fc39b6c55db873030376ff0d3', '[\"*\"]', '2026-08-15 09:56:59', NULL, '2026-08-11 06:07:39', '2026-08-15 09:56:59');
+(8, 'App\\Models\\User', 1, 'admin', '562e6472e7df0940710a0b90901fdcbeec38b43bfd620f097cbaf4dd6f2f0a79', '[\"*\"]', '2026-08-21 09:13:41', NULL, '2026-08-21 08:24:54', '2026-08-21 09:13:41'),
+(11, 'App\\Models\\User', 1, 'admin', '02fbc3f6580f19905bd4c116657f7b864cea2db18948aa4cafe8d3587eabe3cb', '[\"*\"]', '2026-08-28 10:36:14', NULL, '2026-08-27 06:34:54', '2026-08-28 10:36:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `publishers`
+--
+
+CREATE TABLE `publishers` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `publishers`
+--
+
+INSERT INTO `publishers` (`id`, `school_id`, `name`, `code`, `email`, `phone`, `address`, `website`, `description`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Imtiaz Alam Khan', 'PUB-001', 'imtiaz@gmail.com', '9007963069', NULL, NULL, NULL, 1, 1, 1, '2026-08-16 00:15:04', '2026-08-16 00:15:04', NULL);
 
 -- --------------------------------------------------------
 
@@ -1348,9 +2020,28 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('8sMUoCO1kNGGXjljpb34rKboGwZ07VLvJusITVgZ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUktieWVZSE1kdTZVVzhnWXJIV2RuM2NnckVubWNhSnBOcnpLTVNpTyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9mZWUtcmVjZWlwdHMiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1786633929),
-('LhlEt15AjFP2UbrlTE3w3Sa6pm8x8SUeE4STuLx1', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidWpwR1ZhTEY4V3hxczJ6TW9NSmdrd1FaaG9VWm1kdHJQVDNrSDFLaiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmNvbWUtcmVwb3J0cyI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786807231),
-('qA7Q35e0DdeYc5dt0OPrU9dedm2MvEDD9ifV1Dz6', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUENLNlBDWDVxYXBzQjBGQ2c1cHNvZlNRWnpIY1o2NGZPWXZNdnBwYSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1786779447);
+('FVxzElNOGu9nGFbjjiN39pKspGQAHVpRv6ISl2yF', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWkJBU1hmdGVvalZhMWJnS1dncGJrSnFRVlZET0ZabkI2ZVlCSUwzbCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbnZlbnRvcnkvc3RvY2staW5zIjtzOjU6InJvdXRlIjtOO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1787846708),
+('HMGAaWAQNGVOg7ptP4wPezLB77x2O9qA7tDyEjYx', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTWFIRmxNMk9zSlpCY21sbWVCV0J5ZEl6VUhvNGdrQ08xdUE3RFRYZSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90cmFuc3BvcnQvdmVoaWNsZXMiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1787933173);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `group` varchar(255) NOT NULL DEFAULT 'general',
+  `key` varchar(255) NOT NULL,
+  `value` text DEFAULT NULL,
+  `type` enum('string','text','integer','decimal','boolean','json') NOT NULL DEFAULT 'string',
+  `description` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `updated_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1628,6 +2319,132 @@ INSERT INTO `timetables` (`id`, `school_id`, `class_id`, `section_id`, `subject_
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `transport_drivers`
+--
+
+CREATE TABLE `transport_drivers` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `license_no` varchar(255) DEFAULT NULL,
+  `license_expiry` date DEFAULT NULL,
+  `joining_date` date DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `status` varchar(255) NOT NULL DEFAULT 'Active',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transport_routes`
+--
+
+CREATE TABLE `transport_routes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `start_location` varchar(255) DEFAULT NULL,
+  `end_location` varchar(255) DEFAULT NULL,
+  `distance` decimal(10,2) DEFAULT NULL,
+  `travel_time` varchar(255) DEFAULT NULL,
+  `fare` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `status` varchar(255) NOT NULL DEFAULT 'Active',
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transport_route_stops`
+--
+
+CREATE TABLE `transport_route_stops` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `transport_route_id` bigint(20) UNSIGNED NOT NULL,
+  `stop_name` varchar(255) NOT NULL,
+  `stop_code` varchar(255) DEFAULT NULL,
+  `stop_order` int(11) NOT NULL DEFAULT 1,
+  `pickup_time` time DEFAULT NULL,
+  `drop_time` time DEFAULT NULL,
+  `fare` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transport_students`
+--
+
+CREATE TABLE `transport_students` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `transport_route_id` bigint(20) UNSIGNED NOT NULL,
+  `transport_route_stop_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `transport_vehicle_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `transport_driver_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `academic_session` varchar(255) DEFAULT NULL,
+  `pickup_type` varchar(255) NOT NULL DEFAULT 'Both',
+  `transport_fee` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `status` varchar(255) NOT NULL DEFAULT 'Active',
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transport_vehicles`
+--
+
+CREATE TABLE `transport_vehicles` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `vehicle_no` varchar(255) NOT NULL,
+  `registration_no` varchar(255) DEFAULT NULL,
+  `vehicle_type` varchar(255) DEFAULT NULL,
+  `model` varchar(255) DEFAULT NULL,
+  `capacity` int(10) UNSIGNED DEFAULT NULL,
+  `purchase_date` date DEFAULT NULL,
+  `insurance_expiry` date DEFAULT NULL,
+  `fitness_expiry` date DEFAULT NULL,
+  `pollution_expiry` date DEFAULT NULL,
+  `status` varchar(255) NOT NULL DEFAULT 'Active',
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `transport_vehicles`
+--
+
+INSERT INTO `transport_vehicles` (`id`, `school_id`, `vehicle_no`, `registration_no`, `vehicle_type`, `model`, `capacity`, `purchase_date`, `insurance_expiry`, `fitness_expiry`, `pollution_expiry`, `status`, `remarks`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'BWB017880', 'WB01874655384', 'Bus', 'M001', NULL, '2026-08-28', '2040-08-29', '2040-08-28', '2050-08-28', 'Active', 'test', '2026-08-28 10:11:51', '2026-08-28 10:11:51', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -1690,6 +2507,29 @@ ALTER TABLE `authors`
   ADD KEY `authors_school_id_name_index` (`school_id`,`name`);
 
 --
+-- Indexes for table `books`
+--
+ALTER TABLE `books`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `books_school_id_book_code_unique` (`school_id`,`book_code`),
+  ADD KEY `books_category_id_foreign` (`category_id`),
+  ADD KEY `books_publisher_id_foreign` (`publisher_id`),
+  ADD KEY `books_created_by_foreign` (`created_by`),
+  ADD KEY `books_updated_by_foreign` (`updated_by`),
+  ADD KEY `books_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `books_school_id_title_index` (`school_id`,`title`),
+  ADD KEY `books_school_id_category_id_index` (`school_id`,`category_id`),
+  ADD KEY `books_school_id_publisher_id_index` (`school_id`,`publisher_id`);
+
+--
+-- Indexes for table `book_authors`
+--
+ALTER TABLE `book_authors`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `book_authors_book_id_author_id_unique` (`book_id`,`author_id`),
+  ADD KEY `book_authors_author_id_index` (`author_id`);
+
+--
 -- Indexes for table `book_categories`
 --
 ALTER TABLE `book_categories`
@@ -1698,6 +2538,72 @@ ALTER TABLE `book_categories`
   ADD KEY `book_categories_created_by_foreign` (`created_by`),
   ADD KEY `book_categories_updated_by_foreign` (`updated_by`),
   ADD KEY `book_categories_school_id_status_index` (`school_id`,`status`);
+
+--
+-- Indexes for table `book_copies`
+--
+ALTER TABLE `book_copies`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `book_copies_school_id_accession_no_unique` (`school_id`,`accession_no`),
+  ADD UNIQUE KEY `book_copies_school_id_barcode_unique` (`school_id`,`barcode`),
+  ADD KEY `book_copies_book_id_foreign` (`book_id`),
+  ADD KEY `book_copies_created_by_foreign` (`created_by`),
+  ADD KEY `book_copies_updated_by_foreign` (`updated_by`),
+  ADD KEY `book_copies_school_id_book_id_index` (`school_id`,`book_id`),
+  ADD KEY `book_copies_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `book_copies_school_id_condition_index` (`school_id`,`condition`);
+
+--
+-- Indexes for table `book_issues`
+--
+ALTER TABLE `book_issues`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `book_issues_school_id_issue_no_unique` (`school_id`,`issue_no`),
+  ADD KEY `book_issues_library_member_id_foreign` (`library_member_id`),
+  ADD KEY `book_issues_book_id_foreign` (`book_id`),
+  ADD KEY `book_issues_book_copy_id_foreign` (`book_copy_id`),
+  ADD KEY `book_issues_issued_by_foreign` (`issued_by`),
+  ADD KEY `book_issues_returned_by_foreign` (`returned_by`),
+  ADD KEY `book_issues_school_id_library_member_id_index` (`school_id`,`library_member_id`),
+  ADD KEY `book_issues_school_id_book_id_index` (`school_id`,`book_id`),
+  ADD KEY `book_issues_school_id_book_copy_id_index` (`school_id`,`book_copy_id`),
+  ADD KEY `book_issues_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `book_issues_school_id_due_date_index` (`school_id`,`due_date`);
+
+--
+-- Indexes for table `book_renewals`
+--
+ALTER TABLE `book_renewals`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `book_renewals_school_id_renewal_no_unique` (`school_id`,`renewal_no`),
+  ADD KEY `book_renewals_book_issue_id_foreign` (`book_issue_id`),
+  ADD KEY `book_renewals_library_member_id_foreign` (`library_member_id`),
+  ADD KEY `book_renewals_book_id_foreign` (`book_id`),
+  ADD KEY `book_renewals_book_copy_id_foreign` (`book_copy_id`),
+  ADD KEY `book_renewals_renewed_by_foreign` (`renewed_by`),
+  ADD KEY `book_renewals_school_id_book_issue_id_index` (`school_id`,`book_issue_id`),
+  ADD KEY `book_renewals_school_id_library_member_id_index` (`school_id`,`library_member_id`),
+  ADD KEY `book_renewals_school_id_book_id_index` (`school_id`,`book_id`),
+  ADD KEY `book_renewals_school_id_book_copy_id_index` (`school_id`,`book_copy_id`),
+  ADD KEY `book_renewals_school_id_renewal_date_index` (`school_id`,`renewal_date`);
+
+--
+-- Indexes for table `book_returns`
+--
+ALTER TABLE `book_returns`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `book_returns_school_id_return_no_unique` (`school_id`,`return_no`),
+  ADD UNIQUE KEY `book_returns_book_issue_id_unique` (`book_issue_id`),
+  ADD KEY `book_returns_library_member_id_foreign` (`library_member_id`),
+  ADD KEY `book_returns_book_id_foreign` (`book_id`),
+  ADD KEY `book_returns_book_copy_id_foreign` (`book_copy_id`),
+  ADD KEY `book_returns_returned_by_foreign` (`returned_by`),
+  ADD KEY `book_returns_school_id_library_member_id_index` (`school_id`,`library_member_id`),
+  ADD KEY `book_returns_school_id_book_id_index` (`school_id`,`book_id`),
+  ADD KEY `book_returns_school_id_book_copy_id_index` (`school_id`,`book_copy_id`),
+  ADD KEY `book_returns_school_id_return_date_index` (`school_id`,`return_date`),
+  ADD KEY `book_returns_school_id_fine_status_index` (`school_id`,`fine_status`),
+  ADD KEY `book_returns_school_id_book_condition_index` (`school_id`,`book_condition`);
 
 --
 -- Indexes for table `cache`
@@ -1865,6 +2771,13 @@ ALTER TABLE `fee_types`
   ADD KEY `fee_types_school_id_status_index` (`school_id`,`status`);
 
 --
+-- Indexes for table `fine_collections`
+--
+ALTER TABLE `fine_collections`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fine_collections_school_id_foreign` (`school_id`);
+
+--
 -- Indexes for table `grades`
 --
 ALTER TABLE `grades`
@@ -1920,6 +2833,108 @@ ALTER TABLE `income_payments`
   ADD KEY `income_payments_school_id_status_index` (`school_id`,`status`);
 
 --
+-- Indexes for table `inventory_categories`
+--
+ALTER TABLE `inventory_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_categories_school_id_index` (`school_id`);
+
+--
+-- Indexes for table `inventory_items`
+--
+ALTER TABLE `inventory_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_items_school_id_index` (`school_id`),
+  ADD KEY `inventory_items_inventory_category_id_index` (`inventory_category_id`),
+  ADD KEY `inventory_items_inventory_unit_id_index` (`inventory_unit_id`),
+  ADD KEY `inventory_items_inventory_supplier_id_index` (`inventory_supplier_id`);
+
+--
+-- Indexes for table `inventory_purchases`
+--
+ALTER TABLE `inventory_purchases`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `inventory_purchases_school_id_purchase_no_unique` (`school_id`,`purchase_no`),
+  ADD KEY `inventory_purchases_school_id_index` (`school_id`),
+  ADD KEY `inventory_purchases_inventory_supplier_id_index` (`inventory_supplier_id`);
+
+--
+-- Indexes for table `inventory_purchase_items`
+--
+ALTER TABLE `inventory_purchase_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_purchase_items_school_id_index` (`school_id`),
+  ADD KEY `inventory_purchase_items_inventory_purchase_id_index` (`inventory_purchase_id`),
+  ADD KEY `inventory_purchase_items_inventory_item_id_index` (`inventory_item_id`);
+
+--
+-- Indexes for table `inventory_stock_ins`
+--
+ALTER TABLE `inventory_stock_ins`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `inventory_stock_ins_school_id_stock_in_no_unique` (`school_id`,`stock_in_no`),
+  ADD KEY `inventory_stock_ins_school_id_index` (`school_id`),
+  ADD KEY `inventory_stock_ins_inventory_supplier_id_index` (`inventory_supplier_id`),
+  ADD KEY `inventory_stock_ins_stock_in_date_index` (`stock_in_date`),
+  ADD KEY `inventory_stock_ins_created_by_foreign` (`created_by`);
+
+--
+-- Indexes for table `inventory_stock_in_items`
+--
+ALTER TABLE `inventory_stock_in_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_stock_in_items_school_id_index` (`school_id`),
+  ADD KEY `inventory_stock_in_items_inventory_stock_in_id_index` (`inventory_stock_in_id`),
+  ADD KEY `inventory_stock_in_items_inventory_item_id_index` (`inventory_item_id`);
+
+--
+-- Indexes for table `inventory_stock_movements`
+--
+ALTER TABLE `inventory_stock_movements`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `inventory_stock_movements_school_id_movement_no_unique` (`school_id`,`movement_no`),
+  ADD KEY `inventory_stock_movements_school_id_index` (`school_id`),
+  ADD KEY `inventory_stock_movements_inventory_item_id_index` (`inventory_item_id`),
+  ADD KEY `inventory_stock_movements_movement_type_index` (`movement_type`),
+  ADD KEY `inventory_stock_movements_movement_date_index` (`movement_date`),
+  ADD KEY `inventory_stock_movements_reference_id_index` (`reference_id`),
+  ADD KEY `inventory_stock_movements_created_by_foreign` (`created_by`);
+
+--
+-- Indexes for table `inventory_stock_outs`
+--
+ALTER TABLE `inventory_stock_outs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_stock_outs_school_id_index` (`school_id`),
+  ADD KEY `inventory_stock_outs_stock_out_date_index` (`stock_out_date`),
+  ADD KEY `inventory_stock_outs_created_by_index` (`created_by`);
+
+--
+-- Indexes for table `inventory_stock_out_items`
+--
+ALTER TABLE `inventory_stock_out_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_stock_out_items_school_id_index` (`school_id`),
+  ADD KEY `inventory_stock_out_items_stock_out_id_index` (`inventory_stock_out_id`),
+  ADD KEY `inventory_stock_out_items_item_id_index` (`inventory_item_id`);
+
+--
+-- Indexes for table `inventory_suppliers`
+--
+ALTER TABLE `inventory_suppliers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_suppliers_school_id_index` (`school_id`),
+  ADD KEY `inventory_suppliers_school_id_name_index` (`school_id`,`name`),
+  ADD KEY `inventory_suppliers_school_id_code_index` (`school_id`,`code`);
+
+--
+-- Indexes for table `inventory_units`
+--
+ALTER TABLE `inventory_units`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inventory_units_school_id_index` (`school_id`);
+
+--
 -- Indexes for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -1964,6 +2979,43 @@ ALTER TABLE `leave_types`
   ADD KEY `leave_types_updated_by_foreign` (`updated_by`);
 
 --
+-- Indexes for table `library_fines`
+--
+ALTER TABLE `library_fines`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `library_fines_school_id_fine_no_unique` (`school_id`,`fine_no`),
+  ADD KEY `library_fines_library_member_id_index` (`library_member_id`),
+  ADD KEY `library_fines_book_issue_id_index` (`book_issue_id`),
+  ADD KEY `library_fines_book_id_index` (`book_id`),
+  ADD KEY `library_fines_book_copy_id_index` (`book_copy_id`),
+  ADD KEY `library_fines_lost_damaged_book_id_index` (`lost_damaged_book_id`),
+  ADD KEY `library_fines_created_by_index` (`created_by`);
+
+--
+-- Indexes for table `library_members`
+--
+ALTER TABLE `library_members`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `library_members_school_id_member_no_unique` (`school_id`,`member_no`),
+  ADD KEY `library_members_created_by_foreign` (`created_by`),
+  ADD KEY `library_members_updated_by_foreign` (`updated_by`),
+  ADD KEY `library_members_school_id_member_type_index` (`school_id`,`member_type`),
+  ADD KEY `library_members_school_id_student_id_index` (`school_id`,`student_id`),
+  ADD KEY `library_members_school_id_staff_id_index` (`school_id`,`staff_id`),
+  ADD KEY `library_members_school_id_status_index` (`school_id`,`status`);
+
+--
+-- Indexes for table `lost_damaged_books`
+--
+ALTER TABLE `lost_damaged_books`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `lost_damaged_books_school_id_index` (`school_id`),
+  ADD KEY `lost_damaged_books_book_issue_id_index` (`book_issue_id`),
+  ADD KEY `lost_damaged_books_book_copy_id_index` (`book_copy_id`),
+  ADD KEY `lost_damaged_books_library_member_id_index` (`library_member_id`),
+  ADD KEY `lost_damaged_books_status_index` (`status`);
+
+--
 -- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
@@ -2004,6 +3056,17 @@ ALTER TABLE `personal_access_tokens`
   ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
   ADD KEY `personal_access_tokens_expires_at_index` (`expires_at`);
+
+--
+-- Indexes for table `publishers`
+--
+ALTER TABLE `publishers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `publishers_school_id_code_unique` (`school_id`,`code`),
+  ADD KEY `publishers_created_by_foreign` (`created_by`),
+  ADD KEY `publishers_updated_by_foreign` (`updated_by`),
+  ADD KEY `publishers_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `publishers_school_id_name_index` (`school_id`,`name`);
 
 --
 -- Indexes for table `recurring_expenses`
@@ -2072,6 +3135,16 @@ ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `sessions_user_id_index` (`user_id`),
   ADD KEY `sessions_last_activity_index` (`last_activity`);
+
+--
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `settings_school_id_group_key_unique` (`school_id`,`group`,`key`),
+  ADD KEY `settings_school_id_group_index` (`school_id`,`group`),
+  ADD KEY `settings_created_by_foreign` (`created_by`),
+  ADD KEY `settings_updated_by_foreign` (`updated_by`);
 
 --
 -- Indexes for table `students`
@@ -2186,6 +3259,53 @@ ALTER TABLE `timetables`
   ADD KEY `timetables_school_id_class_id_section_id_day_index` (`school_id`,`class_id`,`section_id`,`day`);
 
 --
+-- Indexes for table `transport_drivers`
+--
+ALTER TABLE `transport_drivers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `transport_drivers_school_id_index` (`school_id`),
+  ADD KEY `transport_drivers_license_no_index` (`license_no`),
+  ADD KEY `transport_drivers_status_index` (`status`);
+
+--
+-- Indexes for table `transport_routes`
+--
+ALTER TABLE `transport_routes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `transport_routes_school_id_index` (`school_id`),
+  ADD KEY `transport_routes_status_index` (`status`);
+
+--
+-- Indexes for table `transport_route_stops`
+--
+ALTER TABLE `transport_route_stops`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `transport_route_stops_school_id_index` (`school_id`),
+  ADD KEY `transport_route_stops_transport_route_id_index` (`transport_route_id`);
+
+--
+-- Indexes for table `transport_students`
+--
+ALTER TABLE `transport_students`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `transport_students_school_id_index` (`school_id`),
+  ADD KEY `transport_students_student_id_index` (`student_id`),
+  ADD KEY `transport_students_transport_route_id_index` (`transport_route_id`),
+  ADD KEY `transport_students_transport_route_stop_id_index` (`transport_route_stop_id`),
+  ADD KEY `transport_students_transport_vehicle_id_index` (`transport_vehicle_id`),
+  ADD KEY `transport_students_transport_driver_id_index` (`transport_driver_id`),
+  ADD KEY `transport_students_status_index` (`status`);
+
+--
+-- Indexes for table `transport_vehicles`
+--
+ALTER TABLE `transport_vehicles`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `transport_vehicles_school_id_index` (`school_id`),
+  ADD KEY `transport_vehicles_registration_no_index` (`registration_no`),
+  ADD KEY `transport_vehicles_status_index` (`status`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -2217,10 +3337,46 @@ ALTER TABLE `authors`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `books`
+--
+ALTER TABLE `books`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `book_authors`
+--
+ALTER TABLE `book_authors`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `book_categories`
 --
 ALTER TABLE `book_categories`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `book_copies`
+--
+ALTER TABLE `book_copies`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `book_issues`
+--
+ALTER TABLE `book_issues`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `book_renewals`
+--
+ALTER TABLE `book_renewals`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `book_returns`
+--
+ALTER TABLE `book_returns`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `classes`
@@ -2319,6 +3475,12 @@ ALTER TABLE `fee_types`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `fine_collections`
+--
+ALTER TABLE `fine_collections`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `grades`
 --
 ALTER TABLE `grades`
@@ -2349,6 +3511,72 @@ ALTER TABLE `income_payments`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `inventory_categories`
+--
+ALTER TABLE `inventory_categories`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `inventory_items`
+--
+ALTER TABLE `inventory_items`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `inventory_purchases`
+--
+ALTER TABLE `inventory_purchases`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `inventory_purchase_items`
+--
+ALTER TABLE `inventory_purchase_items`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `inventory_stock_ins`
+--
+ALTER TABLE `inventory_stock_ins`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `inventory_stock_in_items`
+--
+ALTER TABLE `inventory_stock_in_items`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `inventory_stock_movements`
+--
+ALTER TABLE `inventory_stock_movements`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `inventory_stock_outs`
+--
+ALTER TABLE `inventory_stock_outs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `inventory_stock_out_items`
+--
+ALTER TABLE `inventory_stock_out_items`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `inventory_suppliers`
+--
+ALTER TABLE `inventory_suppliers`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `inventory_units`
+--
+ALTER TABLE `inventory_units`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -2373,10 +3601,28 @@ ALTER TABLE `leave_types`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `library_fines`
+--
+ALTER TABLE `library_fines`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `library_members`
+--
+ALTER TABLE `library_members`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `lost_damaged_books`
+--
+ALTER TABLE `lost_damaged_books`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -2388,7 +3634,13 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `publishers`
+--
+ALTER TABLE `publishers`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `recurring_expenses`
@@ -2425,6 +3677,12 @@ ALTER TABLE `schools`
 --
 ALTER TABLE `sections`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -2481,6 +3739,36 @@ ALTER TABLE `timetables`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `transport_drivers`
+--
+ALTER TABLE `transport_drivers`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `transport_routes`
+--
+ALTER TABLE `transport_routes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `transport_route_stops`
+--
+ALTER TABLE `transport_route_stops`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `transport_students`
+--
+ALTER TABLE `transport_students`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `transport_vehicles`
+--
+ALTER TABLE `transport_vehicles`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -2505,12 +3793,71 @@ ALTER TABLE `authors`
   ADD CONSTRAINT `authors_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `books`
+--
+ALTER TABLE `books`
+  ADD CONSTRAINT `books_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `book_categories` (`id`),
+  ADD CONSTRAINT `books_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `books_publisher_id_foreign` FOREIGN KEY (`publisher_id`) REFERENCES `publishers` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `books_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `books_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `book_authors`
+--
+ALTER TABLE `book_authors`
+  ADD CONSTRAINT `book_authors_author_id_foreign` FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`),
+  ADD CONSTRAINT `book_authors_book_id_foreign` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `book_categories`
 --
 ALTER TABLE `book_categories`
   ADD CONSTRAINT `book_categories_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `book_categories_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `book_categories_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `book_copies`
+--
+ALTER TABLE `book_copies`
+  ADD CONSTRAINT `book_copies_book_id_foreign` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `book_copies_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `book_copies_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `book_copies_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `book_issues`
+--
+ALTER TABLE `book_issues`
+  ADD CONSTRAINT `book_issues_book_copy_id_foreign` FOREIGN KEY (`book_copy_id`) REFERENCES `book_copies` (`id`),
+  ADD CONSTRAINT `book_issues_book_id_foreign` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`),
+  ADD CONSTRAINT `book_issues_issued_by_foreign` FOREIGN KEY (`issued_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `book_issues_library_member_id_foreign` FOREIGN KEY (`library_member_id`) REFERENCES `library_members` (`id`),
+  ADD CONSTRAINT `book_issues_returned_by_foreign` FOREIGN KEY (`returned_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `book_issues_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `book_renewals`
+--
+ALTER TABLE `book_renewals`
+  ADD CONSTRAINT `book_renewals_book_copy_id_foreign` FOREIGN KEY (`book_copy_id`) REFERENCES `book_copies` (`id`),
+  ADD CONSTRAINT `book_renewals_book_id_foreign` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`),
+  ADD CONSTRAINT `book_renewals_book_issue_id_foreign` FOREIGN KEY (`book_issue_id`) REFERENCES `book_issues` (`id`),
+  ADD CONSTRAINT `book_renewals_library_member_id_foreign` FOREIGN KEY (`library_member_id`) REFERENCES `library_members` (`id`),
+  ADD CONSTRAINT `book_renewals_renewed_by_foreign` FOREIGN KEY (`renewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `book_renewals_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `book_returns`
+--
+ALTER TABLE `book_returns`
+  ADD CONSTRAINT `book_returns_book_copy_id_foreign` FOREIGN KEY (`book_copy_id`) REFERENCES `book_copies` (`id`),
+  ADD CONSTRAINT `book_returns_book_id_foreign` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`),
+  ADD CONSTRAINT `book_returns_book_issue_id_foreign` FOREIGN KEY (`book_issue_id`) REFERENCES `book_issues` (`id`),
+  ADD CONSTRAINT `book_returns_library_member_id_foreign` FOREIGN KEY (`library_member_id`) REFERENCES `library_members` (`id`),
+  ADD CONSTRAINT `book_returns_returned_by_foreign` FOREIGN KEY (`returned_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `book_returns_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `classes`
@@ -2633,6 +3980,12 @@ ALTER TABLE `fee_types`
   ADD CONSTRAINT `fee_types_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `fine_collections`
+--
+ALTER TABLE `fine_collections`
+  ADD CONSTRAINT `fine_collections_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `grades`
 --
 ALTER TABLE `grades`
@@ -2675,6 +4028,70 @@ ALTER TABLE `income_payments`
   ADD CONSTRAINT `income_payments_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `inventory_categories`
+--
+ALTER TABLE `inventory_categories`
+  ADD CONSTRAINT `inventory_categories_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_items`
+--
+ALTER TABLE `inventory_items`
+  ADD CONSTRAINT `inventory_items_inventory_category_id_foreign` FOREIGN KEY (`inventory_category_id`) REFERENCES `inventory_categories` (`id`),
+  ADD CONSTRAINT `inventory_items_inventory_unit_id_foreign` FOREIGN KEY (`inventory_unit_id`) REFERENCES `inventory_units` (`id`),
+  ADD CONSTRAINT `inventory_items_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_purchases`
+--
+ALTER TABLE `inventory_purchases`
+  ADD CONSTRAINT `inventory_purchases_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_purchase_items`
+--
+ALTER TABLE `inventory_purchase_items`
+  ADD CONSTRAINT `inventory_purchase_items_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`),
+  ADD CONSTRAINT `inventory_purchase_items_inventory_purchase_id_foreign` FOREIGN KEY (`inventory_purchase_id`) REFERENCES `inventory_purchases` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `inventory_purchase_items_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_stock_ins`
+--
+ALTER TABLE `inventory_stock_ins`
+  ADD CONSTRAINT `inventory_stock_ins_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `inventory_stock_ins_inventory_supplier_id_foreign` FOREIGN KEY (`inventory_supplier_id`) REFERENCES `inventory_suppliers` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `inventory_stock_ins_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_stock_in_items`
+--
+ALTER TABLE `inventory_stock_in_items`
+  ADD CONSTRAINT `inventory_stock_in_items_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`),
+  ADD CONSTRAINT `inventory_stock_in_items_inventory_stock_in_id_foreign` FOREIGN KEY (`inventory_stock_in_id`) REFERENCES `inventory_stock_ins` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `inventory_stock_in_items_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_stock_movements`
+--
+ALTER TABLE `inventory_stock_movements`
+  ADD CONSTRAINT `inventory_stock_movements_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `inventory_stock_movements_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`),
+  ADD CONSTRAINT `inventory_stock_movements_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_suppliers`
+--
+ALTER TABLE `inventory_suppliers`
+  ADD CONSTRAINT `inventory_suppliers_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inventory_units`
+--
+ALTER TABLE `inventory_units`
+  ADD CONSTRAINT `inventory_units_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `late_fees`
 --
 ALTER TABLE `late_fees`
@@ -2700,6 +4117,24 @@ ALTER TABLE `leave_types`
   ADD CONSTRAINT `leave_types_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `library_fines`
+--
+ALTER TABLE `library_fines`
+  ADD CONSTRAINT `library_fines_book_copy_id_foreign` FOREIGN KEY (`book_copy_id`) REFERENCES `book_copies` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `library_fines_book_id_foreign` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `library_fines_book_issue_id_foreign` FOREIGN KEY (`book_issue_id`) REFERENCES `book_issues` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `library_fines_library_member_id_foreign` FOREIGN KEY (`library_member_id`) REFERENCES `library_members` (`id`),
+  ADD CONSTRAINT `library_fines_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `library_members`
+--
+ALTER TABLE `library_members`
+  ADD CONSTRAINT `library_members_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `library_members_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `library_members_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `model_has_permissions`
 --
 ALTER TABLE `model_has_permissions`
@@ -2710,6 +4145,14 @@ ALTER TABLE `model_has_permissions`
 --
 ALTER TABLE `model_has_roles`
   ADD CONSTRAINT `model_has_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `publishers`
+--
+ALTER TABLE `publishers`
+  ADD CONSTRAINT `publishers_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `publishers_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `publishers_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `recurring_expenses`
@@ -2748,6 +4191,14 @@ ALTER TABLE `role_has_permissions`
 ALTER TABLE `sections`
   ADD CONSTRAINT `sections_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `sections_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `settings`
+--
+ALTER TABLE `settings`
+  ADD CONSTRAINT `settings_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `settings_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `settings_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `students`

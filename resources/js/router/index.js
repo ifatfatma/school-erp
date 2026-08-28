@@ -798,7 +798,91 @@ const routes = [
                             import(
                                 '@/pages/settings/Index.vue'
                             )
-                    }
+                    },{
+                        path: '/inventory/categories',
+                        name: 'categories',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/categories/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/units',
+                        name: 'units',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/units/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/suppliers',
+                        name: 'suppliers',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/suppliers/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/items',
+                        name: 'items',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/items/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/purchases',
+                        name: 'purchases',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/purchases/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/stock-ins',
+                        name: 'inventory-stock-ins',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/stockins/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/stockmovements',
+                        name: 'stockmovements',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/stockmovements/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/stock-adjustments',
+                        name: 'inventory-stock-adjustments',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/stockadjustments/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/dashboard',
+                        name: 'inventory-dashboard',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/dashboard/Index.vue'
+                            )
+                    },{
+                        path: '/inventory/stock-outs',
+                        name: 'inventory-stock-outs',
+                        component: () =>
+                            import(
+                                '@/pages/inventory/stockouts/Index.vue'
+                            )
+                    },{
+                            path: '/transport/vehicles',
+                            name: 'transport-vehicles',
+                            component: () =>
+                                import(
+                                    '@/pages/transport/vehicles/Index.vue'
+                                )
+                        },{
+                            path: '/transport/drivers',
+                            name: 'transport-drivers',
+                            component: () =>
+                                import(
+                                    '@/pages/transport/drivers/Index.vue'
+                                )
+                        }
         ],
     },
     

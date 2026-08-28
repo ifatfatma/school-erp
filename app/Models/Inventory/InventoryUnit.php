@@ -14,7 +14,7 @@ class InventoryUnit extends Model
     protected $fillable = [
         'school_id',
         'name',
-        'short_name',
+        'code',
         'description',
         'status',
     ];
@@ -28,6 +28,14 @@ class InventoryUnit extends Model
         return $this->belongsTo(
             \App\Models\School::class,
             'school_id'
+        );
+    }
+
+    public function items()
+    {
+        return $this->hasMany(
+            InventoryItem::class,
+            'inventory_unit_id'
         );
     }
 }
