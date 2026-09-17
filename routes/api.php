@@ -69,8 +69,18 @@ use App\Http\Controllers\Api\Inventory\InventoryDashboardController;
 use App\Http\Controllers\Api\Transport\TransportVehicleController;
 use App\Http\Controllers\Api\Transport\TransportDriverController;
 use App\Http\Controllers\Api\Transport\TransportRouteController;
-
-
+use App\Http\Controllers\Api\Transport\TransportStudentController;
+use App\Http\Controllers\Api\Transport\TransportRouteStopController;
+use App\Http\Controllers\Api\Transport\TransportAssignmentController;
+use App\Http\Controllers\Api\Transport\TransportFeeController;
+use App\Http\Controllers\Api\Transport\TransportVehicleMaintenanceController;
+use App\Http\Controllers\Api\Transport\TransportExpenseController;
+use App\Http\Controllers\Api\Transport\TransportReportController;
+use App\Http\Controllers\Api\Administrator\RoleController;
+use App\Http\Controllers\Api\Administrator\UserController;
+use App\Http\Controllers\Api\Administrator\PermissionController;
+use App\Http\Controllers\Api\Hostel\HostelBuildingController;
+use App\Http\Controllers\Api\Hostel\HostelRoomController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
@@ -1950,5 +1960,519 @@ Route::prefix('transport/routes')->group(function () {
     );
 
 });
+
+
+Route::prefix('transport/students')->group(function () {
+
+    // OPTIONS MUST COME BEFORE /{id}
+    Route::get(
+        '/options',
+        [TransportStudentController::class, 'options']
+    );
+
+    Route::get(
+        '/route/{routeId}/stops',
+        [TransportStudentController::class, 'routeStops']
+    );
+
+    Route::get(
+        '/',
+        [TransportStudentController::class, 'index']
+    );
+
+    Route::post(
+        '/',
+        [TransportStudentController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportStudentController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportStudentController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportStudentController::class, 'destroy']
+    );
+
+    Route::post(
+        '/{id}/status',
+        [TransportStudentController::class, 'status']
+    );
+
+});
+
+
+
+Route::prefix('transport/stops')->group(function () {
+
+    Route::get(
+        '/',
+        [TransportRouteStopController::class, 'index']
+    );
+
+    Route::get(
+        '/options',
+        [TransportRouteStopController::class, 'options']
+    );
+
+    Route::post(
+        '/',
+        [TransportRouteStopController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportRouteStopController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportRouteStopController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportRouteStopController::class, 'destroy']
+    );
+
+});
+
+
+Route::prefix('transport/assignments')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fixed routes MUST come before /{id}
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/options',
+        [TransportAssignmentController::class, 'options']
+    );
+
+    Route::get(
+        '/route/{routeId}/stops',
+        [TransportAssignmentController::class, 'routeStops']
+    );
+
+    Route::get(
+        '/',
+        [TransportAssignmentController::class, 'index']
+    );
+
+    Route::post(
+        '/',
+        [TransportAssignmentController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportAssignmentController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportAssignmentController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportAssignmentController::class, 'destroy']
+    );
+
+    Route::post(
+        '/{id}/status',
+        [TransportAssignmentController::class, 'status']
+    );
+
+});
+
+
+
+Route::prefix('transport/fees')->group(function () {
+
+    Route::get(
+        '/options',
+        [TransportFeeController::class, 'options']
+    );
+
+    Route::get(
+        '/student/{studentId}/assignments',
+        [TransportFeeController::class, 'studentAssignments']
+    );
+
+    Route::post(
+        '/generate',
+        [TransportFeeController::class, 'generate']
+    );
+
+    Route::get(
+        '/',
+        [TransportFeeController::class, 'index']
+    );
+
+    Route::post(
+        '/',
+        [TransportFeeController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportFeeController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportFeeController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportFeeController::class, 'destroy']
+    );
+
+});
+
+
+Route::prefix('transport/maintenance')->group(function () {
+
+    Route::get(
+        '/options',
+        [TransportVehicleMaintenanceController::class, 'options']
+    );
+
+    Route::get(
+        '/',
+        [TransportVehicleMaintenanceController::class, 'index']
+    );
+
+    Route::post(
+        '/',
+        [TransportVehicleMaintenanceController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportVehicleMaintenanceController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportVehicleMaintenanceController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportVehicleMaintenanceController::class, 'destroy']
+    );
+
+});
+
+
+Route::prefix('transport/expenses')->group(function () {
+
+    Route::get(
+        '/options',
+        [TransportExpenseController::class, 'options']
+    );
+
+    Route::get(
+        '/',
+        [TransportExpenseController::class, 'index']
+    );
+
+    Route::post(
+        '/',
+        [TransportExpenseController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [TransportExpenseController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [TransportExpenseController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [TransportExpenseController::class, 'destroy']
+    );
+
+});
+
+Route::prefix('transport/reports')->group(function () {
+
+    Route::get(
+        '/options',
+        [TransportReportController::class, 'options']
+    );
+
+    Route::get(
+        '/summary',
+        [TransportReportController::class, 'summary']
+    );
+
+    Route::get(
+        '/vehicles',
+        [TransportReportController::class, 'vehicles']
+    );
+
+    Route::get(
+        '/drivers',
+        [TransportReportController::class, 'drivers']
+    );
+
+    Route::get(
+        '/maintenance',
+        [TransportReportController::class, 'maintenance']
+    );
+
+    Route::get(
+        '/fuel',
+        [TransportReportController::class, 'fuel']
+    );
+
+    Route::get(
+        '/expenses',
+        [TransportReportController::class, 'expenses']
+    );
+
+});
+
+Route::prefix('administrator/roles')->group(function () {
+
+    Route::get(
+        '/',
+        [RoleController::class, 'index']
+    );
+
+    Route::get(
+        '/options',
+        [RoleController::class, 'options']
+    );
+
+    Route::post(
+        '/',
+        [RoleController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [RoleController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [RoleController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [RoleController::class, 'destroy']
+    );
+
+    Route::get(
+        '/{id}/permissions',
+        [RoleController::class, 'permissions']
+    );
+
+    Route::put(
+        '/{id}/permissions',
+        [RoleController::class, 'updatePermissions']
+    );
+
+});
+
+Route::prefix('administrator/users')->group(function () {
+
+    Route::get(
+        '/',
+        [UserController::class, 'index']
+    );
+
+    Route::get(
+        '/options',
+        [UserController::class, 'options']
+    );
+
+    Route::post(
+        '/',
+        [UserController::class, 'store']
+    );
+
+    Route::get(
+        '/{id}',
+        [UserController::class, 'show']
+    );
+
+    Route::put(
+        '/{id}',
+        [UserController::class, 'update']
+    );
+
+    Route::delete(
+        '/{id}',
+        [UserController::class, 'destroy']
+    );
+
+    Route::get(
+        '/{id}/roles',
+        [UserController::class, 'roles']
+    );
+
+    Route::put(
+        '/{id}/roles',
+        [UserController::class, 'updateRoles']
+    );
+
+});
+
+Route::middleware('auth:sanctum')
+    ->prefix('administrator/permissions')
+    ->group(function () {
+
+        Route::get(
+            '/',
+            [PermissionController::class, 'index']
+        );
+
+        Route::get(
+            '/options',
+            [PermissionController::class, 'options']
+        );
+
+        Route::post(
+            '/',
+            [PermissionController::class, 'store']
+        );
+
+        Route::get(
+            '/{id}',
+            [PermissionController::class, 'show']
+        );
+
+        Route::put(
+            '/{id}',
+            [PermissionController::class, 'update']
+        );
+
+        Route::delete(
+            '/{id}',
+            [PermissionController::class, 'destroy']
+        );
+
+    });
+
+
+    Route::prefix('hostel')->group(function () {
+
+    Route::get('/buildings', [
+        HostelBuildingController::class,
+        'index'
+    ]);
+
+    Route::post('/buildings', [
+        HostelBuildingController::class,
+        'store'
+    ]);
+
+    Route::get('/buildings/{id}', [
+        HostelBuildingController::class,
+        'show'
+    ]);
+
+    Route::put('/buildings/{id}', [
+        HostelBuildingController::class,
+        'update'
+    ]);
+
+    Route::delete('/buildings/{id}', [
+        HostelBuildingController::class,
+        'destroy'
+    ]);
+
+    Route::patch('/buildings/{id}/status', [
+        HostelBuildingController::class,
+        'toggleStatus'
+    ]);
+
+});
+
+Route::prefix('hostel')
+    ->group(function () {
+
+    /*
+|--------------------------------------------------------------------------
+| HOSTEL ROOMS
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/rooms/buildings',
+    [
+        HostelRoomController::class,
+        'buildings'
+    ]
+);
+
+Route::get(
+    '/rooms',
+    [
+        HostelRoomController::class,
+        'index'
+    ]
+);
+
+Route::post(
+    '/rooms',
+    [
+        HostelRoomController::class,
+        'store'
+    ]
+);
+
+Route::get(
+    '/rooms/{id}',
+    [
+        HostelRoomController::class,
+        'show'
+    ]
+)->whereNumber('id');
+
+Route::put(
+    '/rooms/{id}',
+    [
+        HostelRoomController::class,
+        'update'
+    ]
+)->whereNumber('id');
+
+Route::patch(
+    '/rooms/{id}/status',
+    [
+        HostelRoomController::class,
+        'toggleStatus'
+    ]
+)->whereNumber('id');
+
+Route::delete(
+    '/rooms/{id}',
+    [
+        HostelRoomController::class,
+        'destroy'
+    ]
+)->whereNumber('id');
+
+    });
 
 });

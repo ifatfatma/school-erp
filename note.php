@@ -1,13 +1,16 @@
-TRANSPORT
+HOSTEL
 │
 ├── Dashboard
-├── Vehicles
-├── Drivers
-├── Routes
-├── Stops
-├── Transport Assignments
-├── Student Transport
-├── Transport Fees
-├── Vehicle Maintenance
-├── Fuel / Expenses
-└── Transport Reports
+├── Hostels
+├── Buildings / Blocks
+├── Floors
+├── Rooms
+├── Beds
+├── Hostel Students
+├── Room Allocation
+├── Room Transfer
+├── Hostel Fees
+├── Hostel Attendance
+├── Complaints
+├── Visitors
+└── Hostel Reports

@@ -187,18 +187,13 @@ class TransportStudentController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $sessions = DB::table(
-            'school_sessions'
-        )
-        ->where(
-            'school_id',
-            $schoolId
-        )
-        ->orderBy(
-            'session_year',
-            'desc'
-        )
-        ->get();
+        $sessions = DB::table('academic_sessions')
+    ->where('school_id', $schoolId)
+    ->where('status', 1)
+    ->whereNull('deleted_at')
+    ->orderByDesc('is_current')
+    ->orderByDesc('start_date')
+    ->get();
 
         return response()->json([
             'success' => true,

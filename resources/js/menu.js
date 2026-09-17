@@ -308,9 +308,9 @@ export default [
                     route: '/book-renewals',
                     permission: "book_renewals.view",
                 },{
-                    title: 'Lost / Damaged Books',
-                    route: '/lost-damaged-books',
-                    permission: "book_renewals.view",
+                    title: "Lost / Damaged Books",
+                    route: "/lost-damaged-books",
+                    permission: "lost_damaged_books.view",
                 },{
                     title: 'Library Fines',
                     route: '/library-fines',
@@ -380,17 +380,64 @@ export default [
                 title: "Vehicles",
                 route: "/transport/vehicles",
                 permission: "transport_vehicles.view",
+                },{
+                    title: 'Routes',
+                    route: '/transport/routes',
+                    permission: "transport_routes.view",
+                },
+                {
+                    title: 'Stops',
+                    route: '/transport/stops',
+                    permission: "transport_stops.view",
+                },{
+                    title: 'Drivers',
+                    route: '/transport/drivers',
+                    permission: "transport_drivers.view",
+                },
+                {
+                    title: 'Student Transport',
+                    route: '/transport/students',
+                    permission: "transport_students.view",
+                },{
+                    title: 'Transport Assignments',
+                    route: '/transport/assignments',
+                    permission: "transport_assignments.view",
+                },{
+                    title: 'Transport Fees',
+                    route: '/transport/fees',
+                    permission: "transport_fees.view",
+                },{
+                    title: 'Vehicle Maintenance',
+                    route: '/transport/maintenance',
+                    permission: "transport_maintenance.view",
+                },{
+                    title: "Fuel / Expenses",
+                    route: "/transport/expenses",
+                    permission: "transport_expenses.view",
+                },
+                {
+                    title: "Transport Reports",
+                    route: "/transport/reports",
+                    permission: "transport_reports.view",
                 },
         ]
     },
-
-    {
+   {
         title: "Hostel",
         icon: "bi bi-house-door",
-        route: "/hostels",
-        permission: "hostel.view",
-    },
-
+        children: [
+                {
+                    title: "Buildings",
+                    route: "/hostel/buildings",
+                    permission: "hostel_buildings.view",
+                },
+                {
+                    title: 'Rooms',
+                    route: '/hostel/rooms',
+                    permission: 'hostel_rooms.view'
+                }
+        ]
+   },
     {
         title: "Reports",
         icon: "bi bi-graph-up",
@@ -404,17 +451,17 @@ export default [
         children: [
             {
                 title: "Users",
-                route: "/users",
+                route: "/administrator/users",
                 permission: "user.view",
             },
             {
                 title: "Roles",
-                route: "/roles",
+                route: "/administrator/roles",
                 permission: "role.view",
             },
             {
                 title: "Permissions",
-                route: "/permissions",
+                route: "/administrator/permissions",
                 permission: "permission.view",
             },
         ],

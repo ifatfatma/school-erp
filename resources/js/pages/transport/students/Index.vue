@@ -751,12 +751,12 @@
                                             "
                                             :key="session.id"
                                             :value="
-                                                session.session_year
+                                                session.name
                                             "
                                         >
 
                                             {{
-                                                session.session_year
+                                                session.name
                                             }}
 
                                         </option>

@@ -505,7 +505,7 @@ const routes = [
                     meta: {
                         title: "Marks Entry",
                         requiresAuth: true,
-                        permission: "exam-mark.view",
+                        permission: "exam_mark.view",
                     },
             },{
                 path: "/report-cards",
@@ -882,7 +882,121 @@ const routes = [
                                 import(
                                     '@/pages/transport/drivers/Index.vue'
                                 )
-                        }
+                        },{
+                            path: '/transport/students',
+                            name: 'transport-students',
+                            component: () =>
+                                import(
+                                    '@/pages/transport/students/Index.vue'
+                                )
+                        },{
+                                path: '/transport/routes',
+                                name: 'transport-routes',
+                                component: () =>
+                                    import(
+                                        '@/pages/transport/routes/Index.vue'
+                                    )
+                            },{
+                            path: '/transport/drivers',
+                            name: 'transport-drivers',
+                            component: () =>
+                                import(
+                                    '@/pages/transport/drivers/Index.vue'
+                                )
+                        },{
+                            path: '/transport/stops',
+                            name: 'transport-stops',
+                            component: () =>
+                                import(
+                                    '@/pages/transport/stops/Index.vue'
+                                )
+                        },{
+                            path: '/transport/assignments',
+                            name: 'transport-assignments',
+                            component: () =>
+                                import(
+                                    '@/pages/transport/assignments/Index.vue'
+                                )
+                        },{
+                        path: '/transport/fees',
+                        name: 'transport-fees',
+                        component: () =>
+                             import('@/pages/transport/fees/Index.vue')
+                         },{
+                                path: '/transport/maintenance',
+                                name: 'transport-maintenance',
+                                component: () =>
+                                    import(
+                                        '@/pages/transport/maintenance/Index.vue'
+                                    )
+                            },{
+                                path: '/transport/expenses',
+                                name: 'transport-expenses',
+                                component: () =>
+                                    import(
+                                        '@/pages/transport/expenses/Index.vue'
+                                    )
+                            },{
+                                path: '/transport/reports',
+                                name: 'transport-reports',
+                                component: () =>
+                                    import(
+                                        '@/pages/transport/reports/Index.vue'
+                                    )
+                            },{
+                                    path: '/administrator/users',
+                                    name: 'administrator-users',
+                                    component: () =>
+                                        import(
+                                            '@/pages/administrator/users/Index.vue'
+                                        ),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'view_users'
+                                    }
+                                },
+
+                                {
+                                    path: '/administrator/roles',
+                                    name: 'administrator-roles',
+                                    component: () =>
+                                        import(
+                                            '@/pages/administrator/roles/Index.vue'
+                                        ),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'view_roles'
+                                    }
+                                },
+
+                                {
+                                    path: '/administrator/permissions',
+                                    name: 'administrator-permissions',
+                                    component: () =>
+                                        import(
+                                            '@/pages/administrator/permissions/Index.vue'
+                                        ),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'view_permissions'
+                                    }
+                                },{
+                                    path: '/hostel/buildings',
+                                    name: 'hostel.buildings',
+                                    component: () =>
+                                        import('@/pages/hostel/buildings/Index.vue')
+                                },{
+                                        path: '/hostel/rooms',
+                                        name: 'hostel.rooms',
+                                        component: () =>
+                                            import(
+                                                '@/pages/hostel/rooms/Index.vue'
+                                            ),
+                                        meta: {
+                                            requiresAuth: true,
+                                            permission: 'hostel_rooms.view'
+                                        }
+                                    },
         ],
     },
     
