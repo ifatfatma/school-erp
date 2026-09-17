@@ -47,8 +47,8 @@
               </span>
             </td>
             <td>
-              <button class="btn btn-sm btn-info me-1" @click="openEditModal(school)">Edit</button>
-              <button class="btn btn-sm btn-danger" @click="confirmDelete(school.id)">Delete</button>
+              <button class="btn btn-sm btn-outline-info me-1" @click="openEditModal(school)">Edit</button>
+              <button class="btn btn-sm btn-outline-danger" @click="confirmDelete(school.id)">Delete</button>
             </td>
           </tr>
         </tbody>

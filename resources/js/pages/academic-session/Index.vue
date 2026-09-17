@@ -64,13 +64,13 @@
 
                     <RouterLink
                         :to="`/academic-sessions/${item.id}/edit`"
-                        class="btn btn-warning btn-sm"
+                        class="btn btn-outline-info btn-sm"
                     >
                         Edit
                     </RouterLink>
 
                     <button
-                        class="btn btn-danger btn-sm ms-2"
+                        class="btn btn-outline-danger btn-sm ms-2"
                         @click="remove(item.id)"
                     >
                         Delete
