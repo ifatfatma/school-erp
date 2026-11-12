@@ -307,10 +307,17 @@ Primary
 
 <div
 v-else
-class="alert alert-info"
+class="alert alert-info d-flex justify-content-between align-items-center"
 >
 
-No students linked with this guardian.
+<span><i class="bi bi-info-circle me-1"></i> No students linked with this guardian yet.</span>
+
+<RouterLink
+:to="{ name: 'guardians.edit', params: { id: guardian.id } }"
+class="btn btn-sm btn-primary rounded-pill px-3"
+>
+<i class="bi bi-link-45deg me-1"></i> Link Student Now
+</RouterLink>
 
 </div>
 

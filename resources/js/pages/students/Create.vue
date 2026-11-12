@@ -79,9 +79,9 @@ onMounted(async () => {
 
     await Promise.all([
 
-        classStore.fetch(),
-        AcademicSessionStore.load(),
-        sectionStore.load(),
+        classStore.fetch({ per_page: 1000 }),
+        AcademicSessionStore.load({ per_page: 1000 }),
+        sectionStore.load({ per_page: 1000 }),
 
     ]);
 

@@ -69,9 +69,9 @@ onMounted(async () => {
     try {
 
         await Promise.all([
-            classStore.fetch(),
-            AcademicSessionStore.load(),
-            sectionStore.load(),
+            classStore.fetch({ per_page: 1000 }),
+            AcademicSessionStore.load({ per_page: 1000 }),
+            sectionStore.load({ per_page: 1000 }),
             studentStore.find(route.params.id),
         ]);
 
@@ -100,9 +100,9 @@ onMounted(async () => {
             email: item.email,
             address: item.address,
 
-            class_id: item.class_id,
-            academic_session_id: item.academic_session_id,
-            section_id: item.section_id,
+            class_id: item.class_id ? Number(item.class_id) : "",
+            academic_session_id: item.academic_session_id ? Number(item.academic_session_id) : "",
+            section_id: item.section_id ? Number(item.section_id) : "",
 
             father_name: item.father_name,
             father_mobile: item.father_mobile,

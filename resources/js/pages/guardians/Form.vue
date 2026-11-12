@@ -54,6 +54,18 @@ const genders = computed(() => [
 
 <form @submit.prevent="$emit('submit')">
 
+<div
+    v-if="Object.keys(errors).length"
+    class="alert alert-danger mb-3"
+>
+    <strong>Please fix the following errors:</strong>
+    <ul class="mb-0">
+        <li v-for="(messages, field) in errors" :key="field">
+            {{ messages[0] }}
+        </li>
+    </ul>
+</div>
+
 <div class="card shadow-sm mb-4">
 
 <div class="card-header bg-primary text-white">
@@ -390,13 +402,13 @@ v-model="form.pincode"
 
 <div class="col-md-6 mb-3">
 
-<label class="form-label">
-Students
+<label class="form-label fw-semibold">
+    <i class="bi bi-people text-primary me-1"></i> Link Students
 </label>
 
 <select
 multiple
-class="form-select"
+class="form-select border-primary"
 v-model="form.student_ids"
 style="height:150px"
 >
@@ -406,10 +418,15 @@ v-for="student in students"
 :key="student.id"
 :value="student.id"
 >
-{{ student.full_name }}
+{{ student.full_name }} (Adm: {{ student.admission_no || student.id }})
 </option>
 
 </select>
+<small class="text-muted d-block mt-1">Hold Ctrl (or Cmd) to select multiple students.</small>
+
+<div class="text-danger small" v-if="errors.student_ids">
+    {{ errors.student_ids[0] }}
+</div>
 
 </div>
 
@@ -417,8 +434,8 @@ v-for="student in students"
 
 <div class="col-md-6 mb-3">
 
-<label class="form-label">
-Primary Student
+<label class="form-label fw-semibold">
+    <i class="bi bi-star-fill text-warning me-1"></i> Primary Student
 </label>
 
 <select
@@ -435,10 +452,15 @@ v-for="student in students"
 :key="student.id"
 :value="student.id"
 >
-{{ student.full_name }}
+{{ student.full_name }} (Adm: {{ student.admission_no || student.id }})
 </option>
 
 </select>
+<small class="text-muted d-block mt-1">Designate which child is the primary student for this guardian.</small>
+
+<div class="text-danger small" v-if="errors.primary_student_id">
+    {{ errors.primary_student_id[0] }}
+</div>
 
 </div>
 

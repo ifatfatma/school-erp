@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import Swal from "sweetalert2";
 
 import Form from "./Form.vue";
 
@@ -84,6 +85,14 @@ async function submit() {
 
         await guardianStore.create(form);
 
+        Swal.fire({
+            icon: "success",
+            title: "Created!",
+            text: "Guardian created successfully.",
+            timer: 1500,
+            showConfirmButton: false,
+        });
+
         router.push({
             name: "guardians.index",
         });
@@ -91,6 +100,11 @@ async function submit() {
     } catch (error) {
 
         console.error(error);
+        Swal.fire({
+            icon: "error",
+            title: "Creation Failed",
+            text: error.response?.data?.message || "Please check the form for errors.",
+        });
 
     }
 

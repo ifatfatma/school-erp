@@ -62,6 +62,8 @@ watch(
 
         if (
             oldClassId !== undefined &&
+            oldClassId !== "" &&
+            oldClassId !== null &&
             Number(newClassId) !== Number(oldClassId)
         ) {
             props.form.section_id = "";
