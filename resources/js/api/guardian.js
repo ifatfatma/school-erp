@@ -35,7 +35,13 @@ export default {
 
                 });
 
-            } else if (data[key] !== null && data[key] !== undefined) {
+            } else if (key === "photo") {
+
+                if (data.photo instanceof File) {
+                    formData.append("photo", data.photo);
+                }
+
+            } else if (key !== "students" && key !== "photo_url" && data[key] !== null && data[key] !== undefined) {
 
                 formData.append(key, data[key]);
 
@@ -70,7 +76,13 @@ export default {
 
                 });
 
-            } else if (data[key] !== null && data[key] !== undefined) {
+            } else if (key === "photo") {
+
+                if (data.photo instanceof File) {
+                    formData.append("photo", data.photo);
+                }
+
+            } else if (key !== "students" && key !== "photo_url" && data[key] !== null && data[key] !== undefined) {
 
                 formData.append(key, data[key]);
 

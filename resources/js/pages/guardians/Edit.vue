@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Swal from "sweetalert2";
 
 import Form from "./Form.vue";
 
@@ -101,15 +102,26 @@ async function submit() {
 
         await guardianStore.update(route.params.id, form);
 
+        Swal.fire({
+            icon: "success",
+            title: "Updated!",
+            text: "Guardian and linked students updated successfully.",
+            timer: 1500,
+            showConfirmButton: false,
+        });
+
         router.push({
-
             name: "guardians.index",
-
         });
 
     } catch (error) {
 
         console.error(error);
+        Swal.fire({
+            icon: "error",
+            title: "Update Failed",
+            text: error.response?.data?.message || "Please check the form for errors.",
+        });
 
     }
 

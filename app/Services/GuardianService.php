@@ -37,13 +37,18 @@ class GuardianService
      */
     public function store(array $data): Guardian
     {
-        $data['school_id'] = auth()->user()->school_id;
-        if (!empty($data['photo'])) {
+        $targetSchoolId = !empty($data['school_id']) 
+            ? (int) $data['school_id'] 
+            : (app(\App\Services\TenantManager::class)->getTenantId() ?: (auth()->user()?->school_id ?: 1));
+        $data['school_id'] = $targetSchoolId;
 
+        if (!empty($data['photo']) && ($data['photo'] instanceof \Illuminate\Http\UploadedFile)) {
             $data['photo'] = $data['photo']->store(
                 'guardians',
                 'public'
             );
+        } else {
+            unset($data['photo']);
         }
         return $this->repository->create($data);
     }
@@ -55,9 +60,9 @@ class GuardianService
         Guardian $guardian,
         array $data
     ): Guardian {
+        $data['school_id'] = $guardian->school_id ?: (!empty($data['school_id']) ? (int) $data['school_id'] : (auth()->user()?->school_id ?: 1));
 
-        $data['school_id'] = auth()->user()->school_id;
-        if (!empty($data['photo'])) {
+        if (!empty($data['photo']) && ($data['photo'] instanceof \Illuminate\Http\UploadedFile)) {
 
             if (
                 $guardian->photo &&
@@ -71,7 +76,6 @@ class GuardianService
                 'public'
             );
         } else {
-
             unset($data['photo']);
         }
 
