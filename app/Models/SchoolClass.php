@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SchoolClass extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToSchool;
 
     protected $table = 'classes';
 
@@ -65,7 +67,17 @@ class SchoolClass extends Model
     }
 
     public function school()
-{
-    return $this->belongsTo(School::class);
-}
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function sections()
+    {
+        return $this->hasMany(Section::class, 'class_id');
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'class_id');
+    }
 }

@@ -7,6 +7,8 @@ export const useStudentStore = defineStore("student", {
 
         items: [],
 
+        allSchools: [],
+
         item: null,
 
         pagination: {},
@@ -32,6 +34,12 @@ export const useStudentStore = defineStore("student", {
                 this.items = data.data;
 
                 this.pagination = data.meta;
+
+                if (data.all_schools) {
+                    this.allSchools = data.all_schools;
+                }
+
+                return data;
 
             } finally {
 

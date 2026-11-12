@@ -25,9 +25,9 @@ class TransportFeeController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
 
@@ -40,7 +40,7 @@ class TransportFeeController extends Controller
     public function index(Request $request)
     {
         $query = StudentTransportFee::query()
-            ->where('school_id', $this->schoolId())
+            ->when($this->schoolId($request), fn($q, $id) => $q->where('school_id', $id))
             ->with([
                 'assignment.route',
                 'assignment.stop',

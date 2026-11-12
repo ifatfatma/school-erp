@@ -24,15 +24,39 @@ class SectionController extends Controller
      */
     public function index(Request $request)
     {
+        $authUser = $request->user();
+        $isSuperAdmin = $authUser && (
+            $authUser->user_type === 'super_admin' || 
+            (method_exists($authUser, 'hasRole') && ($authUser->hasRole('Super Admin') || $authUser->hasRole('super_admin'))) ||
+            ($authUser->roles && $authUser->roles->contains('name', 'Super Admin'))
+        );
+
+        $schoolId = $request->input('school_id');
+        if ($isSuperAdmin && ($schoolId === null || $schoolId === '' || $schoolId === 'all')) {
+            $schoolId = 'all';
+        }
+
+        $filters = $request->only([
+            'search',
+            'class_id',
+            'status',
+        ]);
+        $filters['school_id'] = $schoolId;
+
         $sections = $this->service->paginate(
-            $request->only([
-                'search',
-                'class_id'
-            ]),
+            $filters,
             $request->integer('per_page', 10)
         );
 
-        return SectionResource::collection($sections);
+        $resource = SectionResource::collection($sections);
+
+        if ($isSuperAdmin) {
+            $resource->additional([
+                'all_schools' => \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']),
+            ]);
+        }
+
+        return $resource;
     }
 
     /**

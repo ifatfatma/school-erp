@@ -3,19 +3,48 @@
 namespace App\Repositories\Academic;
 
 use App\Models\Timetable;
+use App\Services\TenantManager;
 
 class TimetableRepository
 {
+    protected function resolveSchoolId(?int $filterSchoolId = null): ?int
+    {
+        $user = auth()->user();
+        $tenantManager = app(TenantManager::class);
+
+        if (!$tenantManager->isSuperAdmin($user)) {
+            return $user?->school_id ? (int) $user->school_id : null;
+        }
+
+        if ($filterSchoolId !== null && $filterSchoolId > 0) {
+            return (int) $filterSchoolId;
+        }
+
+        $tenantId = $tenantManager->getTenantId();
+        if ($tenantId) {
+            return (int) $tenantId;
+        }
+
+        return $user?->school_id ? (int) $user->school_id : null;
+    }
+
     public function paginate(array $filters = [])
     {
+        $filterSchoolId = !empty($filters['school_id']) && $filters['school_id'] !== 'all' ? (int) $filters['school_id'] : null;
+        $schoolId = $this->resolveSchoolId($filterSchoolId);
+
         $query = Timetable::query()
             ->with([
                 'class:id,name',
                 'section:id,name',
                 'subject:id,name',
-                'teacher:id,first_name',
-            ])
-            ->where('school_id', auth()->user()->school_id);
+                'teacher:id,first_name,last_name',
+                'school:id,name,code',
+            ]);
+
+        if ($schoolId !== null) {
+            $query->where('school_id', $schoolId);
+        }
 
         // Search
         if (!empty($filters['search'])) {
@@ -27,7 +56,11 @@ class TimetableRepository
                       $q->where('name', 'like', "%{$search}%");
                   })
                   ->orWhereHas('teacher', function ($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
+                      $q->where(function ($sub) use ($search) {
+                          $sub->where('first_name', 'like', "%{$search}%")
+                              ->orWhere('last_name', 'like', "%{$search}%")
+                              ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", ["%{$search}%"]);
+                      });
                   });
             });
         }
@@ -52,32 +85,38 @@ class TimetableRepository
             $query->where('day', $filters['day']);
         }
 
-        if (isset($filters['status']) && $filters['status'] !== '') {
-            $query->where('status', $filters['status']);
-        }
-
-        $sortBy = $filters['sort_by'] ?? 'day';
-        $sortOrder = $filters['sort_order'] ?? 'asc';
-
         return $query
-            ->orderBy($sortBy, $sortOrder)
-            ->paginate($filters['per_page'] ?? 10);
+            ->orderByRaw("FIELD(day, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')")
+            ->orderBy('start_time')
+            ->paginate($filters['per_page'] ?? 15);
     }
 
     public function find(int $id): ?Timetable
     {
-        return Timetable::with([
-                'class',
-                'section',
-                'subject',
-                'teacher',
-            ])
-            ->where('school_id', auth()->user()->school_id)
-            ->find($id);
+        $user = auth()->user();
+        $tenantManager = app(TenantManager::class);
+        $isSuperAdmin = $tenantManager->isSuperAdmin($user);
+
+        $query = Timetable::with([
+            'class',
+            'section',
+            'subject',
+            'teacher',
+            'school:id,name,code',
+        ]);
+
+        if (!$isSuperAdmin && $user?->school_id) {
+            $query->where('school_id', $user->school_id);
+        }
+
+        return $query->find($id);
     }
 
     public function create(array $data): Timetable
     {
+        if (empty($data['school_id'])) {
+            $data['school_id'] = $this->resolveSchoolId();
+        }
         return Timetable::create($data);
     }
 
@@ -100,9 +139,13 @@ class TimetableRepository
         array $data,
         ?int $ignoreId = null
     ): bool {
+        $schoolId = !empty($data['school_id']) ? (int) $data['school_id'] : $this->resolveSchoolId();
 
-        $query = Timetable::where('school_id', auth()->user()->school_id)
-            ->where('class_id', $data['class_id'])
+        $query = Timetable::query();
+        if ($schoolId !== null) {
+            $query->where('school_id', $schoolId);
+        }
+        $query->where('class_id', $data['class_id'])
             ->where('section_id', $data['section_id'])
             ->where('day', $data['day'])
             ->where(function ($q) use ($data) {

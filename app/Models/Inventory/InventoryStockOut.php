@@ -2,12 +2,14 @@
 
 namespace App\Models\Inventory;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class InventoryStockOut extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $table = 'inventory_stock_outs';
 
@@ -42,5 +44,10 @@ class InventoryStockOut extends Model
             \App\Models\User::class,
             'created_by'
         );
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(\App\Models\School::class);
     }
 }

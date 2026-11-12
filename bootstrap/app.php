@@ -12,7 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->api(append: [
+            \App\Http\Middleware\IdentifyTenant::class,
+            \App\Http\Middleware\CheckSubscriptionFeature::class,
+        ]);
+        $middleware->alias([
+            'tenant' => \App\Http\Middleware\IdentifyTenant::class,
+            'subscription.feature' => \App\Http\Middleware\CheckSubscriptionFeature::class,
+        ]);
     })
     ->withExceptions(function ($exceptions) {
         $exceptions->render(function (AuthenticationException $e, Request $request) {

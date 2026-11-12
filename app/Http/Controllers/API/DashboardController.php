@@ -12,6 +12,7 @@ use App\Models\HostelBuilding;
 use App\Models\HostelRoom;
 use App\Models\Income;
 use App\Models\Inventory\InventoryItem;
+use App\Models\School;
 use App\Models\Section;
 use App\Models\Student;
 use App\Models\StudentAttendance;
@@ -19,6 +20,7 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\TeacherAttendance;
 use App\Models\Transport\TransportVehicle;
+use App\Services\TenantManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -83,8 +85,39 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = auth()->user();
+            if (!$user) {
+                abort(401, 'Unauthenticated.');
+            }
 
-            $schoolId = $this->schoolId();
+            $tenantManager = app(TenantManager::class);
+            $isSuperAdmin = $tenantManager->isSuperAdmin($user);
+
+            // Super Admin: Global Mode (All Schools)
+            if ($isSuperAdmin && $tenantManager->getTenantId() === null) {
+                return response()->json([
+                    'success' => true,
+                    'data'    => $this->getGlobalDashboardData(),
+                ]);
+            }
+
+            // Individual school mode
+            if ($isSuperAdmin) {
+                $schoolId = $tenantManager->getTenantId() ?? $user->school_id;
+                if (!$schoolId) {
+                    $schoolId = School::where('status', 1)->value('id') ?? 1;
+                }
+            } else {
+                if (empty($user->school_id)) {
+                    abort(403, 'No school assigned to this account.');
+                }
+                $schoolId = (int) $user->school_id;
+            }
+
+            $school = School::find($schoolId);
+            if (!$school) {
+                abort(404, 'School not found.');
+            }
 
 
             /*
@@ -875,8 +908,16 @@ class DashboardController extends Controller
                     | Basic
                     */
 
+                    'is_global' => false,
+
                     'school_id' =>
                         $schoolId,
+
+                    'school_name' =>
+                        $school->name,
+
+                    'school_code' =>
+                        $school->code,
 
                     'academic_session' => $currentSession
                         ? [
@@ -1161,5 +1202,155 @@ class DashboardController extends Controller
 
             ], 500);
         }
+    }
+
+    /**
+     * Build system-wide global dashboard data for Super Admin.
+     */
+    protected function getGlobalDashboardData(): array
+    {
+        $totalStudents = Student::withoutGlobalScopes()->count();
+        $activeStudents = Student::withoutGlobalScopes()->where('status', 1)->count();
+        $inactiveStudents = Student::withoutGlobalScopes()->where('status', 0)->count();
+        $maleStudents = Student::withoutGlobalScopes()->where('gender', 'Male')->count();
+        $femaleStudents = Student::withoutGlobalScopes()->where('gender', 'Female')->count();
+        $otherStudents = Student::withoutGlobalScopes()->whereNotIn('gender', ['Male', 'Female'])->count();
+
+        $totalTeachers = Teacher::withoutGlobalScopes()->count();
+        $activeTeachers = Teacher::withoutGlobalScopes()->where('status', 1)->count();
+        $inactiveTeachers = Teacher::withoutGlobalScopes()->where('status', 0)->count();
+
+        $totalClasses = SchoolClass::withoutGlobalScopes()->count();
+        $activeClasses = SchoolClass::withoutGlobalScopes()->where('status', 1)->count();
+        $totalSections = Section::withoutGlobalScopes()->count();
+        $activeSections = Section::withoutGlobalScopes()->where('status', 1)->count();
+        $totalSubjects = Subject::withoutGlobalScopes()->where('status', 1)->count();
+
+        $totalExams = Exam::withoutGlobalScopes()->count();
+        $publishedExams = Exam::withoutGlobalScopes()->where('is_result_published', 1)->count();
+        $upcomingExams = Exam::withoutGlobalScopes()->where('start_date', '>=', now()->toDateString())->count();
+
+        $feeCollected = (float) FeePayment::withoutGlobalScopes()->where('status', 'Success')->sum('total_amount');
+        $totalFeeDue = (float) DB::table('student_fee_dues')->whereNull('deleted_at')->sum('balance_amount');
+        $todayFeeCollection = (float) FeePayment::withoutGlobalScopes()->where('status', 'Success')->whereDate('payment_date', now()->toDateString())->sum('total_amount');
+        $monthlyFees = (float) FeePayment::withoutGlobalScopes()->where('status', 'Success')->whereMonth('payment_date', now()->month)->whereYear('payment_date', now()->year)->sum('total_amount');
+
+        $totalExpenses = (float) Expense::withoutGlobalScopes()->where('status', 'Paid')->sum('amount');
+        $todayExpenses = (float) Expense::withoutGlobalScopes()->where('status', 'Paid')->whereDate('expense_date', now()->toDateString())->sum('amount');
+        $otherIncome = (float) Income::withoutGlobalScopes()->where('status', 'Received')->sum('amount');
+        $todayOtherIncome = (float) Income::withoutGlobalScopes()->where('status', 'Received')->whereDate('income_date', now()->toDateString())->sum('amount');
+        $monthlyTotalIncome = (float) Income::withoutGlobalScopes()->where('status', 'Received')->whereMonth('income_date', now()->month)->whereYear('income_date', now()->year)->sum('amount');
+        $monthlyExpenses = (float) Expense::withoutGlobalScopes()->where('status', 'Paid')->whereMonth('expense_date', now()->month)->whereYear('expense_date', now()->year)->sum('amount');
+        $monthlyBalance = $monthlyTotalIncome - $monthlyExpenses;
+
+        $studentPresent = StudentAttendance::withoutGlobalScopes()->whereDate('attendance_date', now()->toDateString())->where('status', 'Present')->count();
+        $studentAbsent = StudentAttendance::withoutGlobalScopes()->whereDate('attendance_date', now()->toDateString())->where('status', 'Absent')->count();
+        $studentLate = StudentAttendance::withoutGlobalScopes()->whereDate('attendance_date', now()->toDateString())->where('status', 'Late')->count();
+        $studentLeave = StudentAttendance::withoutGlobalScopes()->whereDate('attendance_date', now()->toDateString())->where('status', 'Leave')->count();
+
+        $teacherPresent = TeacherAttendance::withoutGlobalScopes()->whereDate('attendance_date', now()->toDateString())->where('status', 'Present')->count();
+        $teacherAbsent = TeacherAttendance::withoutGlobalScopes()->whereDate('attendance_date', now()->toDateString())->where('status', 'Absent')->count();
+        $teacherLate = TeacherAttendance::withoutGlobalScopes()->whereDate('attendance_date', now()->toDateString())->where('status', 'Late')->count();
+
+        $recentStudents = Student::withoutGlobalScopes()
+            ->with(['school:id,name,code', 'class:id,name', 'section:id,name'])
+            ->latest('id')
+            ->limit(5)
+            ->get();
+
+        $upcomingExamList = Exam::withoutGlobalScopes()
+            ->latest('id')
+            ->limit(5)
+            ->get();
+
+        $schoolList = School::withCount(['students', 'teachers'])
+            ->orderBy('name')
+            ->get(['id', 'name', 'code', 'status']);
+
+        return [
+            'is_global' => true,
+            'school_id' => null,
+            'school_name' => 'All Schools (Global Mode)',
+            'school_code' => 'GLOBAL',
+            'academic_session' => null,
+            'students' => [
+                'total' => $totalStudents,
+                'active' => $activeStudents,
+                'inactive' => $inactiveStudents,
+                'male' => $maleStudents,
+                'female' => $femaleStudents,
+                'other' => $otherStudents,
+            ],
+            'teachers' => [
+                'total' => $totalTeachers,
+                'active' => $activeTeachers,
+                'inactive' => $inactiveTeachers,
+            ],
+            'academic' => [
+                'classes' => $totalClasses,
+                'active_classes' => $activeClasses,
+                'sections' => $totalSections,
+                'active_sections' => $activeSections,
+                'subjects' => $totalSubjects,
+            ],
+            'exams' => [
+                'total' => $totalExams,
+                'published' => $publishedExams,
+                'upcoming' => $upcomingExams,
+            ],
+            'fees' => [
+                'collected' => $feeCollected,
+                'due' => $totalFeeDue,
+                'pending_students' => 0,
+                'today' => $todayFeeCollection,
+                'monthly' => $monthlyFees,
+            ],
+            'finance' => [
+                'expenses' => $totalExpenses,
+                'today_expenses' => $todayExpenses,
+                'other_income' => $otherIncome,
+                'today_other_income' => $todayOtherIncome,
+                'monthly_income' => $monthlyTotalIncome,
+                'monthly_expenses' => $monthlyExpenses,
+                'monthly_balance' => $monthlyBalance,
+            ],
+            'student_attendance' => [
+                'present' => $studentPresent,
+                'absent' => $studentAbsent,
+                'late' => $studentLate,
+                'leave' => $studentLeave,
+            ],
+            'teacher_attendance' => [
+                'present' => $teacherPresent,
+                'absent' => $teacherAbsent,
+                'late' => $teacherLate,
+            ],
+            'hostel' => [
+                'buildings' => HostelBuilding::withoutGlobalScopes()->count(),
+                'rooms' => HostelRoom::withoutGlobalScopes()->count(),
+                'total_capacity' => 0,
+                'occupied_beds' => 0,
+                'available_beds' => 0,
+            ],
+            'inventory' => [
+                'total_items' => 0,
+                'low_stock' => 0,
+                'out_of_stock' => 0,
+            ],
+            'transport' => [
+                'vehicles' => 0,
+                'active_vehicles' => 0,
+                'routes' => 0,
+                'assigned_students' => 0,
+            ],
+            'recent_students' => $recentStudents,
+            'upcoming_exam_list' => $upcomingExamList,
+            'global' => [
+                'total_schools' => School::count(),
+                'active_schools' => School::where('status', 1)->count(),
+                'inactive_schools' => School::where('status', 0)->count(),
+                'schools' => $schoolList,
+            ],
+        ];
     }
 }

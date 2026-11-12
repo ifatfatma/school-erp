@@ -18,6 +18,18 @@ class TeacherResource extends JsonResource
 
             'school_id' => $this->school_id,
 
+            'school_name' => $this->school?->name,
+
+            'school_code' => $this->school?->code,
+
+            'school' => $this->whenLoaded('school', function () {
+                return [
+                    'id' => $this->school->id,
+                    'name' => $this->school->name,
+                    'code' => $this->school->code,
+                ];
+            }),
+
             'employee_id' => $this->employee_id,
 
             'first_name' => $this->first_name,

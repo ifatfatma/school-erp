@@ -769,6 +769,10 @@ const authConfig = () => {
             `Bearer ${token}`;
 
     }
+    const activeSchoolId = localStorage.getItem('active_school_id');
+    if (activeSchoolId) {
+        config.headers['X-School-Id'] = activeSchoolId;
+    }
 
 
     return config;
@@ -970,4 +974,11 @@ onMounted(
     }
 );
 
+
+
+const onTenantChanged = () => { loadSummary(); };
+window.addEventListener('tenant-switched', onTenantChanged);
+if (typeof onBeforeUnmount === 'function') {
+    onBeforeUnmount(() => window.removeEventListener('tenant-switched', onTenantChanged));
+}
 </script>

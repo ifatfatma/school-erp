@@ -3,12 +3,15 @@ import { reactive } from "vue";
 import { useRouter } from "vue-router";
 
 import Form from "./Form.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { useExamStore } from "@/stores/exam";
 
 const router = useRouter();
 const examStore = useExamStore();
 
 const form = reactive({
+
+    school_id: "",
 
     academic_session_id: "",
 
@@ -61,6 +64,16 @@ function cancel() {
 
 <template>
 
+<div class="container-fluid py-2">
+
+<AppBreadcrumb
+    :items="[
+        { label: 'Dashboard', to: '/' },
+        { label: 'Examinations', to: { name: 'exams.index' } },
+        { label: 'Create' }
+    ]"
+/>
+
 <Form
 
     :form="form"
@@ -74,5 +87,7 @@ function cancel() {
     @cancel="cancel"
 
 />
+
+</div>
 
 </template>

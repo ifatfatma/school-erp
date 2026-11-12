@@ -67,6 +67,7 @@
 
 import { reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 import useClass from '@/composables/useSchoolClass'
 
@@ -104,11 +105,12 @@ async function loadClass() {
 
     try {
 
-        const data = await fetchItem(route.params.id)
-        form.name = data.data.name
-        form.numeric_name = data.data.numeric_name
-        form.remarks = data.data.remarks
-        form.status = data.data.status ? 1 : 0;
+        const res = await fetchItem(route.params.id)
+        const data = res?.data || res
+        form.name = data.name
+        form.numeric_name = data.numeric_name
+        form.remarks = data.remarks
+        form.status = data.status ? 1 : 0;
 
     } catch (error) {
 
@@ -124,7 +126,11 @@ async function update() {
 
         await updateItem(route.params.id, form)
 
-        alert('Class updated successfully.')
+        await Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Class updated successfully.'
+        })
 
         router.push({
             name: 'classes.index'

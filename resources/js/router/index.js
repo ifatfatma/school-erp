@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 import Login from "@/pages/auth/Login.vue";
 import Dashboard from "@/pages/dashboard/Dashboard.vue";
@@ -11,6 +12,153 @@ import AcademicSessionEdit from "@/pages/academic-session/Edit.vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 
 const routes = [
+    /*
+    |--------------------------------------------------------------------------
+    | Central School ERP SaaS Platform (Root Domain)
+    |--------------------------------------------------------------------------
+    */
+    {
+        path: "/",
+        component: () => import("@/layouts/SaasLayout.vue"),
+        children: [
+            {
+                path: "",
+                name: "saas.landing",
+                component: () => import("@/pages/saas/SaasLanding.vue"),
+            },
+        ],
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Individual School Portals (/s/:schoolCode)
+    |--------------------------------------------------------------------------
+    */
+    {
+        path: "/s/:schoolCode",
+        component: () => import("@/layouts/WebsiteLayout.vue"),
+        children: [
+            {
+                path: "",
+                name: "tenant.website.home",
+                component: () => import("@/pages/website/Home.vue"),
+            },
+            {
+                path: "about",
+                name: "tenant.website.about",
+                component: () => import("@/pages/website/About.vue"),
+            },
+            {
+                path: "academics",
+                name: "tenant.website.academics",
+                component: () => import("@/pages/website/Academics.vue"),
+            },
+            {
+                path: "admissions",
+                name: "tenant.website.admissions",
+                component: () => import("@/pages/website/Admissions.vue"),
+            },
+            {
+                path: "admissions/apply",
+                name: "tenant.website.admissions.apply",
+                component: () => import("@/pages/website/ApplyAdmission.vue"),
+            },
+            {
+                path: "admissions/track",
+                name: "tenant.website.admissions.track",
+                component: () => import("@/pages/website/TrackAdmission.vue"),
+            },
+            {
+                path: "contact",
+                name: "tenant.website.contact",
+                component: () => import("@/pages/website/Contact.vue"),
+            },
+        ],
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Direct / Root Admissions & Public Pages (e.g. /admissions/apply)
+    |--------------------------------------------------------------------------
+    */
+    {
+        path: "/admissions",
+        component: () => import("@/layouts/WebsiteLayout.vue"),
+        children: [
+            {
+                path: "",
+                name: "public.admissions",
+                component: () => import("@/pages/website/Admissions.vue"),
+            },
+            {
+                path: "apply",
+                name: "public.admissions.apply",
+                component: () => import("@/pages/website/ApplyAdmission.vue"),
+            },
+            {
+                path: "track",
+                name: "public.admissions.track",
+                component: () => import("@/pages/website/TrackAdmission.vue"),
+            },
+        ],
+    },
+    {
+        path: "/apply",
+        redirect: "/admissions/apply",
+    },
+    {
+        path: "/track",
+        redirect: "/admissions/track",
+    },
+    {
+        path: "/",
+        component: () => import("@/layouts/WebsiteLayout.vue"),
+        children: [
+            {
+                path: "about",
+                name: "public.website.about",
+                component: () => import("@/pages/website/About.vue"),
+            },
+            {
+                path: "academics",
+                name: "public.website.academics",
+                component: () => import("@/pages/website/Academics.vue"),
+            },
+            {
+                path: "contact",
+                name: "public.website.contact",
+                component: () => import("@/pages/website/Contact.vue"),
+            },
+        ],
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | School-Scoped Auth Routes
+    |--------------------------------------------------------------------------
+    */
+    {
+        path: "/s/:schoolCode/portal/login",
+        name: "tenant.portal.login",
+        component: () => import("@/pages/portal/Login.vue"),
+        meta: {
+            guest: true,
+        },
+    },
+    {
+        path: "/s/:schoolCode/login",
+        name: "tenant.staff.login",
+        component: Login,
+        meta: {
+            guest: true,
+        },
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin ERP Routes
+    |--------------------------------------------------------------------------
+    */
     {
         path: "/",
         component: AdminLayout,
@@ -143,6 +291,15 @@ const routes = [
                         component: () => import("@/pages/timetables/Edit.vue"),
                     },
                 ],
+            },{
+                path: "/online-classes",
+                name: "online-classes.index",
+                component: () => import("@/pages/online-classes/Index.vue"),
+                meta: {
+                    requiresAuth: true,
+                    permission: "online_classes.view",
+                    feature: "online_classes",
+                },
             },{
                 path: "/teachers",
                 children: [
@@ -542,6 +699,25 @@ const routes = [
                     },
                 ],
             },{
+                path: "/grades",
+                children: [
+                    {
+                        path: "",
+                        name: "grades.index",
+                        component: () => import("@/pages/result-grades/Index.vue"),
+                    },
+                    {
+                        path: "create",
+                        name: "grades.create",
+                        component: () => import("@/pages/result-grades/Create.vue"),
+                    },                    
+                    {
+                        path: ":id/edit",
+                        name: "grades.edit",
+                        component: () => import("@/pages/result-grades/Edit.vue"),
+                    },
+                ],
+            },{
                 path: "/exam-ranks",
                 children: [
                     {
@@ -716,6 +892,13 @@ const routes = [
                                 "@/pages/income-reports/Index.vue"
                             )
                     },{
+                        path: "/library/dashboard",
+                        name: "library.dashboard",
+                        component: () =>
+                            import(
+                                "@/pages/library/dashboard/Index.vue"
+                            )
+                    },{
                         path: "/authors",
                         name: "authors",
                         component: () =>
@@ -791,6 +974,11 @@ const routes = [
                         name: 'lost-damaged-books',
                         component: () =>
                             import('@/pages/lost-damaged-books/Index.vue')
+                    },{
+                        path: '/fine-collections',
+                        name: 'fine-collections',
+                        component: () =>
+                            import('@/pages/fine-collections/Index.vue')
                     },{
                         path: '/settings',
                         name: 'settings',
@@ -981,22 +1169,184 @@ const routes = [
                                         permission: 'view_permissions'
                                     }
                                 },{
+                                    path: '/hostel/dashboard',
+                                    name: 'hostel.dashboard',
+                                    component: () =>
+                                        import('@/pages/hostel/dashboard/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_dashboard.view'
+                                    }
+                                },{
+                                    path: '/hostel/hostels',
+                                    name: 'hostel.hostels',
+                                    component: () =>
+                                        import('@/pages/hostel/hostels/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel.view'
+                                    }
+                                },{
                                     path: '/hostel/buildings',
                                     name: 'hostel.buildings',
                                     component: () =>
-                                        import('@/pages/hostel/buildings/Index.vue')
+                                        import('@/pages/hostel/buildings/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_buildings.view'
+                                    }
                                 },{
-                                        path: '/hostel/rooms',
-                                        name: 'hostel.rooms',
-                                        component: () =>
-                                            import(
-                                                '@/pages/hostel/rooms/Index.vue'
-                                            ),
-                                        meta: {
-                                            requiresAuth: true,
-                                            permission: 'hostel_rooms.view'
-                                        }
-                                    },
+                                    path: '/hostel/floors',
+                                    name: 'hostel.floors',
+                                    component: () =>
+                                        import('@/pages/hostel/floors/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_floors.view'
+                                    }
+                                },{
+                                    path: '/hostel/rooms',
+                                    name: 'hostel.rooms',
+                                    component: () =>
+                                        import('@/pages/hostel/rooms/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_rooms.view'
+                                    }
+                                },{
+                                    path: '/hostel/beds',
+                                    name: 'hostel.beds',
+                                    component: () =>
+                                        import('@/pages/hostel/beds/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_beds.view'
+                                    }
+                                },{
+                                    path: '/hostel/students',
+                                    name: 'hostel.students',
+                                    component: () =>
+                                        import('@/pages/hostel/students/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_students.view'
+                                    }
+                                },{
+                                    path: '/hostel/allocations',
+                                    name: 'hostel.allocations',
+                                    component: () =>
+                                        import('@/pages/hostel/allocations/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_allocations.view'
+                                    }
+                                },{
+                                    path: '/hostel/transfers',
+                                    name: 'hostel.transfers',
+                                    component: () =>
+                                        import('@/pages/hostel/transfers/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_transfers.view'
+                                    }
+                                },{
+                                    path: '/hostel/fees',
+                                    name: 'hostel.fees',
+                                    component: () =>
+                                        import('@/pages/hostel/fees/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_fees.view'
+                                    }
+                                },{
+                                    path: '/hostel/attendance',
+                                    name: 'hostel.attendance',
+                                    component: () =>
+                                        import('@/pages/hostel/attendance/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_attendance.view'
+                                    }
+                                },{
+                                    path: '/hostel/complaints',
+                                    name: 'hostel.complaints',
+                                    component: () =>
+                                        import('@/pages/hostel/complaints/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_complaints.view'
+                                    }
+                                },{
+                                    path: '/hostel/visitors',
+                                    name: 'hostel.visitors',
+                                    component: () =>
+                                        import('@/pages/hostel/visitors/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_visitors.view'
+                                    }
+                                },{
+                                    path: '/hostel/reports',
+                                    name: 'hostel.reports',
+                                    component: () =>
+                                        import('@/pages/hostel/reports/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'hostel_reports.view'
+                                    }
+                                },
+                                {
+                                    path: '/admin/admissions/applications',
+                                    name: 'admin.admissions.applications',
+                                    component: () =>
+                                        import('@/pages/admissions/applications/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'online_admissions.view'
+                                    }
+                                },
+                                {
+                                    path: '/admin/admissions/inquiries',
+                                    name: 'admin.admissions.inquiries',
+                                    component: () =>
+                                        import('@/pages/admissions/inquiries/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'website_inquiries.view'
+                                    }
+                                },
+                                {
+                                    path: '/admin/website/manager',
+                                    name: 'admin.website.manager',
+                                    component: () =>
+                                        import('@/pages/website-manager/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'website_settings.view',
+                                        feature: 'website_cms'
+                                    }
+                                },
+                                {
+                                    path: '/admin/root-website/manager',
+                                    name: 'admin.root.website.manager',
+                                    component: () =>
+                                        import('@/pages/root-website-manager/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'website_settings.view',
+                                        superAdminOnly: true
+                                    }
+                                },
+                                {
+                                    path: '/reports',
+                                    name: 'reports.index',
+                                    component: () =>
+                                        import('@/pages/reports/Index.vue'),
+                                    meta: {
+                                        requiresAuth: true,
+                                        permission: 'report.view'
+                                    }
+                                },
         ],
     },
     
@@ -1008,6 +1358,73 @@ const routes = [
             guest: true,
         },
     },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Student & Parent Portal Routes
+    |--------------------------------------------------------------------------
+    */
+    {
+        path: "/portal/login",
+        name: "portal.login",
+        component: () => import("@/pages/portal/Login.vue"),
+        meta: {
+            guest: true,
+        },
+    },
+    {
+        path: "/portal",
+        component: () => import("@/layouts/PortalLayout.vue"),
+        meta: {
+            requiresAuth: true,
+        },
+        children: [
+            {
+                path: "",
+                redirect: "/portal/dashboard",
+            },
+            {
+                path: "dashboard",
+                name: "portal.dashboard",
+                component: () => import("@/pages/portal/Dashboard.vue"),
+            },
+            {
+                path: "attendance",
+                name: "portal.attendance",
+                component: () => import("@/pages/portal/Attendance.vue"),
+            },
+            {
+                path: "timetable",
+                name: "portal.timetable",
+                component: () => import("@/pages/portal/Timetable.vue"),
+            },
+            {
+                path: "online-classes",
+                name: "portal.online-classes",
+                component: () => import("@/pages/portal/OnlineClasses.vue"),
+            },
+            {
+                path: "fees",
+                name: "portal.fees",
+                component: () => import("@/pages/portal/Fees.vue"),
+            },
+            {
+                path: "results",
+                name: "portal.results",
+                component: () => import("@/pages/portal/Results.vue"),
+            },
+            {
+                path: "library",
+                name: "portal.library",
+                component: () => import("@/pages/portal/Library.vue"),
+            },
+            {
+                path: "profile",
+                name: "portal.profile",
+                component: () => import("@/pages/portal/Profile.vue"),
+            },
+        ],
+    },
 ];
 
 const router = createRouter({
@@ -1015,15 +1432,103 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const token = localStorage.getItem("token");
+    const requiresAuth = to.matched.some(record => record.meta?.requiresAuth) || !!to.meta?.requiresAuth;
 
-    if (to.meta.requiresAuth && !token) {
+    if (requiresAuth && !token) {
+        if (to.path.startsWith("/portal")) {
+            const schoolCode = localStorage.getItem("portal_school_code") || sessionStorage.getItem("portal_school_code");
+            if (schoolCode) {
+                return next(`/s/${schoolCode}/portal/login`);
+            }
+            return next("/portal/login");
+        }
         return next("/login");
     }
 
-    if (to.meta.guest && token) {
+    if (to.meta?.guest && token) {
+        if (to.path.startsWith("/portal") || to.path.includes("/portal/login")) {
+            return next("/portal/dashboard");
+        }
         return next("/dashboard");
+    }
+
+    if (token) {
+        try {
+            const auth = useAuthStore();
+            // Await user profile if not yet loaded in memory
+            if (!auth.user) {
+                try {
+                    await auth.loadProfile();
+                } catch (e) {
+                    localStorage.removeItem("token");
+                    return next("/login");
+                }
+            }
+
+            const user = auth.user;
+            const isSuperAdminUser = user?.user_type === "super_admin" || user?.roles?.some(r => r.name === "Super Admin");
+
+            // Super Admin has 100% unrestricted platform-wide access to all modules and routes
+            if (isSuperAdminUser) {
+                return next();
+            }
+
+            if (to.meta?.superAdminOnly && !isSuperAdminUser) {
+                return next("/dashboard");
+            }
+
+            // Path prefix to subscription feature mapping
+            const PATH_FEATURE_MAP = {
+                "/hostel": "hostel",
+                "/library": "library",
+                "/book-": "library",
+                "/books": "library",
+                "/authors": "library",
+                "/publishers": "library",
+                "/transport": "transport",
+                "/inventory": "inventory",
+                "/online-classes": "online_classes",
+                "/admin/website": "website_cms",
+                "/admin/admissions": "online_admissions",
+            };
+
+            let requiredFeature = to.meta?.feature || null;
+            if (!requiredFeature) {
+                for (const [prefix, feat] of Object.entries(PATH_FEATURE_MAP)) {
+                    if (to.path.startsWith(prefix)) {
+                        requiredFeature = feat;
+                        break;
+                    }
+                }
+            }
+
+            // Subscription plan feature gating for tenant schools (School Admins, Teachers, Students)
+            if (requiredFeature && user && user.school) {
+                const schoolFeatures = user.school.features || [];
+                const plan = (user.school.subscription_plan || "starter").toLowerCase();
+
+                let isAllowed = false;
+                if (Array.isArray(schoolFeatures) && schoolFeatures.length > 0) {
+                    isAllowed = schoolFeatures.includes(requiredFeature);
+                } else {
+                    const upperFeatures = ["hostel", "library", "transport", "inventory", "website_cms", "online_admissions", "custom_domain", "multi_branch"];
+                    isAllowed = !((plan === "starter" || plan === "basic") && upperFeatures.includes(requiredFeature));
+                }
+
+                if (!isAllowed) {
+                    const featureName = requiredFeature.replace(/_/g, " ").toUpperCase();
+                    sessionStorage.setItem(
+                        "subscription_lock_msg",
+                        `The [${featureName}] module is not included in your school's [${plan.toUpperCase()}] package. Please upgrade to unlock.`
+                    );
+                    return next("/dashboard");
+                }
+            }
+        } catch (e) {
+            console.error("Router beforeEach subscription check error:", e);
+        }
     }
 
     next();

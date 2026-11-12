@@ -8,13 +8,12 @@ class SchoolRequest extends FormRequest
 {
     public function authorize()
     {
-        // Use your permission system (e.g., Spatie)
-        return $this->user()->can('school.create') || $this->user()->can('school.update');
+        return auth()->check();
     }
 
     public function rules()
     {
-        $schoolId = $this->route('school')?->id ?? null;
+        $schoolId = $this->route('school')?->id ?? $this->route('school');
 
         return [
             'name'         => 'required|string|max:255',
@@ -26,8 +25,11 @@ class SchoolRequest extends FormRequest
             'state'        => 'nullable|string|max:255',
             'country'      => 'nullable|string|max:255',
             'postal_code'  => 'nullable|string|max:20',
-            'logo'         => 'nullable|string|max:255', // or file validation
-            'status'       => 'boolean',
+            'logo'         => 'nullable',
+            'remove_logo'  => 'nullable|boolean',
+            'status'       => 'nullable',
+            'subscription_plan'   => 'nullable|string|in:starter,basic,growth,professional,enterprise',
+            'subscription_status' => 'nullable|string|in:active,trial,expired,cancelled',
         ];
     }
 }

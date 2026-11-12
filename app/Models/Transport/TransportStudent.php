@@ -2,12 +2,14 @@
 
 namespace App\Models\Transport;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TransportStudent extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $table = 'transport_students';
 
@@ -63,5 +65,10 @@ class TransportStudent extends Model
             TransportDriver::class,
             'transport_driver_id'
         );
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(\App\Models\School::class);
     }
 }

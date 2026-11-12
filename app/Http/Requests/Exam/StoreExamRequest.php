@@ -21,6 +21,11 @@ class StoreExamRequest extends FormRequest
     {
         return [
 
+            'school_id' => [
+                'nullable',
+                'exists:schools,id',
+            ],
+
             'academic_session_id' => [
                 'required',
                 'exists:academic_sessions,id',

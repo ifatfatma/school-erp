@@ -2,10 +2,14 @@
 
 namespace App\Models\Transport;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 
 class TransportRouteStop extends Model
 {
+    use BelongsToSchool;
+
     protected $table = 'transport_route_stops';
 
     protected $fillable = [
@@ -31,5 +35,10 @@ class TransportRouteStop extends Model
             TransportRoute::class,
             'transport_route_id'
         );
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(\App\Models\School::class);
     }
 }

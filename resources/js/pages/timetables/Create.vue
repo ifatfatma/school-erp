@@ -1,6 +1,7 @@
 <script setup>
 import { reactive } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, RouterLink } from "vue-router";
+import Swal from "sweetalert2";
 
 import Form from "./Form.vue";
 
@@ -36,18 +37,27 @@ const form = reactive({
 
 async function save() {
 
-    console.log("FORM BEFORE SAVE:", JSON.parse(JSON.stringify(form)));
-
     try {
 
         await store.create(form);
+
+        await Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Timetable period created successfully."
+        });
 
         router.push({
             name: "timetables.index",
         });
 
     } catch (e) {
-        console.error(e);
+        if (e.response?.data?.errors) {
+            const firstErr = Object.values(e.response.data.errors)[0]?.[0];
+            if (firstErr) {
+                Swal.fire("Validation Error", firstErr, "warning");
+            }
+        }
     }
 }
 </script>
@@ -72,6 +82,13 @@ async function save() {
                 Create Timetable
             </h4>
 
+            <RouterLink
+                :to="{ name: 'timetables.index' }"
+                class="btn btn-secondary"
+            >
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </RouterLink>
+
         </div>
 
         <div class="card-body">
@@ -83,8 +100,15 @@ async function save() {
 
             <div class="text-end mt-4">
 
+                <RouterLink
+                    :to="{ name: 'timetables.index' }"
+                    class="btn btn-secondary me-2"
+                >
+                    Cancel
+                </RouterLink>
+
                 <AppButton
-                    text="Save"
+                    text="Save Timetable"
                     :loading="store.saving"
                     @click="save"
                 />

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ExamType;
 use App\Repositories\ExamTypeRepository;
+use App\Services\TenantManager;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -28,9 +29,9 @@ class ExamTypeService
     /**
      * Get active exam types
      */
-    public function active()
+    public function active(?int $schoolId = null)
     {
-        return $this->repository->active();
+        return $this->repository->active($schoolId);
     }
 
     /**
@@ -46,13 +47,16 @@ class ExamTypeService
      */
     public function store(array $data): ExamType
     {
-        if ($this->repository->exists($data['name'])) {
+        $tenantId = app(TenantManager::class)->getTenantId();
+        $schoolId = !empty($data['school_id']) ? (int) $data['school_id'] : ($tenantId ?: (Auth::user()?->school_id ?: 1));
+        $data['school_id'] = $schoolId;
+
+        if ($this->repository->exists($data['name'], null, $schoolId)) {
             throw ValidationException::withMessages([
                 'name' => ['Exam Type already exists.'],
             ]);
         }
 
-        $data['school_id'] = Auth::user()->school_id;
         $data['created_by'] = Auth::id();
 
         return $this->repository->create($data);
@@ -63,7 +67,9 @@ class ExamTypeService
      */
     public function update(ExamType $examType, array $data): ExamType
     {
-        if ($this->repository->exists($data['name'], $examType->id)) {
+        $schoolId = !empty($data['school_id']) ? (int) $data['school_id'] : $examType->school_id;
+
+        if ($this->repository->exists($data['name'], $examType->id, $schoolId)) {
             throw ValidationException::withMessages([
                 'name' => ['Exam Type already exists.'],
             ]);

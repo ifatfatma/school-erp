@@ -2,10 +2,14 @@
 
 namespace App\Models\Inventory;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 
 class InventoryStockInItem extends Model
 {
+    use BelongsToSchool;
+
     protected $table = 'inventory_stock_in_items';
 
     protected $fillable = [

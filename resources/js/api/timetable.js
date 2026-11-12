@@ -12,6 +12,10 @@ export default {
         return api.get(`/timetables/${id}`);
     },
 
+    find(id) {
+        return this.get(id);
+    },
+
     create(data) {
         return api.post("/timetables", data);
     },

@@ -20,8 +20,12 @@ class AcademicSessionService
     {
         $data['is_current'] = filter_var($data['is_current'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
-        if ($data['is_current']) {
-            AcademicSession::query()->update([
+        $targetSchoolId = $data['school_id'] 
+            ?? app(\App\Services\TenantManager::class)->getTenantId() 
+            ?? auth()->user()?->school_id;
+
+        if ($data['is_current'] && $targetSchoolId) {
+            AcademicSession::where('school_id', $targetSchoolId)->update([
                 'is_current' => false,
             ]);
         }
@@ -33,8 +37,10 @@ class AcademicSessionService
     {
         $data['is_current'] = filter_var($data['is_current'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
-        if ($data['is_current']) {
-            AcademicSession::query()
+        $targetSchoolId = $session->school_id;
+
+        if ($data['is_current'] && $targetSchoolId) {
+            AcademicSession::where('school_id', $targetSchoolId)
                 ->where('id', '!=', $session->id)
                 ->update([
                     'is_current' => false,

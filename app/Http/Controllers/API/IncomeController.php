@@ -20,6 +20,8 @@ class IncomeController extends Controller
      */
     public function index(Request $request)
     {
+        $schoolId = $this->resolveSchoolId($request);
+
         $data = $request->validate([
 
             'search' => [
@@ -34,11 +36,13 @@ class IncomeController extends Controller
                 Rule::exists(
                     'income_categories',
                     'id'
-                )->where(function ($query) {
-                    $query->where(
-                        'school_id',
-                        auth()->user()->school_id
-                    );
+                )->where(function ($query) use ($schoolId) {
+                    if ($schoolId !== null) {
+                        $query->where(
+                            'school_id',
+                            $schoolId
+                        );
+                    }
                 }),
             ],
 
@@ -75,19 +79,28 @@ class IncomeController extends Controller
                 'max:100',
             ],
 
+            'school_id' => [
+                'nullable',
+            ],
+
         ]);
 
+        if ($schoolId !== null) {
+            $data['school_id'] = $schoolId;
+        }
 
-        return response()->json([
+        $list = $this->service->list($data);
 
+        $response = [
             'success' => true,
+            'data' => $list,
+        ];
 
-            'data' =>
-                $this->service->list(
-                    $data
-                ),
+        if ($this->isSuperAdmin($request)) {
+            $response['all_schools'] = \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']);
+        }
 
-        ]);
+        return response()->json($response);
     }
 
 

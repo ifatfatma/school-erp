@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Student extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToSchool;
 
     protected $fillable = [
 
@@ -50,6 +52,8 @@ class Student extends Model
 
         'photo',
 
+        'user_id',
+
         'status',
 
         'created_by',
@@ -85,9 +89,19 @@ class Student extends Model
         return $this->belongsTo(School::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function class()
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');
+    }
+
+    public function academicSession()
+    {
+        return $this->belongsTo(AcademicSession::class, 'academic_session_id');
     }
 
     public function section()

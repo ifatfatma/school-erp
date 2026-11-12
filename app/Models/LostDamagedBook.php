@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LostDamagedBook extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToSchool;
 
     protected $table = 'lost_damaged_books';
 

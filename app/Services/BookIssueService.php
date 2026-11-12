@@ -68,7 +68,7 @@ class BookIssueService
                 )
                 ->where(
                     'school_id',
-                    auth()->user()->school_id
+                    (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                 )
                 ->lockForUpdate()
                 ->first();
@@ -153,7 +153,7 @@ class BookIssueService
                 )
                 ->where(
                     'school_id',
-                    auth()->user()->school_id
+                    (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                 )
                 ->lockForUpdate()
                 ->first();
@@ -237,7 +237,7 @@ class BookIssueService
                 )
                 ->where(
                     'school_id',
-                    auth()->user()->school_id
+                    (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                 )
                 ->first();
 

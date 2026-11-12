@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Validator;
 
 class TransportExpenseController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
 
@@ -182,7 +182,7 @@ class TransportExpenseController extends Controller
 
 
         $vehicles = DB::table('transport_vehicles')
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at')
             ->orderBy('vehicle_no')
             ->get([
@@ -196,7 +196,7 @@ class TransportExpenseController extends Controller
 
 
         $drivers = DB::table('transport_drivers')
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at')
             ->orderBy('name')
             ->get([
@@ -420,7 +420,7 @@ class TransportExpenseController extends Controller
         if ($request->filled('transport_vehicle_id')) {
 
             $vehicleExists = DB::table('transport_vehicles')
-                ->where('school_id', $schoolId)
+                ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
                 ->where('id', $request->transport_vehicle_id)
                 ->whereNull('deleted_at')
                 ->exists();
@@ -445,7 +445,7 @@ class TransportExpenseController extends Controller
         if ($request->filled('transport_driver_id')) {
 
             $driverExists = DB::table('transport_drivers')
-                ->where('school_id', $schoolId)
+                ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
                 ->where('id', $request->transport_driver_id)
                 ->whereNull('deleted_at')
                 ->exists();

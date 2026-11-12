@@ -7,21 +7,44 @@ use Illuminate\Support\Facades\DB;
 
 class IncomeRepository
 {
+    protected function resolveSchoolId(?int $filterSchoolId = null): ?int
+    {
+        $user = auth()->user();
+        $tenantManager = app(\App\Services\TenantManager::class);
+
+        if (!$tenantManager->isSuperAdmin($user)) {
+            return $user?->school_id ? (int) $user->school_id : null;
+        }
+
+        if ($filterSchoolId !== null && $filterSchoolId > 0) {
+            return (int) $filterSchoolId;
+        }
+
+        $tenantId = $tenantManager->getTenantId();
+        if ($tenantId) {
+            return (int) $tenantId;
+        }
+
+        return $user?->school_id ? (int) $user->school_id : null;
+    }
+
     /**
      * List incomes.
      */
     public function list(array $filters = [])
     {
-        $schoolId = auth()->user()->school_id;
+        $filterSchoolId = !empty($filters['school_id']) && $filters['school_id'] !== 'all' ? (int) $filters['school_id'] : null;
+        $schoolId = $this->resolveSchoolId($filterSchoolId);
 
         $query = Income::query()
-            ->where(
-                'incomes.school_id',
-                $schoolId
-            )
             ->with([
                 'category',
+                'school:id,name,code',
             ]);
+
+        if ($schoolId !== null) {
+            $query->where('incomes.school_id', $schoolId);
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -207,19 +230,21 @@ class IncomeRepository
     public function find(
         int $id
     ): Income {
+        $user = auth()->user();
+        $tenantManager = app(\App\Services\TenantManager::class);
+        $isSuperAdmin = $tenantManager->isSuperAdmin($user);
 
-        return Income::query()
-
-            ->where(
-                'school_id',
-                auth()->user()->school_id
-            )
-
+        $query = Income::query()
             ->with([
                 'category',
-            ])
+                'school:id,name,code',
+            ]);
 
-            ->findOrFail($id);
+        if (!$isSuperAdmin && $user?->school_id) {
+            $query->where('school_id', $user->school_id);
+        }
+
+        return $query->findOrFail($id);
     }
 
 
@@ -230,8 +255,7 @@ class IncomeRepository
         array $data
     ): Income {
 
-        $schoolId =
-            auth()->user()->school_id;
+        $schoolId = $data['school_id'] ?? $this->resolveSchoolId() ?? auth()->user()?->school_id ?? \App\Models\School::first()?->id ?? 1;
 
         $userId =
             auth()->id();

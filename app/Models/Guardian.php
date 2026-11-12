@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Guardian extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $fillable = [
 
@@ -53,6 +55,8 @@ class Guardian extends Model
 
         'photo',
 
+        'user_id',
+
         'status',
 
         'created_by',
@@ -78,6 +82,11 @@ class Guardian extends Model
     public function school()
     {
         return $this->belongsTo(School::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function creator()

@@ -1,7 +1,9 @@
 <script setup>
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Swal from "sweetalert2";
 
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { useStudentAttendanceStore } from "@/stores/studentAttendance";
 
 const route = useRoute();
@@ -53,22 +55,38 @@ onMounted(async () => {
 
 });
 
-async function submit(){
-
-    await store.update(route.params.id, form);
-
-    router.push({
-        name:"student-attendance.index"
-    });
-
+async function submit() {
+    try {
+        await store.update(route.params.id, form);
+        await Swal.fire({
+            icon: "success",
+            title: "Updated!",
+            text: "Student attendance has been updated.",
+            timer: 1500,
+            showConfirmButton: false,
+        });
+        router.push({ name: "student-attendance.index" });
+    } catch (e) {
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: e.response?.data?.message || "Failed to update attendance.",
+        });
+    }
 }
 </script>
 
 <template>
-
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Student Attendance', to: { name: 'student-attendance.index' } },
+            { label: 'Edit Attendance' }
+        ]"
+    />
 
-<div class="card">
+<div class="card shadow-sm">
 
 <div class="card-header">
 
@@ -93,7 +111,7 @@ Student
 <input
 class="form-control"
 :readonly="true"
-:value="store.item?.student?.name"
+:value="store.item?.student?.full_name || store.item?.student?.name || '-'"
 />
 
 </div>

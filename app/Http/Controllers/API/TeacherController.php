@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTeacherRequest;
 use App\Http\Requests\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
+use App\Models\School;
 use App\Models\Teacher;
 use App\Services\TeacherService;
 use Illuminate\Http\Request;
@@ -24,9 +25,31 @@ class TeacherController extends Controller
      */
     public function index(Request $request)
     {
-        $teachers = $this->service->paginate($request->all());
+        $user = $request->user();
+        $isSuperAdmin = $user && (
+            $user->user_type === 'super_admin' || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+            ($user->roles && $user->roles->contains('name', 'Super Admin'))
+        );
 
-        return TeacherResource::collection($teachers);
+        $schoolId = $request->input('school_id');
+        if ($isSuperAdmin && ($schoolId === null || $schoolId === '' || $schoolId === 'all')) {
+            $schoolId = 'all';
+        }
+
+        $params = $request->all();
+        $params['school_id'] = $schoolId;
+
+        $teachers = $this->service->paginate($params);
+        $resource = TeacherResource::collection($teachers);
+
+        if ($isSuperAdmin) {
+            $resource->additional([
+                'all_schools' => School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']),
+            ]);
+        }
+
+        return $resource;
     }
 
     /**

@@ -10,15 +10,21 @@
         >
             <div>
                 <h4 class="mb-1">
-                    School Dashboard
+                    <i :class="dashboard.is_global ? 'bi bi-globe2 text-primary me-2' : 'bi bi-building text-primary me-2'"></i>
+                    {{ dashboard.is_global ? 'Global Dashboard (All Schools)' : (dashboard.school_name || 'School Dashboard') }}
                 </h4>
 
                 <div class="text-muted">
-                    <span v-if="dashboard.academic_session">
-                        {{ dashboard.academic_session.name }}
+                    <span v-if="dashboard.is_global">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-2">Global Mode</span>
+                        System-wide aggregated overview across all active registered schools
                     </span>
-
+                    <span v-else-if="dashboard.academic_session">
+                        <span v-if="dashboard.school_code" class="badge bg-light text-dark border me-2">{{ dashboard.school_code }}</span>
+                        Session: {{ dashboard.academic_session.name }}
+                    </span>
                     <span v-else>
+                        <span v-if="dashboard.school_code" class="badge bg-light text-dark border me-2">{{ dashboard.school_code }}</span>
                         School overview
                     </span>
                 </div>
@@ -815,10 +821,12 @@
 import {
     reactive,
     ref,
-    onMounted
+    onMounted,
+    onUnmounted
 } from 'vue';
 
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 
 /*
@@ -839,6 +847,12 @@ const error = ref('');
 */
 
 const dashboard = reactive({
+
+    is_global: false,
+
+    school_name: '',
+
+    school_code: '',
 
     school_id: null,
 
@@ -1005,6 +1019,15 @@ const loadDashboard = async () => {
         | Safely update nested data
         |--------------------------------------------------------------------------
         */
+
+        dashboard.is_global =
+            !!result.is_global;
+
+        dashboard.school_name =
+            result.school_name || '';
+
+        dashboard.school_code =
+            result.school_code || '';
 
         dashboard.school_id =
             result.school_id ?? null;
@@ -1207,10 +1230,29 @@ const formatDate = (value) => {
 |--------------------------------------------------------------------------
 */
 
-onMounted(() => {
-
+const onTenantSwitched = () => {
     loadDashboard();
+};
 
+onMounted(() => {
+    loadDashboard();
+    window.addEventListener('tenant-switched', onTenantSwitched);
+
+    const lockMsg = sessionStorage.getItem("subscription_lock_msg");
+    if (lockMsg) {
+        sessionStorage.removeItem("subscription_lock_msg");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Feature Locked',
+            text: lockMsg,
+            confirmButtonText: 'Understood',
+            confirmButtonColor: '#0d6efd',
+        });
+    }
+});
+
+onUnmounted(() => {
+    window.removeEventListener('tenant-switched', onTenantSwitched);
 });
 
 </script>

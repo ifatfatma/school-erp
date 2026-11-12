@@ -1578,8 +1578,7 @@
 
 <script setup>
 
-import {
-    onMounted,
+import { onMounted, onBeforeUnmount,
     ref
 } from 'vue';
 
@@ -1738,6 +1737,10 @@ const getAuthConfig = () => {
         config.headers.Authorization =
             `Bearer ${token}`;
 
+    }
+    const activeSchoolId = localStorage.getItem('active_school_id');
+    if (activeSchoolId) {
+        config.headers['X-School-Id'] = activeSchoolId;
     }
 
 
@@ -2679,4 +2682,11 @@ onMounted(
     }
 );
 
+
+
+const onTenantChanged = () => { loadRoutes(1); };
+window.addEventListener('tenant-switched', onTenantChanged);
+if (typeof onBeforeUnmount === 'function') {
+    onBeforeUnmount(() => window.removeEventListener('tenant-switched', onTenantChanged));
+}
 </script>

@@ -8,6 +8,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useAcademicSessionStore } from "@/stores/academicSession";
 
 import Form from "./Form.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 const store = useAcademicSessionStore();
 
@@ -43,7 +44,15 @@ async function save() {
 
 <template>
 
-<div class="container-fluid">
+<div class="container-fluid py-2">
+
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Academic Sessions', to: '/academic-sessions' },
+            { label: 'Create' }
+        ]"
+    />
 
     <h3>Create Academic Session</h3>
 

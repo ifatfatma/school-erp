@@ -1,6 +1,13 @@
 <template>
+    <div class="container-fluid py-2">
+        <AppBreadcrumb
+            :items="[
+                { label: 'Dashboard', to: '/' },
+                { label: 'Sections' }
+            ]"
+        />
 
-    <AppCard title="Sections">
+        <AppCard title="Sections">
 
         <template #header-action>
 
@@ -12,17 +19,35 @@
 
         </template>
 
-        <div class="row mb-3">
+        <div class="row g-2 mb-3 align-items-center">
 
-            <div class="col-md-6">
+            <!-- School Filter (Super Admin) -->
+            <div class="col-md-3" v-if="isSuperAdmin && allSchools.length > 0">
+                <select
+                    v-model="filters.school_id"
+                    class="form-select fw-semibold"
+                    @change="onSchoolChange"
+                >
+                    <option value="">All Schools</option>
+                    <option
+                        v-for="s in allSchools"
+                        :key="'sec-sch-' + s.id"
+                        :value="s.id"
+                    >
+                        {{ s.name }} ({{ s.code }})
+                    </option>
+                </select>
+            </div>
+
+            <div :class="(isSuperAdmin && allSchools.length > 0) ? 'col-md-4' : 'col-md-6'">
                 <AppSearch
                     v-model="search"
                     placeholder="Search Section..."
-                    @search="load"
+                    @search="load(1)"
                 />
             </div>
 
-            <div class="col-md-3">
+            <div :class="(isSuperAdmin && allSchools.length > 0) ? 'col-md-3' : 'col-md-3'">
 
                 <AppSelect
                     v-model="filters.class_id"
@@ -30,7 +55,7 @@
                     option-label="name"
                     option-value="id"
                     placeholder="All Classes"
-                    @change="load"
+                    @change="load(1)"
                 />
 
             </div>
@@ -51,6 +76,8 @@
                     <tr>
 
                         <th width="70">#</th>
+
+                        <th v-if="isSuperAdmin">School / Campus</th>
 
                         <th>Class</th>
 
@@ -75,6 +102,15 @@
 
                         <td>
                             {{ index + 1 }}
+                        </td>
+
+                        <td v-if="isSuperAdmin">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold">
+                                <i class="bi bi-building me-1"></i> {{ item.school_name || item.school?.name || 'School' }}
+                            </span>
+                            <small v-if="item.school_code || item.school?.code" class="text-muted d-block font-monospace">
+                                ({{ item.school_code || item.school?.code }})
+                            </small>
                         </td>
 
                         <td>
@@ -103,9 +139,18 @@
 <div class="d-flex gap-2">
     <div class="btn-group btn-group-sm">
                             <AppButton
+                                color="info"
+                                size="sm"
+                                icon="bi bi-eye"
+                                title="View Section"
+                                @click="viewSection(item.id)"
+                            />
+
+                            <AppButton
                                 color="warning"
                                 size="sm"
                                 icon="bi bi-pencil"
+                                title="Edit Section"
                                 @click="editSection(item.id)"
                             />
 
@@ -113,6 +158,7 @@
                                 color="danger"
                                 size="sm"
                                 icon="bi bi-trash"
+                                title="Delete Section"
                                 @click="removeSection(item.id)"
                             />
 </div>
@@ -124,7 +170,7 @@
                     <tr v-if="!store.items.length">
 
                         <td
-                            colspan="6"
+                            :colspan="isSuperAdmin ? 7 : 6"
                             class="text-center text-muted py-4"
                         >
                             No sections found.
@@ -144,17 +190,20 @@
         />
 
     </AppCard>
-
+    </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
+import axios from "@/api/axios";
 
 import { useSectionStore } from "@/stores/section";
+import { useAuthStore } from "@/stores/auth";
 import classApi from "@/api/class";
 
 import AppButton from "@/components/ui/AppButton.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import AppCard from "@/components/ui/AppCard.vue";
 import AppSearch from "@/components/ui/AppSearch.vue";
 import AppPagination from "@/components/ui/AppPagination.vue";
@@ -164,19 +213,59 @@ import AppSelect from "@/components/ui/AppSelect.vue";
 
 const router = useRouter();
 const store = useSectionStore();
+const authStore = useAuthStore();
 
 const search = ref("");
 
+const isSuperAdmin = computed(() => {
+    const u = authStore.user;
+    return u?.user_type === 'super_admin' || u?.roles?.some(r => {
+        const name = typeof r === 'string' ? r : (r.name || '');
+        return name.toLowerCase() === 'super admin' || name.toLowerCase() === 'super_admin';
+    });
+});
+
+const allSchools = ref([]);
+
 const filters = reactive({
+    school_id: "",
     class_id: "",
 });
 
 const classOptions = ref([]);
 
+async function loadSchools() {
+    if (isSuperAdmin.value) {
+        try {
+            const res = await axios.get("/tenants");
+            if (res.data?.data?.length) {
+                allSchools.value = res.data.data;
+                return;
+            }
+        } catch (e) {}
+
+        try {
+            const res2 = await axios.get("/public/saas/schools");
+            if (res2.data?.data?.length) {
+                allSchools.value = res2.data.data;
+            }
+        } catch (e2) {}
+    }
+}
+
+async function onSchoolChange() {
+    filters.class_id = "";
+    await Promise.all([
+        loadClasses(),
+        load(1)
+    ]);
+}
+
 async function load(page = 1) {
     await store.load({
         page,
         search: search.value,
+        school_id: filters.school_id || undefined,
         class_id: filters.class_id,
     });
 }
@@ -184,6 +273,7 @@ async function load(page = 1) {
 async function loadClasses() {
     const { data } = await classApi.getAll({
         per_page: 1000,
+        school_id: filters.school_id || undefined,
     });
 
     classOptions.value = data.data;
@@ -192,6 +282,13 @@ async function loadClasses() {
 function createSection() {
     router.push({
         name: "sections.create",
+    });
+}
+
+function viewSection(id) {
+    router.push({
+        name: "sections.show",
+        params: { id },
     });
 }
 
@@ -230,9 +327,15 @@ async function removeSection(id) {
 
 onMounted(async () => {
 
-    await loadClasses();
+    if (!authStore.user && authStore.token) {
+        await authStore.loadProfile();
+    }
 
-    await load();
+    await Promise.all([
+        loadSchools(),
+        loadClasses(),
+        load(),
+    ]);
 
 });
 </script>

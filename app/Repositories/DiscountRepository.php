@@ -3,43 +3,63 @@
 namespace App\Repositories;
 
 use App\Models\Discount;
+use App\Services\TenantManager;
 
 class DiscountRepository
 {
+    protected function resolveSchoolId(?int $filterSchoolId = null): ?int
+    {
+        $user = auth()->user();
+        $tenantManager = app(TenantManager::class);
+
+        if (!$tenantManager->isSuperAdmin($user)) {
+            return $user?->school_id ? (int) $user->school_id : null;
+        }
+
+        if ($filterSchoolId !== null && $filterSchoolId > 0) {
+            return (int) $filterSchoolId;
+        }
+
+        $tenantId = $tenantManager->getTenantId();
+        if ($tenantId) {
+            return (int) $tenantId;
+        }
+
+        return $user?->school_id ? (int) $user->school_id : null;
+    }
+
     public function list(array $filters = [])
     {
-        return Discount::query()
+        $filterSchoolId = !empty($filters['school_id']) && $filters['school_id'] !== 'all' ? (int) $filters['school_id'] : null;
+        $schoolId = $this->resolveSchoolId($filterSchoolId);
 
-            ->where(
-                'school_id',
-                auth()->user()->school_id
-            )
+        $query = Discount::query()->with('school:id,name,code');
 
+        if ($schoolId !== null) {
+            $query->where('school_id', $schoolId);
+        }
+
+        return $query
             ->filter($filters)
-
             ->latest('id')
-
-            ->paginate(
-                (int) (
-                    $filters['per_page']
-                    ?? 20
-                )
-            );
+            ->paginate((int) ($filters['per_page'] ?? 20));
     }
 
 
     public function find(
         int $id
     ): Discount {
+        $user = auth()->user();
+        $tenantManager = app(TenantManager::class);
+        $isSuperAdmin = $tenantManager->isSuperAdmin($user);
 
-        return Discount::query()
+        $query = Discount::query()->with('school:id,name,code');
 
-            ->where(
-                'school_id',
-                auth()->user()->school_id
-            )
+        if (!$isSuperAdmin && $user?->school_id) {
+            $query->where('school_id', $user->school_id);
+        }
 
-            ->findOrFail($id);
+        return $query->findOrFail($id);
     }
 
 
@@ -47,8 +67,7 @@ class DiscountRepository
         array $data
     ): Discount {
 
-        $data['school_id'] =
-            auth()->user()->school_id;
+        $data['school_id'] = $data['school_id'] ?? $this->resolveSchoolId() ?? \App\Models\School::first()?->id ?? 1;
 
         $data['created_by'] =
             auth()->id();

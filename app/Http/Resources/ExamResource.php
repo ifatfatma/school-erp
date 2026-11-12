@@ -18,6 +18,14 @@ class ExamResource extends JsonResource
 
             'school_id' => $this->school_id,
 
+            'school' => $this->whenLoaded('school', function () {
+                return [
+                    'id' => $this->school->id,
+                    'name' => $this->school->name,
+                    'code' => $this->school->code,
+                ];
+            }),
+
             'academic_session_id' => $this->academic_session_id,
 
             'academic_session' => [

@@ -18,9 +18,24 @@ class AcademicSessionController extends Controller
 
     public function index(Request $request)
     {
-        return AcademicSessionResource::collection(
+        $user = $request->user();
+        $isSuperAdmin = $user && (
+            $user->user_type === 'super_admin' || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+            ($user->roles && $user->roles->contains('name', 'Super Admin'))
+        );
+
+        $resource = AcademicSessionResource::collection(
             $this->service->list($request)
         );
+
+        if ($isSuperAdmin) {
+            $resource->additional([
+                'all_schools' => \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']),
+            ]);
+        }
+
+        return $resource;
     }
 
     public function store(StoreAcademicSessionRequest $request)

@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Validator;
 
 class InventoryCategoryController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
     /*
@@ -25,7 +25,7 @@ class InventoryCategoryController extends Controller
         $schoolId = $this->schoolId();
 
         $query = InventoryCategory::query()
-            ->where('school_id', $schoolId);
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id));
 
         if ($request->filled('search')) {
 

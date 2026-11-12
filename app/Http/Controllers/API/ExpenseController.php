@@ -19,6 +19,8 @@ class ExpenseController extends Controller
      */
     public function index(Request $request)
     {
+        $schoolId = $this->resolveSchoolId($request);
+
         $filters = $request->validate([
 
             'search' => [
@@ -33,11 +35,13 @@ class ExpenseController extends Controller
                 Rule::exists(
                     'expense_categories',
                     'id'
-                )->where(function ($query) {
-                    $query->where(
-                        'school_id',
-                        auth()->user()->school_id
-                    );
+                )->where(function ($query) use ($schoolId) {
+                    if ($schoolId !== null) {
+                        $query->where(
+                            'school_id',
+                            $schoolId
+                        );
+                    }
                 }),
             ],
 
@@ -81,19 +85,28 @@ class ExpenseController extends Controller
                 'max:100',
             ],
 
+            'school_id' => [
+                'nullable',
+            ],
+
         ]);
 
+        if ($schoolId !== null) {
+            $filters['school_id'] = $schoolId;
+        }
 
-        return response()->json([
+        $list = $this->service->list($filters);
 
+        $response = [
             'success' => true,
+            'data' => $list,
+        ];
 
-            'data' =>
-                $this->service->list(
-                    $filters
-                ),
+        if ($this->isSuperAdmin($request)) {
+            $response['all_schools'] = \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']);
+        }
 
-        ]);
+        return response()->json($response);
     }
 
 
@@ -120,8 +133,10 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
-        $schoolId =
-            auth()->user()->school_id;
+        $schoolId = $this->resolveSchoolId($request) ?? auth()->user()?->school_id;
+        if (!$schoolId) {
+            $schoolId = \App\Models\School::first()?->id ?? 1;
+        }
 
 
         $data = $request->validate([
@@ -438,6 +453,8 @@ class ExpenseController extends Controller
     public function total(
         Request $request
     ) {
+        $schoolId = $this->resolveSchoolId($request);
+
         $filters = $request->validate([
 
             'date_from' => [
@@ -457,11 +474,13 @@ class ExpenseController extends Controller
                 Rule::exists(
                     'expense_categories',
                     'id'
-                )->where(function ($query) {
-                    $query->where(
-                        'school_id',
-                        auth()->user()->school_id
-                    );
+                )->where(function ($query) use ($schoolId) {
+                    if ($schoolId !== null) {
+                        $query->where(
+                            'school_id',
+                            $schoolId
+                        );
+                    }
                 }),
             ],
 

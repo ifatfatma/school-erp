@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Validator;
 
 class InventoryUnitController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
     /*

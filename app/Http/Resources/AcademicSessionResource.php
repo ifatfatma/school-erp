@@ -15,6 +15,14 @@ class AcademicSessionResource extends JsonResource
 
             'school_id' => $this->school_id,
 
+            'school' => $this->whenLoaded('school', function () {
+                return [
+                    'id' => $this->school->id,
+                    'name' => $this->school->name,
+                    'code' => $this->school->code,
+                ];
+            }),
+
             'name' => $this->name,
 
             'start_date' => $this->start_date?->format('Y-m-d'),

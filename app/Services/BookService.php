@@ -532,7 +532,7 @@ class BookService
     ): void {
 
         $schoolId =
-            auth()->user()->school_id;
+            (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id);
 
 
         /*

@@ -7,6 +7,7 @@ use App\Http\Requests\ExamType\StoreExamTypeRequest;
 use App\Http\Requests\ExamType\UpdateExamTypeRequest;
 use App\Http\Resources\ExamTypeResource;
 use App\Models\ExamType;
+use App\Models\School;
 use App\Services\ExamTypeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,11 +26,21 @@ class ExamTypeController extends Controller
      */
     public function index(Request $request)
     {
+        $isSuperAdmin = $this->isSuperAdmin($request);
+
         $examTypes = $this->service->paginate(
             $request->all()
         );
 
-        return ExamTypeResource::collection($examTypes);
+        $resource = ExamTypeResource::collection($examTypes);
+
+        if ($isSuperAdmin) {
+            $resource->additional([
+                'all_schools' => School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']),
+            ]);
+        }
+
+        return $resource;
     }
 
     /**
@@ -94,12 +105,14 @@ class ExamTypeController extends Controller
     /**
      * Active Exam Types
      */
-    public function active(): JsonResponse
+    public function active(Request $request): JsonResponse
     {
+        $schoolId = $request->input('school_id') ? (int) $request->input('school_id') : null;
+
         return response()->json([
             'success' => true,
             'data' => ExamTypeResource::collection(
-                $this->service->active()
+                $this->service->active($schoolId)
             ),
         ]);
     }

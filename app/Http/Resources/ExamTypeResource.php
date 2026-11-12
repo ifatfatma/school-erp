@@ -18,6 +18,12 @@ class ExamTypeResource extends JsonResource
 
             'school_id' => $this->school_id,
 
+            'school' => $this->school ? [
+                'id' => $this->school->id,
+                'name' => $this->school->name,
+                'code' => $this->school->code,
+            ] : null,
+
             'name' => $this->name,
 
             'code' => $this->code,

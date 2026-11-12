@@ -1,5 +1,13 @@
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid py-2">
+
+        <AppBreadcrumb
+            :items="[
+                { label: 'Dashboard', to: '/' },
+                { label: 'Subjects', to: { name: 'subjects.index' } },
+                { label: 'Details' }
+            ]"
+        />
 
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -31,7 +39,7 @@
 
             <div
                 class="card-body"
-                v-if="!loading && item"
+                v-if="!loading && subjectData"
             >
 
                 <table class="table table-bordered">
@@ -40,28 +48,28 @@
 
                         <tr>
                             <th width="220">ID</th>
-                            <td>{{ item.id }}</td>
+                            <td>{{ subjectData.id }}</td>
                         </tr>
 
                         <tr>
                             <th>Subject Name</th>
-                            <td>{{ item.name }}</td>
+                            <td>{{ subjectData.name }}</td>
                         </tr>
 
                         <tr>
                             <th>Subject Code</th>
-                            <td>{{ item.code }}</td>
+                            <td>{{ subjectData.code }}</td>
                         </tr>
 
                         <tr>
                             <th>Subject Type</th>
-                            <td>{{ item.type }}</td>
+                            <td>{{ subjectData.type }}</td>
                         </tr>
 
                         <tr>
                             <th>Description</th>
                             <td>
-                                {{ item.description || '-' }}
+                                {{ subjectData.description || '-' }}
                             </td>
                         </tr>
 
@@ -72,9 +80,9 @@
 
                                 <span
                                     class="badge"
-                                    :class="item.status ? 'bg-success' : 'bg-danger'"
+                                    :class="subjectData.status ? 'bg-success' : 'bg-danger'"
                                 >
-                                    {{ item.status ? 'Active' : 'Inactive' }}
+                                    {{ subjectData.status ? 'Active' : 'Inactive' }}
                                 </span>
 
                             </td>
@@ -83,12 +91,12 @@
 
                         <tr>
                             <th>Created At</th>
-                            <td>{{ item.created_at }}</td>
+                            <td>{{ subjectData.created_at }}</td>
                         </tr>
 
                         <tr>
                             <th>Updated At</th>
-                            <td>{{ item.updated_at }}</td>
+                            <td>{{ subjectData.updated_at }}</td>
                         </tr>
 
                     </tbody>
@@ -111,8 +119,9 @@
 
 <script setup>
 
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 import { useSubject } from '@/composables/useSubject'
 
@@ -127,6 +136,11 @@ const {
     fetchItem
 
 } = useSubject()
+
+const subjectData = computed(() => {
+    if (!item.value) return null
+    return item.value.data || item.value
+})
 
 onMounted(() => {
 

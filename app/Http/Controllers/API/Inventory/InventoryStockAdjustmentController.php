@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Validator;
 
 class InventoryStockAdjustmentController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
     protected function currentStock($schoolId, $itemId)
     {
-        $item = InventoryItem::where('school_id', $schoolId)
+        $item = InventoryItem::when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('id', $itemId)
             ->first();
 
@@ -26,7 +26,7 @@ class InventoryStockAdjustmentController extends Controller
             return 0;
         }
 
-        $in = InventoryStockMovement::where('school_id', $schoolId)
+        $in = InventoryStockMovement::when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('inventory_item_id', $itemId)
             ->whereIn('movement_type', [
                 'IN',
@@ -34,7 +34,7 @@ class InventoryStockAdjustmentController extends Controller
             ])
             ->sum('quantity');
 
-        $out = InventoryStockMovement::where('school_id', $schoolId)
+        $out = InventoryStockMovement::when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('inventory_item_id', $itemId)
             ->whereIn('movement_type', [
                 'OUT',

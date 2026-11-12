@@ -10,5 +10,13 @@ export function hasPermission(user, permission) {
 
     const permissions = user.permissions ?? [];
 
+    if (Array.isArray(permission)) {
+        return permission.some(perm => permissions.some(p => p.name === perm));
+    }
+
+    if (typeof permission === 'string' && permission.includes(',')) {
+        return permission.split(',').map(s => s.trim()).some(perm => permissions.some(p => p.name === perm));
+    }
+
     return permissions.some((p) => p.name === permission);
 }

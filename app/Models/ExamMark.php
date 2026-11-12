@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ExamMark extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $fillable = [
 
@@ -63,6 +65,11 @@ class ExamMark extends Model
             ExamSchedule::class,
             'exam_schedule_id'
         );
+    }
+
+    public function examSchedule()
+    {
+        return $this->schedule();
     }
 
     public function student()

@@ -67,7 +67,7 @@ class LostDamagedBookService
                 $issue = BookIssue::query()
                     ->where(
                         'school_id',
-                        auth()->user()->school_id
+                        (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                     )
                     ->where(
                         'id',
@@ -96,7 +96,7 @@ class LostDamagedBookService
             $copy = BookCopy::query()
                 ->where(
                     'school_id',
-                    auth()->user()->school_id
+                    (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                 )
                 ->where(
                     'id',
@@ -143,7 +143,7 @@ class LostDamagedBookService
             $existing = LostDamagedBook::query()
                 ->where(
                     'school_id',
-                    auth()->user()->school_id
+                    (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                 )
                 ->where(
                     'book_copy_id',
@@ -645,7 +645,7 @@ class LostDamagedBookService
                     BookCopy::query()
                         ->where(
                             'school_id',
-                            auth()->user()->school_id
+                            (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                         )
                         ->where(
                             'id',
@@ -678,7 +678,7 @@ class LostDamagedBookService
                         BookIssue::query()
                             ->where(
                                 'school_id',
-                                auth()->user()->school_id
+                                (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id)
                             )
                             ->where(
                                 'id',

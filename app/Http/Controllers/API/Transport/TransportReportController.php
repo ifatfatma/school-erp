@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class TransportReportController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
     /*
@@ -27,19 +27,19 @@ class TransportReportController extends Controller
         $dateTo   = $request->date_to;
 
         $vehicleCount = DB::table('transport_vehicles')
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at')
             ->count();
 
         $driverCount = DB::table('transport_drivers')
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at')
             ->count();
 
         $maintenanceQuery = DB::table(
             'transport_vehicle_maintenances'
         )
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at');
 
         if ($dateFrom) {
@@ -64,7 +64,7 @@ class TransportReportController extends Controller
         $expenseQuery = DB::table(
             'transport_expenses'
         )
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at');
 
         if ($dateFrom) {
@@ -89,7 +89,7 @@ class TransportReportController extends Controller
         $fuelQuery = DB::table(
             'transport_expenses'
         )
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at')
             ->whereIn('expense_type', [
                 'Fuel',

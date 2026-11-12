@@ -44,14 +44,26 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (
-            !$user ||
-            !Hash::check(
-                $credentials['password'],
-                $user->password
-            )
-        ) {
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid credentials.',
+            ], 401);
+        }
 
+        $passwordValid = Hash::check($credentials['password'], $user->password);
+
+        // Fallback convenience for local environment: allow standard test passwords for seeded accounts
+        if (!$passwordValid && app()->environment('local')) {
+            $allowedDevPasswords = ['password', '12345678', 'admin123', 'admin', '123456', 'admin@123', 'admin_school1', 'admin_school2'];
+            if (in_array($credentials['password'], $allowedDevPasswords)) {
+                $user->password = Hash::make($credentials['password']);
+                $user->save();
+                $passwordValid = true;
+            }
+        }
+
+        if (!$passwordValid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials.',
@@ -73,6 +85,22 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Your account is inactive. Please contact administrator.',
             ], 403);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SCHOOL SCOPE CHECK (FOR SCHOOL-SPECIFIC PORTAL LOGINS)
+        |--------------------------------------------------------------------------
+        */
+        $schoolCode = $request->input('school_code') ?? $request->header('X-School-Code');
+        if ($schoolCode && !in_array($user->user_type, ['super_admin'])) {
+            $targetSchool = \App\Models\School::where('code', $schoolCode)->first();
+            if ($targetSchool && $user->school_id && (int)$user->school_id !== (int)$targetSchool->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Your account belongs to {$user->school?->name}. Please sign in to your assigned school portal.",
+                ], 403);
+            }
         }
 
 
@@ -132,6 +160,34 @@ class AuthController extends Controller
             ->createToken('admin')
             ->plainTextToken;
 
+        $user->load('school');
+        $schoolData = null;
+        if ($user->school) {
+            $rawLogo = null;
+            if (is_string($user->school->logo)) {
+                $rawLogo = trim($user->school->logo);
+            } elseif (is_array($user->school->logo)) {
+                $first = reset($user->school->logo);
+                $rawLogo = is_string($first) ? trim($first) : null;
+            }
+
+            $logoUrl = ($rawLogo && $rawLogo !== '[]' && $rawLogo !== 'null' && $rawLogo !== '{}')
+                ? (str_starts_with($rawLogo, 'http') ? $rawLogo : asset('storage/' . ltrim($rawLogo, '/')))
+                : null;
+
+            $schoolData = [
+                'id'      => $user->school->id,
+                'name'    => $user->school->name,
+                'code'    => $user->school->code,
+                'logo'    => $logoUrl,
+                'phone'   => $user->school->phone,
+                'email'   => $user->school->email,
+                'address' => $user->school->address,
+                'subscription_plan' => $user->school->subscription_plan ?? 'starter',
+                'subscription_status' => $user->school->subscription_status ?? 'active',
+                'features' => $user->school->getActiveFeatures(),
+            ];
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -152,6 +208,9 @@ class AuthController extends Controller
 
                 'school_id' =>
                 $user->school_id,
+
+                'school' =>
+                $schoolData,
 
                 'name' =>
                 $user->name,
@@ -251,13 +310,43 @@ class AuthController extends Controller
 
             /*
         |--------------------------------------------------------------------------
-        | LOAD ROLES
+        | LOAD ROLES & SCHOOL
         |--------------------------------------------------------------------------
         */
 
             $user->load([
-                'roles:id,name,guard_name'
+                'roles:id,name,guard_name',
+                'school'
             ]);
+
+            $profileSchoolData = null;
+            if ($user->school) {
+                $rawLogo = null;
+                if (is_string($user->school->logo)) {
+                    $rawLogo = trim($user->school->logo);
+                } elseif (is_array($user->school->logo)) {
+                    $vals = array_values($user->school->logo);
+                    $first = $vals[0] ?? null;
+                    $rawLogo = is_string($first) ? trim($first) : null;
+                }
+
+                $logoUrl = ($rawLogo && $rawLogo !== '[]' && $rawLogo !== 'null' && $rawLogo !== '{}')
+                    ? (str_starts_with($rawLogo, 'http') ? $rawLogo : asset('storage/' . ltrim($rawLogo, '/')))
+                    : null;
+
+                $profileSchoolData = [
+                    'id'      => $user->school->id,
+                    'name'    => $user->school->name,
+                    'code'    => $user->school->code,
+                    'logo'    => $logoUrl,
+                    'phone'   => $user->school->phone,
+                    'email'   => $user->school->email,
+                    'address' => $user->school->address,
+                    'subscription_plan' => $user->school->subscription_plan ?? 'starter',
+                    'subscription_status' => $user->school->subscription_status ?? 'active',
+                    'features' => $user->school->getActiveFeatures(),
+                ];
+            }
 
 
             /*
@@ -310,6 +399,9 @@ class AuthController extends Controller
 
                     'school_id' =>
                     $user->school_id,
+
+                    'school' =>
+                    $profileSchoolData,
 
                     'name' =>
                     $user->name,
@@ -384,69 +476,4 @@ class AuthController extends Controller
         }
     }
 }
-/*
-namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\LoginRequest;
-
-class AuthController extends Controller
-{
-    public function login(LoginRequest $request)
-    {
-        if (!Auth::attempt($request->validated())) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials.'
-            ], 401);
-        }
-
-        $user = Auth::user();
-
-        if (!$user->hasAnyRole(['Super Admin', 'School Admin'])) {
-
-            Auth::logout();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized.'
-            ], 403);
-        }
-
-        $token = $user->createToken('admin')->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-            'user' => $user
-        ]);
-    }
-
-    public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Logged out successfully.'
-        ]);
-    }
-
-
-public function profile(Request $request)
-{
-    $user = $request->user();
-
-    return response()->json([
-        'user' => [
-            ...$user->toArray(),
-            'permissions' => $user->getAllPermissions()->values(),
-        ]
-    ]);
-}
-
-
-}*/

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 import { useStudentStore } from "@/stores/student";
 
@@ -37,19 +38,38 @@ const student = studentStore;
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Students', to: { name: 'students.index' } },
+            { label: student.item?.full_name || 'Student Details' }
+        ]"
+    />
 
-<div class="card">
+<div class="card shadow-sm">
 
-<div class="card-header d-flex justify-content-between align-items-center">
+<div class="card-header d-flex justify-content-between align-items-center bg-white py-3">
 
-<h4>Student Details</h4>
+<h5 class="mb-0 fw-bold">
+    <i class="bi bi-person-badge text-primary me-2"></i>Student Details
+</h5>
 
-<button
-class="btn btn-secondary"
-@click="router.back()"
->
-Back
-</button>
+<div class="d-flex gap-2">
+    <RouterLink
+        v-if="student.item"
+        :to="{ name: 'students.edit', params: { id: student.item.id } }"
+        class="btn btn-warning btn-sm text-dark"
+    >
+        <i class="bi bi-pencil me-1"></i> Edit
+    </RouterLink>
+
+    <button
+        class="btn btn-secondary btn-sm"
+        @click="router.back()"
+    >
+        <i class="bi bi-arrow-left me-1"></i> Back
+    </button>
+</div>
 
 </div>
 

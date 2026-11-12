@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HostelRoom extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToSchool;
 
     protected $table = 'hostel_rooms';
 
@@ -40,6 +42,22 @@ class HostelRoom extends Model
         return $this->belongsTo(
             HostelBuilding::class,
             'hostel_building_id'
+        );
+    }
+
+    public function beds()
+    {
+        return $this->hasMany(
+            HostelBed::class,
+            'hostel_room_id'
+        );
+    }
+
+    public function allocations()
+    {
+        return $this->hasMany(
+            HostelRoomAllocation::class,
+            'hostel_room_id'
         );
     }
 }

@@ -3,6 +3,7 @@ import { reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 import AppTable from "@/components/ui/AppTable.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { useExamTypeStore } from "@/stores/examType";
 
 const router = useRouter();
@@ -99,7 +100,14 @@ async function remove(id) {
 
 <template>
 
-<div class="container-fluid">
+<div class="container-fluid py-2">
+
+<AppBreadcrumb
+    :items="[
+        { label: 'Dashboard', to: '/' },
+        { label: 'Exam Types' }
+    ]"
+/>
 
 <div class="card shadow-sm">
 

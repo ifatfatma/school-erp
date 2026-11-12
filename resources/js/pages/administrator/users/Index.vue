@@ -70,8 +70,36 @@
 
                 <div class="row g-3">
 
+                    <!-- SCHOOL (SUPER ADMIN) -->
+                    <div
+                        v-if="isSuperAdmin && allSchools.length > 0"
+                        class="col-md-3"
+                    >
+                        <label class="form-label">
+                            School / Campus
+                        </label>
+
+                        <select
+                            v-model="schoolId"
+                            class="form-select fw-semibold"
+                            @change="loadUsers(1)"
+                        >
+                            <option value="">
+                                All Schools
+                            </option>
+
+                            <option
+                                v-for="s in allSchools"
+                                :key="'usr-sch-' + s.id"
+                                :value="s.id"
+                            >
+                                {{ s.name }} ({{ s.code }})
+                            </option>
+                        </select>
+                    </div>
+
                     <!-- SEARCH -->
-                    <div class="col-md-6">
+                    <div :class="(isSuperAdmin && allSchools.length > 0) ? 'col-md-4' : 'col-md-6'">
 
                         <label class="form-label">
                             Search
@@ -89,7 +117,7 @@
 
 
                     <!-- STATUS -->
-                    <div class="col-md-3">
+                    <div :class="(isSuperAdmin && allSchools.length > 0) ? 'col-md-2' : 'col-md-3'">
 
                         <label class="form-label">
                             Status
@@ -195,6 +223,10 @@
                                     Email
                                 </th>
 
+                                <th v-if="isSuperAdmin">
+                                    School / Campus
+                                </th>
+
                                 <th>
                                     Roles
                                 </th>
@@ -220,7 +252,7 @@
                             <tr v-if="loading">
 
                                 <td
-                                    colspan="7"
+                                    :colspan="isSuperAdmin ? 8 : 7"
                                     class="text-center py-5"
                                 >
 
@@ -244,7 +276,7 @@
                             <tr v-else-if="users.length === 0">
 
                                 <td
-                                    colspan="7"
+                                    :colspan="isSuperAdmin ? 8 : 7"
                                     class="text-center py-5 text-muted"
                                 >
 
@@ -299,6 +331,33 @@
                                 <!-- EMAIL -->
                                 <td>
                                     {{ user.email || '-' }}
+                                </td>
+
+
+                                <!-- SCHOOL / CAMPUS (SUPER ADMIN) -->
+                                <td v-if="isSuperAdmin">
+                                    <span
+                                        v-if="user.school"
+                                        class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold"
+                                    >
+                                        <i class="bi bi-building me-1"></i>
+                                        {{ user.school.name }} ({{ user.school.code }})
+                                    </span>
+
+                                    <span
+                                        v-else-if="user.user_type === 'super_admin'"
+                                        class="badge bg-dark-subtle text-dark border"
+                                    >
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        Platform Wide
+                                    </span>
+
+                                    <span
+                                        v-else
+                                        class="text-muted small"
+                                    >
+                                        -
+                                    </span>
                                 </td>
 
 
@@ -1018,6 +1077,18 @@ const search = ref('');
 
 const status = ref('');
 
+const schoolId = ref('');
+
+const allSchools = ref([]);
+
+const isSuperAdmin = computed(() => {
+    const u = currentUser.value;
+    return u?.user_type === 'super_admin' || u?.roles?.some(r => {
+        const name = typeof r === 'string' ? r : (r.name || '');
+        return name.toLowerCase() === 'super admin' || name.toLowerCase() === 'super_admin';
+    });
+});
+
 const showUserModal = ref(false);
 
 const showRolesModal = ref(false);
@@ -1303,7 +1374,11 @@ const loadUsers = async (
                         status:
                             status.value !== ''
                                 ? status.value
-                                : undefined
+                                : undefined,
+
+                        school_id:
+                            schoolId.value ||
+                            undefined
 
                     }
 
@@ -1331,6 +1406,9 @@ const loadUsers = async (
         const result =
             response.data?.data;
 
+        if (response.data?.all_schools?.length) {
+            allSchools.value = response.data.all_schools;
+        }
 
         users.value =
             result?.data || [];
@@ -2132,6 +2210,8 @@ const resetSearch = () => {
     search.value = '';
 
     status.value = '';
+
+    schoolId.value = '';
 
     loadUsers(1);
 

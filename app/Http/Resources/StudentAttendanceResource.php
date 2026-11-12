@@ -41,29 +41,30 @@ class StudentAttendanceResource extends JsonResource
                 : null,
 
             'student' => $this->whenLoaded('student', function () {
-                return [
+                return $this->student ? [
                     'id' => $this->student->id,
                     'admission_no' => $this->student->admission_no,
                     'roll_no' => $this->student->roll_no,
                     'name' => trim(
                         $this->student->first_name . ' ' . $this->student->last_name
                     ),
+                    'full_name' => $this->student->full_name ?? trim($this->student->first_name . ' ' . $this->student->last_name),
                     'photo' => $this->student->photo_url ?? null,
-                ];
+                ] : null;
             }),
 
             'class' => $this->whenLoaded('class', function () {
-                return [
+                return $this->class ? [
                     'id' => $this->class->id,
                     'name' => $this->class->name,
-                ];
+                ] : null;
             }),
 
             'section' => $this->whenLoaded('section', function () {
-                return [
+                return $this->section ? [
                     'id' => $this->section->id,
                     'name' => $this->section->name,
-                ];
+                ] : null;
             }),
 
             'created_at' => optional($this->created_at)

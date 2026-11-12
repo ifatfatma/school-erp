@@ -20,9 +20,9 @@ class InventoryStockInController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
 
@@ -37,7 +37,7 @@ class InventoryStockInController extends Controller
         $schoolId = $this->schoolId();
 
         $query = InventoryStockIn::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->with([
                 'supplier:id,name,code',
                 'creator:id,name',
@@ -186,7 +186,7 @@ class InventoryStockInController extends Controller
         */
 
         $suppliers = InventorySupplier::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('status', true)
             ->orderBy('name')
             ->get([
@@ -203,7 +203,7 @@ class InventoryStockInController extends Controller
         */
 
         $items = InventoryItem::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('status', true)
             ->orderBy('name')
             ->get([
@@ -245,7 +245,7 @@ class InventoryStockInController extends Controller
 
 
         $last = InventoryStockIn::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where(
                 'stock_in_no',
                 'like',
@@ -296,7 +296,7 @@ class InventoryStockInController extends Controller
 
 
         $last = InventoryStockMovement::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where(
                 'movement_no',
                 'like',

@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Validator;
 
 class TransportStudentController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
     /*
@@ -188,7 +188,7 @@ class TransportStudentController extends Controller
         */
 
         $sessions = DB::table('academic_sessions')
-    ->where('school_id', $schoolId)
+    ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
     ->where('status', 1)
     ->whereNull('deleted_at')
     ->orderByDesc('is_current')

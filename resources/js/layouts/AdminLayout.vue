@@ -49,7 +49,28 @@
             <!-- PAGE CONTENT -->
             <main class="admin-main">
 
-                <RouterView />
+                <!-- Subscription Feature Locked State -->
+                <div v-if="isRouteLocked" class="container py-5 text-center">
+                    <div class="card border-0 shadow-sm rounded-4 p-5 mx-auto bg-white" style="max-width: 580px;">
+                        <div class="bg-warning-subtle text-warning rounded-circle mx-auto p-4 mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
+                            <i class="bi bi-shield-lock-fill fs-1 text-warning"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Feature Not Included in Subscription</h4>
+                        <p class="text-muted small mb-4">
+                            The <strong>{{ lockedFeatureName }}</strong> module is not available on 
+                            <strong>{{ currentSchoolName }}</strong>'s current 
+                            <span class="badge bg-secondary-subtle text-secondary border font-monospace">{{ currentPlanName }}</span> package.
+                            Please upgrade your institution's subscription plan to access this module.
+                        </p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <router-link to="/dashboard" class="btn btn-primary rounded-pill px-4">
+                                <i class="bi bi-speedometer2 me-1"></i> Return to Dashboard
+                            </router-link>
+                        </div>
+                    </div>
+                </div>
+
+                <RouterView v-else />
 
             </main>
 
@@ -67,13 +88,83 @@
 
 import {
     ref,
+    computed,
     onMounted,
     onBeforeUnmount
 } from "vue";
+import { useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { useTenantStore } from "@/stores/tenant";
 
 import Sidebar from "@/components/layout/Sidebar.vue";
 import Navbar from "@/components/layout/Navbar.vue";
 import Footer from "@/components/layout/Footer.vue";
+
+const route = useRoute();
+const auth = useAuthStore();
+const tenantStore = useTenantStore();
+
+const PATH_FEATURE_MAP = {
+    "/hostel": "hostel",
+    "/library": "library",
+    "/book-": "library",
+    "/books": "library",
+    "/authors": "library",
+    "/publishers": "library",
+    "/transport": "transport",
+    "/inventory": "inventory",
+    "/online-classes": "online_classes",
+    "/admin/website": "website_cms",
+    "/admin/admissions": "online_admissions",
+};
+
+const currentRequiredFeature = computed(() => {
+    if (route.meta?.feature) return route.meta.feature;
+    for (const [prefix, feat] of Object.entries(PATH_FEATURE_MAP)) {
+        if (route.path.startsWith(prefix)) {
+            return feat;
+        }
+    }
+    return null;
+});
+
+const isRouteLocked = computed(() => {
+    const feat = currentRequiredFeature.value;
+    if (!feat) return false;
+
+    const user = auth.user;
+    if (!user) return false;
+
+    // Super Admin has 100% full, unrestricted access to all modules and features in School ERP
+    const isSuperAdminUser = user?.user_type === "super_admin" || user?.roles?.some(r => r.name === "Super Admin");
+    if (isSuperAdminUser) return false;
+
+    const activeSchool = user.school;
+    if (!activeSchool) return false;
+
+    const features = activeSchool.features || [];
+    const plan = (activeSchool.subscription_plan || "starter").toLowerCase();
+
+    if (Array.isArray(features) && features.length > 0) {
+        return !features.includes(feat);
+    }
+
+    const upperFeatures = ["hostel", "library", "transport", "inventory", "website_cms", "online_admissions", "custom_domain", "multi_branch"];
+    return (plan === "starter" || plan === "basic") && upperFeatures.includes(feat);
+});
+
+const lockedFeatureName = computed(() => {
+    return (currentRequiredFeature.value || "This").replace(/_/g, " ").toUpperCase();
+});
+
+const currentSchoolName = computed(() => {
+    return tenantStore.currentTenant?.name || auth.user?.school?.name || "School";
+});
+
+const currentPlanName = computed(() => {
+    const plan = tenantStore.currentTenant?.subscription_plan || auth.user?.school?.subscription_plan || "starter";
+    return plan.toUpperCase();
+});
 
 
 /*

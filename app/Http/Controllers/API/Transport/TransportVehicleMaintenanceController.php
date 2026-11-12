@@ -16,9 +16,9 @@ class TransportVehicleMaintenanceController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
 
@@ -200,7 +200,7 @@ class TransportVehicleMaintenanceController extends Controller
 
 
         $vehicles = DB::table('transport_vehicles')
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->whereNull('deleted_at')
             ->orderBy('vehicle_no')
             ->get([
@@ -408,7 +408,7 @@ class TransportVehicleMaintenanceController extends Controller
         */
 
         $vehicle = DB::table('transport_vehicles')
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('id', $request->transport_vehicle_id)
             ->whereNull('deleted_at')
             ->first();
@@ -611,7 +611,7 @@ class TransportVehicleMaintenanceController extends Controller
 
 
         $vehicle = DB::table('transport_vehicles')
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('id', $request->transport_vehicle_id)
             ->whereNull('deleted_at')
             ->first();

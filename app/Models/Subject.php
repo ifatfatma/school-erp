@@ -5,6 +5,7 @@ namespace App\Models;
 class Subject extends BaseModel
 {
     protected $fillable = [
+        'school_id',
         'name',
         'code',
         'type',

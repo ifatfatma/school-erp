@@ -18,7 +18,7 @@ class RoleController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    private function isSuperAdmin(Request $request): bool
+    protected function isSuperAdmin(?\Illuminate\Http\Request $request = null): bool
     {
         $user = $request->user();
 

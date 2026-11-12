@@ -2,12 +2,14 @@
 
 namespace App\Models\Transport;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TransportExpense extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $table = 'transport_expenses';
 
@@ -36,4 +38,9 @@ class TransportExpense extends Model
         'rate' => 'decimal:2',
         'amount' => 'decimal:2',
     ];
+
+    public function school()
+    {
+        return $this->belongsTo(\App\Models\School::class);
+    }
 }

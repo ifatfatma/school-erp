@@ -1,5 +1,13 @@
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid py-2">
+
+        <AppBreadcrumb
+            :items="[
+                { label: 'Dashboard', to: '/' },
+                { label: 'Academic Sessions', to: { name: 'academic-sessions.index' } },
+                { label: 'Edit' }
+            ]"
+        />
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Edit Academic Session</h3>
@@ -30,6 +38,7 @@ import { reactive, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import Form from "./Form.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { useAcademicSessionStore } from "@/stores/academicSession";
 
 const route = useRoute();

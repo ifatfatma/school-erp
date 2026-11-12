@@ -2,7 +2,9 @@
 
 import {
     onMounted,
-    ref
+    onBeforeUnmount,
+    ref,
+    computed
 } from "vue";
 
 import {
@@ -18,8 +20,20 @@ import AppButton
 import api
     from "@/api/axios";
 
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
+const authStore = useAuthStore();
+
+const isSuperAdmin = computed(() => {
+    const u = authStore.user;
+    return u?.user_type === 'super_admin' || u?.roles?.some(r => {
+        const name = typeof r === 'string' ? r : (r.name || '');
+        return name.toLowerCase() === 'super admin' || name.toLowerCase() === 'super_admin';
+    });
+});
+
+const allSchools = ref([]);
 
 const items = ref([]);
 
@@ -28,6 +42,7 @@ const loading = ref(false);
 const search = ref("");
 
 const filters = ref({
+    school_id: "",
     academic_session_id: "",
     class_id: "",
     fee_type_id: "",
@@ -59,6 +74,10 @@ const load = async (page = 1) => {
             per_page: pagination.value.per_page,
         };
 
+        if (filters.value.school_id) {
+            params.school_id = filters.value.school_id;
+        }
+
         if (filters.value.academic_session_id) {
             params.academic_session_id =
                 filters.value.academic_session_id;
@@ -86,6 +105,10 @@ const load = async (page = 1) => {
 
         items.value =
             data.data?.data ?? [];
+
+        if (data.all_schools) {
+            allSchools.value = data.all_schools;
+        }
 
         pagination.value = {
             current_page:
@@ -194,6 +217,7 @@ const formatAmount = (amount) => {
 const resetFilters = () => {
 
     filters.value = {
+        school_id: "",
         academic_session_id: "",
         class_id: "",
         fee_type_id: "",
@@ -204,11 +228,17 @@ const resetFilters = () => {
 
 };
 
+function handleTenantSwitched() {
+    load(1);
+}
 
 onMounted(() => {
-
     load();
+    window.addEventListener("tenant-switched", handleTenantSwitched);
+});
 
+onBeforeUnmount(() => {
+    window.removeEventListener("tenant-switched", handleTenantSwitched);
 });
 
 </script>
@@ -262,9 +292,32 @@ onMounted(() => {
 
             <!-- Filters -->
 
-            <div class="row mb-3">
+            <div class="row g-2 mb-3">
 
-                <div class="col-md-3">
+                <!-- School Filter (Super Admin) -->
+                <div class="col-md-3" v-if="isSuperAdmin">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-primary">
+                            <i class="bi bi-buildings"></i>
+                        </span>
+                        <select
+                            v-model="filters.school_id"
+                            class="form-select border-start-0 fw-semibold"
+                            @change="load(1)"
+                        >
+                            <option value="">All Schools</option>
+                            <option
+                                v-for="s in allSchools"
+                                :key="'fs-sch-' + s.id"
+                                :value="s.id"
+                            >
+                                {{ s.name }} ({{ s.code }})
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div :class="isSuperAdmin ? 'col-md-2' : 'col-md-3'">
 
                     <input
                         v-model="filters.academic_session_id"
@@ -276,7 +329,7 @@ onMounted(() => {
                 </div>
 
 
-                <div class="col-md-3">
+                <div :class="isSuperAdmin ? 'col-md-2' : 'col-md-3'">
 
                     <input
                         v-model="filters.class_id"
@@ -288,7 +341,7 @@ onMounted(() => {
                 </div>
 
 
-                <div class="col-md-3">
+                <div :class="isSuperAdmin ? 'col-md-2' : 'col-md-3'">
 
                     <input
                         v-model="filters.fee_type_id"
@@ -300,7 +353,7 @@ onMounted(() => {
                 </div>
 
 
-                <div class="col-md-3">
+                <div :class="(isSuperAdmin && allSchools.length > 0) ? 'col-md-3' : 'col-md-3'">
 
                     <select
                         v-model="filters.status"
@@ -364,6 +417,10 @@ onMounted(() => {
                                 #
                             </th>
 
+                            <th v-if="isSuperAdmin">
+                                School
+                            </th>
+
                             <th>
                                 Academic Session
                             </th>
@@ -415,7 +472,7 @@ onMounted(() => {
                         <tr v-if="loading">
 
                             <td
-                                colspan="10"
+                                :colspan="isSuperAdmin ? 11 : 10"
                                 class="text-center py-5"
                             >
 
@@ -442,7 +499,7 @@ onMounted(() => {
                         >
 
                             <td
-                                colspan="10"
+                                :colspan="isSuperAdmin ? 11 : 10"
                                 class="text-center py-5 text-muted"
                             >
 
@@ -474,6 +531,13 @@ onMounted(() => {
                                     1
                                 }}
 
+                            </td>
+
+                            <td v-if="isSuperAdmin">
+                                <span v-if="item.school" class="badge bg-light text-dark border">
+                                    <i class="bi bi-building me-1"></i>{{ item.school.name }} ({{ item.school.code }})
+                                </span>
+                                <span v-else class="text-muted small">Global</span>
                             </td>
 
 

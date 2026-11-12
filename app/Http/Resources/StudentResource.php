@@ -70,26 +70,35 @@ class StudentResource extends JsonResource
 
             'status_text' => $this->status ? 'Active' : 'Inactive',
 
+            'school_id' => $this->school_id,
+            'school_name' => $this->school?->name ?? 'N/A',
+            'school_code' => $this->school?->code ?? '',
+            'school' => $this->whenLoaded('school', function () {
+                return $this->school ? [
+                    'id' => $this->school->id,
+                    'name' => $this->school->name,
+                    'code' => $this->school->code,
+                ] : null;
+            }),
+
             'class_id' => $this->class_id,
+            'class_name' => $this->class?->name ?? 'N/A',
 
             'class' => $this->whenLoaded('class', function () {
-
-                return [
+                return $this->class ? [
                     'id' => $this->class->id,
                     'name' => $this->class->name,
-                ];
-
+                ] : null;
             }),
 
             'section_id' => $this->section_id,
+            'section_name' => $this->section?->name ?? 'N/A',
 
             'section' => $this->whenLoaded('section', function () {
-
-                return [
+                return $this->section ? [
                     'id' => $this->section->id,
                     'name' => $this->section->name,
-                ];
-
+                ] : null;
             }),
 
             'created_at' => optional($this->created_at)

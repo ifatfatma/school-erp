@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ExamType extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $fillable = [
 
@@ -60,29 +62,21 @@ class ExamType extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeFilter($query,array $filters)
+    public function scopeFilter($query, array $filters)
     {
         return $query
-
             ->when(
-
                 $filters['search'] ?? null,
-
-                function($q,$value){
-
-                    $q->where('name','like',"%{$value}%")
-                      ->orWhere('code','like',"%{$value}%");
-
+                function($q, $value) {
+                    $q->where(function($sq) use ($value) {
+                        $sq->where('name', 'like', "%{$value}%")
+                           ->orWhere('code', 'like', "%{$value}%");
+                    });
                 }
-
             )
-
             ->when(
-
-                isset($filters['status']),
-
-                fn($q,$value)=>$q->where('status',$value)
-
+                isset($filters['status']) && $filters['status'] !== '',
+                fn($q) => $q->where('status', (bool) $filters['status'])
             );
     }
 }

@@ -3,14 +3,22 @@
         <div class="row h-100">
 
             <div class="col-md-7 d-none d-md-flex bg-primary text-white justify-content-center align-items-center">
-                <div class="text-center">
+                <div class="text-center p-4">
 
-                    <h1 class="display-4 fw-bold">
-                        School ERP
+                    <img
+                        v-if="schoolInfo?.logo"
+                        :src="schoolInfo.logo"
+                        alt="School Logo"
+                        class="mb-3 rounded bg-white p-2 shadow"
+                        style="max-height: 90px; max-width: 140px; object-fit: contain;"
+                    />
+
+                    <h1 class="display-5 fw-bold">
+                        {{ schoolInfo?.name || 'School ERP' }}
                     </h1>
 
                     <p class="lead">
-                        Complete School Management System
+                        {{ schoolInfo?.city ? `${schoolInfo.city}, ${schoolInfo.state || ''}` : 'Complete School Management System' }}
                     </p>
 
                 </div>
@@ -22,9 +30,19 @@
 
                     <div class="card-body p-5">
 
-                        <h3 class="text-center mb-4">
-                            Login
-                        </h3>
+                        <div class="text-center mb-4">
+                            <img
+                                v-if="schoolInfo?.logo"
+                                :src="schoolInfo.logo"
+                                alt="Logo"
+                                class="mb-2 rounded"
+                                style="max-height: 48px; object-fit: contain;"
+                            />
+                            <h3 class="mb-0">
+                                Login
+                            </h3>
+                            <small class="text-muted">Enter credentials to continue</small>
+                        </div>
 
                         <form @submit.prevent="submit">
 
@@ -80,6 +98,21 @@
 
                             </button>
 
+                            <div class="mt-4 pt-3 border-top text-center">
+                                <small class="text-muted d-block mb-2 fw-semibold" style="font-size: 0.75rem;">QUICK DEMO CREDENTIALS (PASSWORD: <code>12345678</code>)</small>
+                                <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                    <button type="button" class="btn btn-xs btn-outline-primary py-1 px-2" style="font-size: 0.75rem;" @click="fillCreds('admin@school.com')">
+                                        <i class="bi bi-shield-lock me-1"></i>Super Admin
+                                    </button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary py-1 px-2" style="font-size: 0.75rem;" @click="fillCreds('admin_school1@school.com')">
+                                        <i class="bi bi-building me-1"></i>School 1 Admin
+                                    </button>
+                                    <button type="button" class="btn btn-xs btn-outline-secondary py-1 px-2" style="font-size: 0.75rem;" @click="fillCreds('admin_school2@school.com')">
+                                        <i class="bi bi-building me-1"></i>School 2 Admin
+                                    </button>
+                                </div>
+                            </div>
+
                         </form>
 
                     </div>
@@ -94,29 +127,52 @@
 
 <script setup>
 
-import { reactive, ref } from "vue";
-
-import { useRouter } from "vue-router";
+import { reactive, ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 import Swal from "sweetalert2";
+import api from "@/api/axios";
 
 import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
-
+const route = useRoute();
 const auth = useAuthStore();
 
 const loading = ref(false);
-
 const showPassword = ref(false);
+const schoolInfo = ref(null);
+
+const schoolCodeParam = computed(() => {
+    return route.params.schoolCode || route.query.school || "";
+});
+
+onMounted(async () => {
+    const code = schoolCodeParam.value;
+    if (code === 'S001') {
+        form.email = 'admin_school1@school.com';
+    } else if (code === 'S002') {
+        form.email = 'admin_school2@school.com';
+    }
+    try {
+        const { data } = await api.get('/public/school-info', {
+            params: code ? { school: code } : {}
+        });
+        schoolInfo.value = data.data ?? data;
+    } catch (e) {
+        // Fallback
+    }
+});
 
 const form = reactive({
-
     email: "admin@school.com",
-
     password: "12345678"
-
 });
+
+function fillCreds(email) {
+    form.email = email;
+    form.password = "12345678";
+}
 
 async function submit(){
 

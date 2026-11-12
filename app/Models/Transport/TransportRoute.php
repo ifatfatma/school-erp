@@ -2,12 +2,14 @@
 
 namespace App\Models\Transport;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TransportRoute extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $table = 'transport_routes';
 
@@ -35,5 +37,10 @@ class TransportRoute extends Model
             TransportRouteStop::class,
             'transport_route_id'
         )->orderBy('stop_order');
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(\App\Models\School::class);
     }
 }

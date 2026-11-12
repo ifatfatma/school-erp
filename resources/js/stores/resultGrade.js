@@ -9,6 +9,7 @@ export const useResultGradeStore = defineStore(
         state: () => ({
             items: [],
             pagination: {},
+            allSchools: [],
 
             loading: false,
             saving: false,
@@ -35,6 +36,10 @@ export const useResultGradeStore = defineStore(
 
                     this.pagination =
                         data.meta ?? {};
+
+                    if (data.all_schools) {
+                        this.allSchools = data.all_schools;
+                    }
 
                     return data;
 

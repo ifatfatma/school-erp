@@ -8,19 +8,18 @@ class AcademicSessionRepository
 {
     public function paginate($request)
     {
-        return AcademicSession::query()
+        $query = AcademicSession::query()->with('school:id,name,code');
 
-            ->when($request->search,function($q) use($request){
+        if ($request->filled('school_id') && $request->school_id !== 'all') {
+            $query->where('school_id', $request->school_id);
+        }
 
-                $q->where('name','like','%'.$request->search.'%');
-
+        return $query
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
             })
-
             ->latest()
-
-            ->paginate(
-                $request->per_page ?? 10
-            );
+            ->paginate($request->per_page ?? 10);
     }
 
     public function create(array $data)

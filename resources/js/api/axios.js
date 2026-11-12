@@ -24,6 +24,16 @@ api.interceptors.request.use(config => {
 
     }
 
+    const isLogout = config.url && (config.url.includes('/logout') || config.url.endsWith('logout'))
+
+    if (!isLogout) {
+        const activeSchoolId = localStorage.getItem("active_school_id")
+
+        if (activeSchoolId !== null && activeSchoolId !== undefined && activeSchoolId !== "") {
+            config.headers["X-School-Id"] = activeSchoolId
+        }
+    }
+
     return config
 
 })

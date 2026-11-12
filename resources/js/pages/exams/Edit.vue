@@ -3,6 +3,7 @@ import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import Form from "./Form.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { useExamStore } from "@/stores/exam";
 
 const route = useRoute();
@@ -73,6 +74,16 @@ function cancel() {
 
 <template>
 
+<div class="container-fluid py-2">
+
+<AppBreadcrumb
+    :items="[
+        { label: 'Dashboard', to: '/' },
+        { label: 'Examinations', to: { name: 'exams.index' } },
+        { label: 'Edit' }
+    ]"
+/>
+
 <Form
 
     :form="form"
@@ -86,5 +97,7 @@ function cancel() {
     @cancel="cancel"
 
 />
+
+</div>
 
 </template>

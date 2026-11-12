@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 
 class FeePayment extends Model
 {
+    use BelongsToSchool;
+
     protected $fillable = [
         'school_id',
         'academic_session_id',

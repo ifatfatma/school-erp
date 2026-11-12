@@ -6,7 +6,8 @@ use App\Models\Exam;
 use App\Models\ExamMark;
 use App\Models\ExamSchedule;
 use App\Models\Student;
-use App\Models\Grade;
+use App\Models\ResultGrade as Grade;
+use App\Services\TenantManager;
 
 class ReportCardRepository
 {
@@ -14,25 +15,30 @@ class ReportCardRepository
         int $studentId,
         int $examId
     ): array {
+        $user = auth()->user();
+        $tenantManager = app(TenantManager::class);
+        $isSuperAdmin = $user && $tenantManager->isSuperAdmin($user);
+        $activeSchoolId = $tenantManager->getTenantId() ?? $user?->school_id;
 
-        $student = Student::query()
-            ->where('school_id', auth()->user()->school_id)
-            ->with([
-                'class',
-                'section',
-            ])
-            ->findOrFail($studentId);
+        $studentQuery = Student::query()->with([
+            'class',
+            'section',
+        ]);
+        if (!$isSuperAdmin || $activeSchoolId) {
+            $studentQuery->where('school_id', $activeSchoolId ?? $user?->school_id);
+        }
+        $student = $studentQuery->findOrFail($studentId);
 
-        $exam = Exam::query()
-    ->where(
-        'school_id',
-        auth()->user()->school_id
-    )
-    ->with([
-        'academicSession',
-        'examType',
-    ])
-    ->findOrFail($examId);
+        $schoolId = $student->school_id ?? $activeSchoolId ?? $user?->school_id;
+
+        $examQuery = Exam::query()->with([
+            'academicSession',
+            'examType',
+        ]);
+        if (!$isSuperAdmin || $schoolId) {
+            $examQuery->where('school_id', $schoolId);
+        }
+        $exam = $examQuery->findOrFail($examId);
 
         /*
         |--------------------------------------------------------------------------
@@ -123,7 +129,7 @@ class ReportCardRepository
             $grade = Grade::query()
                 ->where(
                     'school_id',
-                    auth()->user()->school_id
+                    $schoolId
                 )
                 ->where('status', true)
                 ->where(
@@ -215,7 +221,7 @@ class ReportCardRepository
         $overallGrade = Grade::query()
             ->where(
                 'school_id',
-                auth()->user()->school_id
+                $schoolId
             )
             ->where('status', true)
             ->where(

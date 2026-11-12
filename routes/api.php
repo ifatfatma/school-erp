@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\SchoolController;
+use App\Http\Controllers\Api\TenantController;
 use App\Http\Controllers\API\AcademicSessionController;
 use App\Http\Controllers\API\SchoolClassController;
+use App\Http\Controllers\API\OnlineClassController;
 use App\Http\Controllers\API\SubjectController;
 use App\Http\Controllers\API\SectionController;
 use App\Http\Controllers\API\TimetableController;
@@ -15,6 +17,7 @@ use App\Http\Controllers\API\LeaveTypeController;
 use App\Http\Controllers\API\LeaveRequestController;
 use App\Http\Controllers\Api\TeacherAttendanceController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\API\StudentImportExportController;
 use App\Http\Controllers\Api\StudentAttendanceController;
 use App\Http\Controllers\Api\GuardianController;
 use App\Http\Controllers\Api\StudentPromotionController;
@@ -54,6 +57,10 @@ use App\Http\Controllers\Api\LibraryMemberController;
 use App\Http\Controllers\Api\BookIssueController;
 use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\BookRenewalController;
+use App\Http\Controllers\Api\LostDamagedBookController;
+use App\Http\Controllers\Api\LibraryFineController;
+use App\Http\Controllers\Api\FineCollectionController;
+use App\Http\Controllers\Api\LibraryDashboardController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\LibraryReportController;
 use App\Http\Controllers\Api\Inventory\InventoryItemController;
@@ -81,9 +88,74 @@ use App\Http\Controllers\Api\Administrator\UserController;
 use App\Http\Controllers\Api\Administrator\PermissionController;
 use App\Http\Controllers\Api\Hostel\HostelBuildingController;
 use App\Http\Controllers\Api\Hostel\HostelRoomController;
+use App\Http\Controllers\Api\Hostel\HostelController;
+use App\Http\Controllers\Api\Hostel\HostelFloorController;
+use App\Http\Controllers\Api\Hostel\HostelBedController;
+use App\Http\Controllers\Api\Hostel\HostelStudentController;
+use App\Http\Controllers\Api\Hostel\HostelRoomAllocationController;
+use App\Http\Controllers\Api\Hostel\HostelRoomTransferController;
+use App\Http\Controllers\Api\Hostel\HostelFeeController;
+use App\Http\Controllers\Api\Hostel\HostelAttendanceController;
+use App\Http\Controllers\Api\Hostel\HostelComplaintController;
+use App\Http\Controllers\Api\Hostel\HostelVisitorController;
+use App\Http\Controllers\Api\Hostel\HostelDashboardController;
+use App\Http\Controllers\Api\Hostel\HostelReportController;
+use App\Http\Controllers\API\PublicAdmissionController;
+use App\Http\Controllers\API\AdminAdmissionController;
+use App\Http\Controllers\API\StudentPortalController;
+use App\Http\Controllers\API\WebsiteManagerController;
+use App\Http\Controllers\API\SaasPlatformController;
+
+/*
+|--------------------------------------------------------------------------
+| Public Website & Online Admission Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('public')->group(function () {
+    // SaaS Platform Root Routes
+    Route::get('/saas/plans', [SaasPlatformController::class, 'getPlans']);
+    Route::post('/saas/register-school', [SaasPlatformController::class, 'registerSchool']);
+    Route::post('/saas/demo-inquiry', [SaasPlatformController::class, 'submitDemoRequest']);
+    Route::get('/saas/schools', [SaasPlatformController::class, 'getDirectory']);
+    Route::get('/saas/content', [SaasPlatformController::class, 'getPublicContent']);
+
+    Route::get('/school-info', function (\Illuminate\Http\Request $request) {
+        $identifier = $request->input('school') ?? $request->input('code') ?? $request->header('X-School-Code') ?? $request->header('X-School-Id');
+        if ($identifier) {
+            $school = \App\Models\School::where('status', 1)
+                ->where(function ($q) use ($identifier) {
+                    $q->where('code', $identifier)->orWhere('id', $identifier);
+                })->first();
+        }
+        $school = $school ?? \App\Models\School::where('status', 1)->first() ?? \App\Models\School::first();
+        if (!$school) {
+            return response()->json(['success' => false, 'data' => null]);
+        }
+        return new \App\Http\Resources\SchoolResource($school);
+    });
+    Route::get('/schools', function () {
+        $schools = \App\Models\School::where('status', 1)->get(['id', 'name', 'code', 'city', 'state', 'logo']);
+        return response()->json(['success' => true, 'data' => $schools]);
+    });
+    Route::get('/website-content', [PublicAdmissionController::class, 'getWebsiteContent']);
+    Route::get('/school/{schoolCode}/website-content', [PublicAdmissionController::class, 'getWebsiteContent']);
+    Route::get('/admission-metadata', [PublicAdmissionController::class, 'metadata']);
+    Route::post('/admissions/apply', [PublicAdmissionController::class, 'apply']);
+    Route::get('/admissions/track', [PublicAdmissionController::class, 'track']);
+    Route::post('/contact-inquiries', [PublicAdmissionController::class, 'submitInquiry']);
+    Route::get('/stats', [PublicAdmissionController::class, 'stats']);
+});
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
+    // Multi-Tenant Context & School Switching
+    Route::get('/schools/switcher', [TenantController::class, 'index']);
+    Route::post('/schools/switch/{school}', [TenantController::class, 'switchByParam']);
+    Route::get('/schools/current', [TenantController::class, 'current']);
+    Route::get('/tenants', [TenantController::class, 'index']);
+    Route::get('/tenants/current', [TenantController::class, 'current']);
+    Route::post('/tenants/switch', [TenantController::class, 'switch']);
+    Route::get('/tenants/overview', [TenantController::class, 'systemOverview']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -111,6 +183,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('subjects', SubjectController::class);
 
     Route::apiResource('timetables', TimetableController::class);
+
+    // Online Classes & Live Virtual Classrooms
+    Route::post('online-classes/generate-room', [OnlineClassController::class, 'generateRoom']);
+    Route::patch('online-classes/{id}/status', [OnlineClassController::class, 'updateStatus']);
+    Route::apiResource('online-classes', OnlineClassController::class);
     Route::get(
         'sections/active',
         [SectionController::class, 'active']
@@ -127,6 +204,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('teacher-leaves/{id}/approve', [LeaveRequestController::class, 'approve']);
     Route::post('teacher-leaves/{id}/reject', [LeaveRequestController::class, 'reject']);
     Route::apiResource('teacher-attendances', TeacherAttendanceController::class);
+    // Student Bulk Excel Import & Export
+    Route::get('students/export/excel', [StudentImportExportController::class, 'exportExcel']);
+    Route::get('students/export/template', [StudentImportExportController::class, 'downloadTemplate']);
+    Route::post('students/import/excel', [StudentImportExportController::class, 'importExcel']);
+
     Route::apiResource('students', StudentController::class);
     Route::get('students-active', [StudentController::class, 'active']);
     Route::get('students-by-class', [StudentController::class, 'byClass']);
@@ -1456,6 +1538,44 @@ Route::middleware('auth:sanctum')->group(function () {
             [LibraryReportController::class, 'fineCollection']
         );
     });
+
+    Route::get('/library/dashboard', [LibraryDashboardController::class, 'index']);
+
+    Route::prefix('lost-damaged-books')->group(function () {
+        Route::get('/statistics', [LostDamagedBookController::class, 'statistics']);
+        Route::get('/pending-charges', [LostDamagedBookController::class, 'pendingCharges']);
+        Route::get('/lost', [LostDamagedBookController::class, 'lostBooks']);
+        Route::get('/damaged', [LostDamagedBookController::class, 'damagedBooks']);
+        Route::get('/member/{memberId}', [LostDamagedBookController::class, 'memberHistory'])->whereNumber('memberId');
+        Route::get('/copy/{copyId}', [LostDamagedBookController::class, 'copyHistory'])->whereNumber('copyId');
+        Route::get('/', [LostDamagedBookController::class, 'index']);
+        Route::post('/', [LostDamagedBookController::class, 'store']);
+        Route::get('/{id}', [LostDamagedBookController::class, 'show'])->whereNumber('id');
+        Route::put('/{id}', [LostDamagedBookController::class, 'update'])->whereNumber('id');
+        Route::delete('/{id}', [LostDamagedBookController::class, 'destroy'])->whereNumber('id');
+    });
+
+    Route::prefix('library-fines')->group(function () {
+        Route::get('/statistics', [LibraryFineController::class, 'statistics']);
+        Route::get('/pending', [LibraryFineController::class, 'pendingFines']);
+        Route::get('/overdue', [LibraryFineController::class, 'overdueFines']);
+        Route::get('/lost-damaged', [LibraryFineController::class, 'lostDamagedFines']);
+        Route::get('/member/{memberId}', [LibraryFineController::class, 'memberFines'])->whereNumber('memberId');
+        Route::get('/issue/{issueId}', [LibraryFineController::class, 'issueFines'])->whereNumber('issueId');
+        Route::get('/', [LibraryFineController::class, 'index']);
+        Route::post('/', [LibraryFineController::class, 'store']);
+        Route::get('/{id}', [LibraryFineController::class, 'show'])->whereNumber('id');
+        Route::put('/{id}', [LibraryFineController::class, 'update'])->whereNumber('id');
+        Route::delete('/{id}', [LibraryFineController::class, 'destroy'])->whereNumber('id');
+    });
+
+    Route::prefix('fine-collections')->group(function () {
+        Route::get('/pending-fines', [FineCollectionController::class, 'pendingFines']);
+        Route::get('/', [FineCollectionController::class, 'index']);
+        Route::post('/', [FineCollectionController::class, 'store']);
+        Route::get('/{id}', [FineCollectionController::class, 'show'])->whereNumber('id');
+        Route::delete('/{id}', [FineCollectionController::class, 'destroy'])->whereNumber('id');
+    });
     Route::prefix('settings')->group(function () {
 
         /*
@@ -2375,104 +2495,162 @@ Route::middleware('auth:sanctum')
 
 
     Route::prefix('hostel')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [HostelDashboardController::class, 'index']);
 
-    Route::get('/buildings', [
-        HostelBuildingController::class,
-        'index'
-    ]);
+        // Hostels
+        Route::get('/hostels', [HostelController::class, 'index']);
+        Route::get('/hostels/all', [HostelController::class, 'all']);
+        Route::post('/hostels', [HostelController::class, 'store']);
+        Route::get('/hostels/{id}', [HostelController::class, 'show'])->whereNumber('id');
+        Route::put('/hostels/{id}', [HostelController::class, 'update'])->whereNumber('id');
+        Route::patch('/hostels/{id}/status', [HostelController::class, 'toggleStatus'])->whereNumber('id');
+        Route::delete('/hostels/{id}', [HostelController::class, 'destroy'])->whereNumber('id');
 
-    Route::post('/buildings', [
-        HostelBuildingController::class,
-        'store'
-    ]);
+        // Buildings
+        Route::get('/buildings', [HostelBuildingController::class, 'index']);
+        Route::post('/buildings', [HostelBuildingController::class, 'store']);
+        Route::get('/buildings/{id}', [HostelBuildingController::class, 'show'])->whereNumber('id');
+        Route::put('/buildings/{id}', [HostelBuildingController::class, 'update'])->whereNumber('id');
+        Route::patch('/buildings/{id}/status', [HostelBuildingController::class, 'toggleStatus'])->whereNumber('id');
+        Route::delete('/buildings/{id}', [HostelBuildingController::class, 'destroy'])->whereNumber('id');
 
-    Route::get('/buildings/{id}', [
-        HostelBuildingController::class,
-        'show'
-    ]);
+        // Floors
+        Route::get('/floors', [HostelFloorController::class, 'index']);
+        Route::get('/floors/buildings', [HostelFloorController::class, 'buildings']);
+        Route::post('/floors', [HostelFloorController::class, 'store']);
+        Route::get('/floors/{id}', [HostelFloorController::class, 'show'])->whereNumber('id');
+        Route::put('/floors/{id}', [HostelFloorController::class, 'update'])->whereNumber('id');
+        Route::patch('/floors/{id}/status', [HostelFloorController::class, 'toggleStatus'])->whereNumber('id');
+        Route::delete('/floors/{id}', [HostelFloorController::class, 'destroy'])->whereNumber('id');
 
-    Route::put('/buildings/{id}', [
-        HostelBuildingController::class,
-        'update'
-    ]);
+        // Rooms
+        Route::get('/rooms', [HostelRoomController::class, 'index']);
+        Route::get('/rooms/buildings', [HostelRoomController::class, 'buildings']);
+        Route::post('/rooms', [HostelRoomController::class, 'store']);
+        Route::get('/rooms/{id}', [HostelRoomController::class, 'show'])->whereNumber('id');
+        Route::put('/rooms/{id}', [HostelRoomController::class, 'update'])->whereNumber('id');
+        Route::patch('/rooms/{id}/status', [HostelRoomController::class, 'toggleStatus'])->whereNumber('id');
+        Route::delete('/rooms/{id}', [HostelRoomController::class, 'destroy'])->whereNumber('id');
 
-    Route::delete('/buildings/{id}', [
-        HostelBuildingController::class,
-        'destroy'
-    ]);
+        // Beds
+        Route::get('/beds', [HostelBedController::class, 'index']);
+        Route::get('/beds/rooms', [HostelBedController::class, 'rooms']);
+        Route::post('/beds', [HostelBedController::class, 'store']);
+        Route::get('/beds/{id}', [HostelBedController::class, 'show'])->whereNumber('id');
+        Route::put('/beds/{id}', [HostelBedController::class, 'update'])->whereNumber('id');
+        Route::delete('/beds/{id}', [HostelBedController::class, 'destroy'])->whereNumber('id');
 
-    Route::patch('/buildings/{id}/status', [
-        HostelBuildingController::class,
-        'toggleStatus'
-    ]);
+        // Students
+        Route::get('/students', [HostelStudentController::class, 'index']);
+        Route::get('/students/dropdowns', [HostelStudentController::class, 'dropdowns']);
+        Route::post('/students', [HostelStudentController::class, 'store']);
+        Route::get('/students/{id}', [HostelStudentController::class, 'show'])->whereNumber('id');
+        Route::put('/students/{id}', [HostelStudentController::class, 'update'])->whereNumber('id');
+        Route::delete('/students/{id}', [HostelStudentController::class, 'destroy'])->whereNumber('id');
 
-});
+        // Allocations
+        Route::get('/allocations', [HostelRoomAllocationController::class, 'index']);
+        Route::get('/allocations/dropdowns', [HostelRoomAllocationController::class, 'dropdowns']);
+        Route::post('/allocations', [HostelRoomAllocationController::class, 'store']);
+        Route::post('/allocations/{id}/vacate', [HostelRoomAllocationController::class, 'vacate'])->whereNumber('id');
+        Route::delete('/allocations/{id}', [HostelRoomAllocationController::class, 'destroy'])->whereNumber('id');
 
-Route::prefix('hostel')
-    ->group(function () {
+        // Transfers
+        Route::get('/transfers', [HostelRoomTransferController::class, 'index']);
+        Route::get('/transfers/dropdowns', [HostelRoomTransferController::class, 'dropdowns']);
+        Route::post('/transfers', [HostelRoomTransferController::class, 'store']);
+        Route::delete('/transfers/{id}', [HostelRoomTransferController::class, 'destroy'])->whereNumber('id');
+
+        // Fees
+        Route::get('/fees', [HostelFeeController::class, 'index']);
+        Route::get('/fees/students', [HostelFeeController::class, 'students']);
+        Route::post('/fees', [HostelFeeController::class, 'store']);
+        Route::post('/fees/{id}/collect', [HostelFeeController::class, 'collect'])->whereNumber('id');
+        Route::delete('/fees/{id}', [HostelFeeController::class, 'destroy'])->whereNumber('id');
+
+        // Attendance
+        Route::get('/attendances', [HostelAttendanceController::class, 'index']);
+        Route::post('/attendances', [HostelAttendanceController::class, 'store']);
+
+        // Complaints
+        Route::get('/complaints', [HostelComplaintController::class, 'index']);
+        Route::get('/complaints/dropdowns', [HostelComplaintController::class, 'dropdowns']);
+        Route::post('/complaints', [HostelComplaintController::class, 'store']);
+        Route::put('/complaints/{id}', [HostelComplaintController::class, 'update'])->whereNumber('id');
+        Route::delete('/complaints/{id}', [HostelComplaintController::class, 'destroy'])->whereNumber('id');
+
+        // Visitors
+        Route::get('/visitors', [HostelVisitorController::class, 'index']);
+        Route::get('/visitors/students', [HostelVisitorController::class, 'students']);
+        Route::post('/visitors', [HostelVisitorController::class, 'store']);
+        Route::post('/visitors/{id}/checkout', [HostelVisitorController::class, 'checkout'])->whereNumber('id');
+        Route::delete('/visitors/{id}', [HostelVisitorController::class, 'destroy'])->whereNumber('id');
+
+        // Reports
+        Route::get('/reports/occupancy', [HostelReportController::class, 'occupancy']);
+        Route::get('/reports/students', [HostelReportController::class, 'students']);
+        Route::get('/reports/fees', [HostelReportController::class, 'fees']);
+        Route::get('/reports/attendance', [HostelReportController::class, 'attendance']);
+        Route::get('/reports/complaints', [HostelReportController::class, 'complaints']);
+    });
 
     /*
-|--------------------------------------------------------------------------
-| HOSTEL ROOMS
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | Admin Admissions & Inquiries Management
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin/admissions')->group(function () {
+        Route::get('/applications', [AdminAdmissionController::class, 'index']);
+        Route::get('/applications/{id}', [AdminAdmissionController::class, 'show'])->whereNumber('id');
+        Route::post('/applications/{id}/status', [AdminAdmissionController::class, 'updateStatus'])->whereNumber('id');
+        Route::post('/applications/{id}/enroll', [AdminAdmissionController::class, 'enrollStudent'])->whereNumber('id');
+        Route::get('/inquiries', [AdminAdmissionController::class, 'inquiries']);
+        Route::post('/inquiries/{id}/status', [AdminAdmissionController::class, 'updateInquiryStatus'])->whereNumber('id');
+        Route::delete('/inquiries/{id}', [AdminAdmissionController::class, 'deleteInquiry'])->whereNumber('id');
+    });
 
-Route::get(
-    '/rooms/buildings',
-    [
-        HostelRoomController::class,
-        'buildings'
-    ]
-);
+    /*
+    |--------------------------------------------------------------------------
+    | Website Content Management (CMS)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin/website')->group(function () {
+        Route::get('/content', [WebsiteManagerController::class, 'getAll']);
+        Route::post('/content/{section}', [WebsiteManagerController::class, 'updateSection']);
+        Route::post('/content/{section}/reset', [WebsiteManagerController::class, 'resetSection']);
 
-Route::get(
-    '/rooms',
-    [
-        HostelRoomController::class,
-        'index'
-    ]
-);
+        Route::get('/notices', [WebsiteManagerController::class, 'noticesIndex']);
+        Route::post('/notices', [WebsiteManagerController::class, 'noticesStore']);
+        Route::put('/notices/{id}', [WebsiteManagerController::class, 'noticesUpdate'])->whereNumber('id');
+        Route::delete('/notices/{id}', [WebsiteManagerController::class, 'noticesDestroy'])->whereNumber('id');
+    });
 
-Route::post(
-    '/rooms',
-    [
-        HostelRoomController::class,
-        'store'
-    ]
-);
+    /*
+    |--------------------------------------------------------------------------
+    | Root SaaS Platform Website Content Management (CMS)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin/saas')->group(function () {
+        Route::get('/content', [SaasPlatformController::class, 'getAdminContent']);
+        Route::post('/content/{section}', [SaasPlatformController::class, 'updateSection']);
+        Route::post('/content/{section}/reset', [SaasPlatformController::class, 'resetSection']);
+    });
 
-Route::get(
-    '/rooms/{id}',
-    [
-        HostelRoomController::class,
-        'show'
-    ]
-)->whereNumber('id');
-
-Route::put(
-    '/rooms/{id}',
-    [
-        HostelRoomController::class,
-        'update'
-    ]
-)->whereNumber('id');
-
-Route::patch(
-    '/rooms/{id}/status',
-    [
-        HostelRoomController::class,
-        'toggleStatus'
-    ]
-)->whereNumber('id');
-
-Route::delete(
-    '/rooms/{id}',
-    [
-        HostelRoomController::class,
-        'destroy'
-    ]
-)->whereNumber('id');
-
+    /*
+    |--------------------------------------------------------------------------
+    | Student & Parent Portal API
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('portal')->group(function () {
+        Route::get('/dashboard', [StudentPortalController::class, 'dashboard']);
+        Route::get('/attendance', [StudentPortalController::class, 'attendance']);
+        Route::get('/timetable', [StudentPortalController::class, 'timetable']);
+        Route::get('/online-classes', [StudentPortalController::class, 'onlineClasses']);
+        Route::get('/fees', [StudentPortalController::class, 'fees']);
+        Route::get('/results', [StudentPortalController::class, 'results']);
+        Route::get('/library', [StudentPortalController::class, 'library']);
+        Route::get('/profile', [StudentPortalController::class, 'profile']);
     });
 
 });

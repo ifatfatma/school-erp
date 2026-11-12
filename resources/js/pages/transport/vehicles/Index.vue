@@ -1,5 +1,12 @@
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid py-2">
+        <AppBreadcrumb
+            :items="[
+                { label: 'Dashboard', to: '/' },
+                { label: 'Transport' },
+                { label: 'Vehicles' }
+            ]"
+        />
 
         <!-- HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -1135,12 +1142,12 @@
 
 <script setup>
 
-import {
-    onMounted,
+import { onMounted, onBeforeUnmount,
     ref
 } from 'vue';
 
 import axios from 'axios';
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue';
 
 
 /*
@@ -1297,6 +1304,10 @@ const getAuthConfig = () => {
         config.headers.Authorization =
             `Bearer ${token}`;
 
+    }
+    const activeSchoolId = localStorage.getItem('active_school_id');
+    if (activeSchoolId) {
+        config.headers['X-School-Id'] = activeSchoolId;
     }
 
 
@@ -2095,4 +2106,11 @@ onMounted(
     }
 );
 
+
+
+const onTenantChanged = () => { loadVehicles(1); };
+window.addEventListener('tenant-switched', onTenantChanged);
+if (typeof onBeforeUnmount === 'function') {
+    onBeforeUnmount(() => window.removeEventListener('tenant-switched', onTenantChanged));
+}
 </script>

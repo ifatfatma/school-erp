@@ -8,8 +8,30 @@ class TeacherRepository
 {
     public function paginate(array $filters = [])
     {
-        $query = Teacher::query()
-            ->where('school_id', auth()->user()->school_id);
+        $query = Teacher::query()->with('school:id,name,code');
+
+        $user = auth()->user();
+        $isSuperAdmin = $user && (
+            $user->user_type === 'super_admin' || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+            ($user->roles && $user->roles->contains('name', 'Super Admin'))
+        );
+
+        if (!$isSuperAdmin && $user && $user->school_id) {
+            $query->where('teachers.school_id', $user->school_id);
+        } else {
+            // Super Admin can filter by school_id or view all
+            if (isset($filters['school_id']) && $filters['school_id'] !== '') {
+                if ($filters['school_id'] === 'all' || $filters['school_id'] === '0') {
+                    $query->withoutGlobalScope(\App\Scopes\SchoolScope::class);
+                } else {
+                    $query->withoutGlobalScope(\App\Scopes\SchoolScope::class)
+                          ->where('teachers.school_id', $filters['school_id']);
+                }
+            } else {
+                $query->withoutGlobalScope(\App\Scopes\SchoolScope::class);
+            }
+        }
 
         if (!empty($filters['search'])) {
 
@@ -41,8 +63,21 @@ class TeacherRepository
 
     public function find(int $id): ?Teacher
     {
-        return Teacher::where('school_id', auth()->user()->school_id)
-            ->find($id);
+        $user = auth()->user();
+        $isSuperAdmin = $user && (
+            $user->user_type === 'super_admin' || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+            ($user->roles && $user->roles->contains('name', 'Super Admin'))
+        );
+
+        $query = Teacher::query()->with('school:id,name,code');
+        if (!$isSuperAdmin && $user && $user->school_id) {
+            $query->where('teachers.school_id', $user->school_id);
+        } else {
+            $query->withoutGlobalScope(\App\Scopes\SchoolScope::class);
+        }
+
+        return $query->find($id);
     }
 
     public function create(array $data): Teacher

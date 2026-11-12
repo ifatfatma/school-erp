@@ -24,6 +24,7 @@ class UserController extends Controller
         $query = User::query()
             ->with([
                 'roles:id,name,guard_name',
+                'school:id,name,code',
             ]);
 
         /*
@@ -65,20 +66,23 @@ class UserController extends Controller
         |
         | If the authenticated user has school_id,
         | restrict users to the same school.
+        | Super Admin can filter by school or see all schools.
         |
         */
 
         $authUser = $request->user();
+        $isSuperAdmin = $authUser && (
+            $authUser->user_type === 'super_admin' || 
+            (method_exists($authUser, 'hasRole') && ($authUser->hasRole('Super Admin') || $authUser->hasRole('super_admin'))) ||
+            ($authUser->roles && $authUser->roles->contains('name', 'Super Admin'))
+        );
 
-        if (
-            $authUser &&
-            !empty($authUser->school_id)
-        ) {
-
-            $query->where(
-                'school_id',
-                $authUser->school_id
-            );
+        if (!$isSuperAdmin && !empty($authUser->school_id)) {
+            $query->where('school_id', $authUser->school_id);
+        } else if ($isSuperAdmin && $request->filled('school_id')) {
+            if ($request->school_id !== 'all' && $request->school_id !== '0') {
+                $query->where('school_id', $request->school_id);
+            }
         }
 
         /*
@@ -96,9 +100,14 @@ class UserController extends Controller
                 )
             );
 
+        $allSchools = $isSuperAdmin 
+            ? \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']) 
+            : [];
+
         return response()->json([
             'success' => true,
             'data' => $users,
+            'all_schools' => $allSchools,
         ]);
     }
 
@@ -123,11 +132,23 @@ class UserController extends Controller
                 'guard_name',
             ]);
 
+        $authUser = $request->user();
+        $isSuperAdmin = $authUser && (
+            $authUser->user_type === 'super_admin' || 
+            (method_exists($authUser, 'hasRole') && ($authUser->hasRole('Super Admin') || $authUser->hasRole('super_admin'))) ||
+            ($authUser->roles && $authUser->roles->contains('name', 'Super Admin'))
+        );
+
+        $schools = $isSuperAdmin 
+            ? \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']) 
+            : [];
+
         return response()->json([
             'success' => true,
 
             'data' => [
                 'roles' => $roles,
+                'schools' => $schools,
             ],
         ]);
     }
@@ -147,6 +168,7 @@ class UserController extends Controller
         $query = User::query()
             ->with([
                 'roles:id,name,guard_name',
+                'school:id,name,code',
             ]);
 
         /*

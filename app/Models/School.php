@@ -2,9 +2,26 @@
 
 namespace App\Models;
 
-class School extends BaseModel
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+
+class School extends Model
 {
+    use HasFactory, SoftDeletes, LogsActivity;
+
     protected $table = 'schools';
+
+    protected $guarded = [];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
+    }
 
     protected $fillable = [
         'name',
@@ -18,13 +35,29 @@ class School extends BaseModel
         'postal_code',
         'logo',
         'status',
+        'subscription_plan',
+        'subscription_status',
+        'subscription_expires_at',
+        'subscription_features',
     ];
 
     protected function casts(): array
     {
         return [
             'status' => 'boolean',
+            'subscription_features' => 'array',
+            'subscription_expires_at' => 'datetime',
         ];
+    }
+
+    public function canAccessFeature(string $feature): bool
+    {
+        return \App\Services\SubscriptionPlanService::canAccessFeature($this, $feature);
+    }
+
+    public function getActiveFeatures(): array
+    {
+        return \App\Services\SubscriptionPlanService::getSchoolFeatures($this);
     }
 
     /*

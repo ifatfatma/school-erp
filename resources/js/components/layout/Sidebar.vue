@@ -13,13 +13,36 @@
                 v-if="!collapsed"
                 class="brand d-flex align-items-center"
             >
-                <div class="brand-icon">
-                    <i class="bi bi-mortarboard-fill"></i>
+                <div class="brand-icon d-flex align-items-center justify-content-center">
+                    <img
+                        v-if="schoolLogo"
+                        :src="schoolLogo"
+                        alt="Logo"
+                        class="rounded"
+                        style="width: 32px; height: 32px; object-fit: contain; background: rgba(255,255,255,0.15); padding: 2px;"
+                        @error="logoError = true"
+                    />
+                    <i v-else class="bi bi-mortarboard-fill"></i>
                 </div>
 
-                <span class="brand-text ms-2">
-                    School ERP
+                <span class="brand-text ms-2 text-truncate" style="max-width: 150px;" :title="schoolName">
+                    {{ schoolName }}
                 </span>
+            </div>
+            <div
+                v-else
+                class="brand-icon mx-auto d-flex align-items-center justify-content-center"
+                :title="schoolName"
+            >
+                <img
+                    v-if="schoolLogo"
+                    :src="schoolLogo"
+                    alt="Logo"
+                    class="rounded"
+                    style="width: 28px; height: 28px; object-fit: contain; background: rgba(255,255,255,0.15); padding: 2px;"
+                    @error="logoError = true"
+                />
+                <i v-else class="bi bi-mortarboard-fill"></i>
             </div>
 
             <button
@@ -187,7 +210,8 @@ import {
     computed,
     ref,
     watch,
-    onMounted
+    onMounted,
+    onUnmounted
 } from "vue";
 
 import {
@@ -197,6 +221,10 @@ import {
 import {
     useAuthStore
 } from "@/stores/auth";
+
+import {
+    useTenantStore
+} from "@/stores/tenant";
 
 import menu from "@/menu";
 
@@ -238,6 +266,23 @@ const emit = defineEmits([
 */
 
 const auth = useAuthStore();
+const tenantStore = useTenantStore();
+
+const logoError = ref(false);
+
+const schoolLogo = computed(() => {
+    if (logoError.value) return null;
+    const l = tenantStore.currentTenant?.logo || auth.user?.school?.logo;
+    if (!l || l === "[]" || l.endsWith("/[]") || l === "null") return null;
+    return l;
+});
+
+const schoolName = computed(() => {
+    if (tenantStore.isGlobal || tenantStore.activeSchoolId === "all") {
+        return "Global / All Schools";
+    }
+    return tenantStore.currentTenant?.name || auth.user?.school?.name || "School ERP";
+});
 
 const route = useRoute();
 
@@ -316,6 +361,39 @@ function closeMobile() {
 */
 
 function canAccess(item) {
+    const isSuperAdminUser = auth.user?.user_type === 'super_admin'
+        || auth.user?.roles?.some(r => r.name === 'Super Admin');
+
+    // Super Admin has unrestricted platform-wide visibility into all modules
+    if (isSuperAdminUser) {
+        return true;
+    }
+
+    if (item.superAdminOnly) {
+        return false;
+    }
+
+    const activeSchool = auth.user?.school;
+
+    // Subscription plan feature gating for tenant schools
+    if (item.feature) {
+        if (!activeSchool) {
+            return false;
+        }
+
+        const features = activeSchool.features;
+        if (Array.isArray(features)) {
+            if (!features.includes(item.feature)) {
+                return false;
+            }
+        } else {
+            const plan = (activeSchool.subscription_plan || 'starter').toLowerCase();
+            const upperFeatures = ['hostel', 'library', 'transport', 'inventory', 'website_cms', 'online_admissions', 'custom_domain', 'multi_branch'];
+            if ((plan === 'starter' || plan === 'basic') && upperFeatures.includes(item.feature)) {
+                return false;
+            }
+        }
+    }
 
     if (!item.permission) {
         return true;
@@ -325,7 +403,6 @@ function canAccess(item) {
         auth.user,
         item.permission
     );
-
 }
 
 
@@ -336,54 +413,33 @@ function canAccess(item) {
 */
 
 const filteredMenu = computed(() => {
-
     return menu
-
+        .filter(item => canAccess(item))
         .map(item => {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Parent menu
-            |--------------------------------------------------------------------------
-            */
-
             if (item.children) {
-
-                const children =
-                    item.children.filter(child =>
-                        canAccess(child)
-                    );
+                const children = item.children.filter(child => {
+                    const effectiveChild = {
+                        ...child,
+                        feature: child.feature || item.feature,
+                        superAdminOnly: child.superAdminOnly ?? item.superAdminOnly,
+                    };
+                    return canAccess(effectiveChild);
+                });
 
                 return {
                     ...item,
                     children
                 };
-
             }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Single menu
-            |--------------------------------------------------------------------------
-            */
 
             return item;
-
         })
-
         .filter(item => {
-
             if (item.children) {
-
                 return item.children.length > 0;
-
             }
-
-            return canAccess(item);
-
+            return true;
         });
-
 });
 
 
@@ -494,10 +550,32 @@ watch(
 );
 
 
+function handleSchoolLogoUpdated() {
+    logoError.value = false;
+}
+
+function handleTenantSwitched(e) {
+    logoError.value = false;
+    if (e.detail?.school) {
+        tenantStore.currentTenant = e.detail.school;
+        tenantStore.activeSchoolId = String(e.detail.school.id);
+        tenantStore.isGlobal = false;
+    } else if (e.detail?.school_id === 'all') {
+        tenantStore.currentTenant = null;
+        tenantStore.activeSchoolId = 'all';
+        tenantStore.isGlobal = true;
+    }
+}
+
 onMounted(() => {
-
     openActiveMenus();
+    window.addEventListener('school-logo-updated', handleSchoolLogoUpdated);
+    window.addEventListener('tenant-switched', handleTenantSwitched);
+});
 
+onUnmounted(() => {
+    window.removeEventListener('school-logo-updated', handleSchoolLogoUpdated);
+    window.removeEventListener('tenant-switched', handleTenantSwitched);
 });
 
 

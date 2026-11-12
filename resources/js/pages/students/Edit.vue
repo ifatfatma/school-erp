@@ -8,6 +8,7 @@ import { useStudentStore } from "@/stores/student";
 import { useClassStore } from "@/stores/class";
 import { useSectionStore } from "@/stores/section";
 import { useAcademicSessionStore } from "@/stores/academicSession";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -186,6 +187,13 @@ function cancel() {
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Students', to: { name: 'students.index' } },
+            { label: 'Edit Student' }
+        ]"
+    />
 
             <Form
                 :form="form"

@@ -25,9 +25,24 @@ class ExamController extends Controller
      */
     public function index(Request $request)
     {
-        return ExamResource::collection(
+        $user = $request->user();
+        $isSuperAdmin = $user && (
+            $user->user_type === 'super_admin' || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+            ($user->roles && $user->roles->contains('name', 'Super Admin'))
+        );
+
+        $resource = ExamResource::collection(
             $this->service->paginate($request->all())
         );
+
+        if ($isSuperAdmin) {
+            $resource->additional([
+                'all_schools' => \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']),
+            ]);
+        }
+
+        return $resource;
     }
 
     /**

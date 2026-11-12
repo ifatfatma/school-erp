@@ -85,6 +85,13 @@ onMounted(async () => {
 
     ]);
 
+    if (!form.academic_session_id && AcademicSessionStore.sessions.length > 0) {
+        const currentSession = AcademicSessionStore.sessions.find(s => s.is_current) || AcademicSessionStore.sessions[0];
+        if (currentSession) {
+            form.academic_session_id = currentSession.id;
+        }
+    }
+
 });
 
 async function submit() {

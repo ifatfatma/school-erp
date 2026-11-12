@@ -1,6 +1,13 @@
 <template>
 
-<div class="container-fluid">
+<div class="container-fluid py-2">
+
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Academic Sessions' }
+        ]"
+    />
 
     <div class="d-flex justify-content-between mb-3">
 
@@ -91,6 +98,7 @@
 <script setup>
 
 import { onMounted } from "vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 import { useAcademicSessionStore } from "@/stores/academicSession";
 

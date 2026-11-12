@@ -60,7 +60,10 @@ class ExamService
             ]);
         }
 
-        $data['school_id'] = Auth::user()->school_id;
+        $tenantId = app(\App\Services\TenantManager::class)->getTenantId();
+        $session = !empty($data['academic_session_id']) ? \App\Models\AcademicSession::withoutGlobalScopes()->find($data['academic_session_id']) : null;
+        $schoolId = !empty($data['school_id']) ? (int) $data['school_id'] : ($tenantId ?: ($session?->school_id ?: (Auth::user()?->school_id ?: 1)));
+        $data['school_id'] = $schoolId;
         $data['created_by'] = Auth::id();
 
         return $this->repository->create($data);

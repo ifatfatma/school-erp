@@ -18,12 +18,24 @@ class SectionResource extends JsonResource
 
             'school_id' => $this->school_id,
 
+            'school_name' => $this->school?->name,
+
+            'school_code' => $this->school?->code,
+
+            'school' => $this->school ? [
+                'id' => $this->school->id,
+                'name' => $this->school->name,
+                'code' => $this->school->code,
+            ] : null,
+
             'class_id' => $this->class_id,
 
-            'class_name' => $this->whenLoaded(
-                'class',
-                fn () => $this->class->name
-            ),
+            'class_name' => $this->class?->name,
+
+            'class' => $this->class ? [
+                'id' => $this->class->id,
+                'name' => $this->class->name,
+            ] : null,
 
             'name' => $this->name,
 

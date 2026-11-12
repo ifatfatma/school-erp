@@ -330,6 +330,13 @@ class PermissionSeeder extends Seeder
             |--------------------------------------------------------------------------
             */
 
+            'library_dashboard.view',
+
+            'book_categories.view',
+            'book_categories.create',
+            'book_categories.update',
+            'book_categories.delete',
+
             'authors.view',
             'authors.create',
             'authors.update',
@@ -383,6 +390,10 @@ class PermissionSeeder extends Seeder
             'library_fines.update',
             'library_fines.delete',
             'library_fines.collect',
+
+            'fine_collections.view',
+            'fine_collections.create',
+            'fine_collections.delete',
 
             'library_reports.view',
             'library_reports.export',
@@ -502,6 +513,8 @@ class PermissionSeeder extends Seeder
             |--------------------------------------------------------------------------
             */
 
+            'hostel_dashboard.view',
+
             'hostel.view',
             'hostel.create',
             'hostel.update',
@@ -511,6 +524,11 @@ class PermissionSeeder extends Seeder
             'hostel_buildings.create',
             'hostel_buildings.update',
             'hostel_buildings.delete',
+
+            'hostel_floors.view',
+            'hostel_floors.create',
+            'hostel_floors.update',
+            'hostel_floors.delete',
 
             'hostel_rooms.view',
             'hostel_rooms.create',
@@ -527,6 +545,15 @@ class PermissionSeeder extends Seeder
             'hostel_students.update',
             'hostel_students.delete',
 
+            'hostel_allocations.view',
+            'hostel_allocations.create',
+            'hostel_allocations.vacate',
+            'hostel_allocations.delete',
+
+            'hostel_transfers.view',
+            'hostel_transfers.create',
+            'hostel_transfers.delete',
+
             'hostel_fees.view',
             'hostel_fees.create',
             'hostel_fees.update',
@@ -537,6 +564,16 @@ class PermissionSeeder extends Seeder
             'hostel_attendance.create',
             'hostel_attendance.update',
             'hostel_attendance.delete',
+
+            'hostel_complaints.view',
+            'hostel_complaints.create',
+            'hostel_complaints.update',
+            'hostel_complaints.delete',
+
+            'hostel_visitors.view',
+            'hostel_visitors.create',
+            'hostel_visitors.checkout',
+            'hostel_visitors.delete',
 
             'hostel_expenses.view',
             'hostel_expenses.create',
@@ -610,6 +647,29 @@ class PermissionSeeder extends Seeder
             'settings.update',
             'settings.delete',
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | ADMISSIONS & WEBSITE
+            |--------------------------------------------------------------------------
+            */
+
+            'online_admissions.view',
+            'online_admissions.manage',
+            'online_admissions.enroll',
+            'online_admissions.delete',
+
+            'website_inquiries.view',
+            'website_inquiries.manage',
+            'website_inquiries.delete',
+
+            'website_settings.view',
+            'website_settings.manage',
+
+            'notices.view',
+            'notices.create',
+            'notices.update',
+            'notices.delete',
 
             /*
             |--------------------------------------------------------------------------

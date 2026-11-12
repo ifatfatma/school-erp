@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class HostelBuilding extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToSchool;
 
     protected $table = 'hostel_buildings';
 
     protected $fillable = [
         'school_id',
+        'hostel_id',
         'name',
         'code',
         'building_type',
@@ -29,6 +32,7 @@ class HostelBuilding extends Model
 
     protected $casts = [
         'school_id'    => 'integer',
+        'hostel_id'    => 'integer',
         'total_floors' => 'integer',
         'total_rooms'  => 'integer',
         'total_beds'   => 'integer',
@@ -38,6 +42,19 @@ class HostelBuilding extends Model
     public function school()
     {
         return $this->belongsTo(School::class);
+    }
+
+    public function hostel()
+    {
+        return $this->belongsTo(Hostel::class, 'hostel_id');
+    }
+
+    public function floors()
+    {
+        return $this->hasMany(
+            HostelFloor::class,
+            'hostel_building_id'
+        );
     }
 
     public function rooms()

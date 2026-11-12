@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 
 class InventoryDashboardController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
     public function index(Request $request)
@@ -20,7 +20,7 @@ class InventoryDashboardController extends Controller
         $schoolId = $this->schoolId();
 
         $query = InventoryItem::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->with([
                 'category:id,name',
                 'unit:id,name',

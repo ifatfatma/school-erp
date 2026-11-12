@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import Form from "./Form.vue";
 import AppButton from "@/components/ui/AppButton.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { useSectionStore } from "@/stores/section";
 
 const route = useRoute();
@@ -48,6 +49,15 @@ onMounted(load);
 </script>
 
 <template>
+<div class="container-fluid py-2">
+
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Sections', to: { name: 'sections.index' } },
+            { label: 'Edit' }
+        ]"
+    />
 
     <Form
         :form="form"
@@ -62,4 +72,5 @@ onMounted(load);
         />
     </div>
 
+</div>
 </template>

@@ -20,7 +20,24 @@ class SchoolClassController extends Controller
      */
     public function index(Request $request)
     {
-        $query = SchoolClass::query();
+        $query = SchoolClass::query()->with('school:id,name,code');
+
+        $authUser = $request->user();
+        $isSuperAdmin = $authUser && (
+            $authUser->user_type === 'super_admin' || 
+            (method_exists($authUser, 'hasRole') && ($authUser->hasRole('Super Admin') || $authUser->hasRole('super_admin'))) ||
+            ($authUser->roles && $authUser->roles->contains('name', 'Super Admin'))
+        );
+
+        // School Filter (for Super Admin)
+        if ($isSuperAdmin) {
+            if ($request->filled('school_id') && $request->school_id !== 'all' && $request->school_id !== '0') {
+                $query->withoutGlobalScope(\App\Scopes\SchoolScope::class)
+                      ->where('school_id', $request->school_id);
+            } else {
+                $query->withoutGlobalScope(\App\Scopes\SchoolScope::class);
+            }
+        }
 
         // Search
         if ($request->filled('search')) {
@@ -47,6 +64,12 @@ class SchoolClassController extends Controller
             $request->get('per_page', 10)
         );
         Log::info($classes);
+
+        if ($isSuperAdmin) {
+            $data = $classes->toArray();
+            $data['all_schools'] = \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']);
+            return response()->json($data);
+        }
 
         return response()->json($classes);
     }
@@ -93,6 +116,8 @@ class SchoolClassController extends Controller
      */
     public function show(SchoolClass $class)
     {
+        $class->load('sections')->loadCount(['sections', 'students']);
+
         return response()->json([
             'success' => true,
             'data' => $class

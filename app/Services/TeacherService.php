@@ -38,7 +38,22 @@ class TeacherService
 
         return DB::transaction(function () use ($data) {
 
-            $data['school_id'] = auth()->user()->school_id;
+            $user = auth()->user();
+            $isSuperAdmin = $user && (
+                $user->user_type === 'super_admin' || 
+                (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+                ($user->roles && $user->roles->contains('name', 'Super Admin'))
+            );
+
+            if (!$isSuperAdmin && $user && $user->school_id) {
+                $data['school_id'] = $user->school_id;
+            } else {
+                if (empty($data['school_id'])) {
+                    $data['school_id'] = app(\App\Services\TenantManager::class)->getTenantId()
+                        ?? \App\Models\School::first()?->id
+                        ?? 1;
+                }
+            }
             $data['created_by'] = auth()->id();
 
             if (

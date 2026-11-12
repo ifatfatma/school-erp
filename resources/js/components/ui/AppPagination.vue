@@ -94,6 +94,7 @@ import { computed } from 'vue'
 
 const props = defineProps({
     pagination: Object,
+    meta: Object,
 
     currentPage: Number,
     lastPage: Number,
@@ -104,15 +105,17 @@ const props = defineProps({
     }
 })
 
+const pag = computed(() => props.pagination || props.meta)
+
 const currentPage = computed(() =>
-    props.pagination
-        ? props.pagination.current_page
+    pag.value
+        ? pag.value.current_page
         : props.currentPage
 )
 
 const lastPage = computed(() =>
-    props.pagination
-        ? props.pagination.last_page
+    pag.value
+        ? pag.value.last_page
         : props.lastPage
 )
 

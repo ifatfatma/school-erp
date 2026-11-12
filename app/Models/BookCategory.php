@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BookCategory extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToSchool;
 
     protected $fillable = [
 
@@ -71,7 +73,8 @@ class BookCategory extends Model
     public function books()
     {
         return $this->hasMany(
-            Book::class
+            Book::class,
+            'category_id'
         );
     }
 

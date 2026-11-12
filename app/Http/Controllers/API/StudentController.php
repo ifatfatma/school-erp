@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
 use App\Http\Resources\StudentResource;
+use App\Models\School;
 use App\Models\Student;
 use App\Services\StudentService;
 use Illuminate\Http\Request;
@@ -31,7 +32,21 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
+        $user = $request->user();
+        $isSuperAdmin = $user && (
+            $user->user_type === 'super_admin' || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+            ($user->roles && $user->roles->contains('name', 'Super Admin'))
+        );
+
+        $schoolId = $request->input('school_id');
+        // When Super Admin requests without an explicit school_id, default to 'all' so they can see all schools
+        if ($isSuperAdmin && ($schoolId === null || $schoolId === '' || $schoolId === 'all')) {
+            $schoolId = 'all';
+        }
+
         $students = $this->service->paginate([
+            'school_id'  => $schoolId,
             'search'     => $request->search,
             'class_id'   => $request->class_id,
             'section_id' => $request->section_id,
@@ -39,7 +54,15 @@ class StudentController extends Controller
             'per_page'   => $request->per_page ?? 15,
         ]);
 
-        return StudentResource::collection($students);
+        $resource = StudentResource::collection($students);
+
+        if ($isSuperAdmin) {
+            $resource->additional([
+                'all_schools' => School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']),
+            ]);
+        }
+
+        return $resource;
     }
 
     /**

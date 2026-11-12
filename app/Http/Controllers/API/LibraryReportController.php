@@ -24,7 +24,7 @@ class LibraryReportController extends Controller
 
     protected function schoolId()
     {
-        return auth()->user()->school_id;
+        return (app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id);
     }
 
 
@@ -178,7 +178,7 @@ class LibraryReportController extends Controller
 
    public function issuedBooks(Request $request)
 {
-    $schoolId = auth()->user()->school_id;
+    $schoolId = app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id;
 
     $query = BookIssue::query()
         ->where('school_id', $schoolId);
@@ -350,7 +350,7 @@ class LibraryReportController extends Controller
 
     public function returnedBooks(Request $request)
 {
-    $schoolId = auth()->user()->school_id;
+    $schoolId = app(\App\Services\TenantManager::class)->getTenantId() ?? auth()->user()?->school_id;
 
     $query = BookIssue::query()
         ->where('school_id', $schoolId)

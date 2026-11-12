@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Validator;
 
 class TransportDriverController extends Controller
 {
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
     public function index(Request $request)

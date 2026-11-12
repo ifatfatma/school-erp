@@ -1,74 +1,101 @@
+
 <script setup>
-import { reactive, onMounted } from "vue";
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
+import axios from "@/api/axios";
 
 import AppTable from "@/components/ui/AppTable.vue";
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 import { useExamStore } from "@/stores/exam";
 import { useAcademicSessionStore } from "@/stores/academicSession";
 import { useExamTypeStore } from "@/stores/examType";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const examStore = useExamStore();
 const sessionStore = useAcademicSessionStore();
 const examTypeStore = useExamTypeStore();
 
-const filters = reactive({
-
-    search: "",
-
-    academic_session_id: "",
-
-    exam_type_id: "",
-
-    status: "",
-
-    page: 1,
-
-    per_page: 15,
-
+const isSuperAdmin = computed(() => {
+    const u = authStore.user;
+    return u?.user_type === 'super_admin' || u?.roles?.some(r => {
+        const name = typeof r === 'string' ? r : (r.name || '');
+        return name.toLowerCase() === 'super admin' || name.toLowerCase() === 'super_admin';
+    });
 });
 
-const columns = [
+const allSchools = ref([]);
 
-    { key: "name", label: "Exam" },
+const filters = reactive({
+    search: "",
+    school_id: "",
+    academic_session_id: "",
+    exam_type_id: "",
+    status: "",
+    page: 1,
+    per_page: 15,
+});
 
-    { key: "code", label: "Code" },
+const columns = computed(() => {
+    const cols = [
+        { key: "name", label: "Exam" },
+        { key: "code", label: "Code" },
+    ];
 
-    { key: "academic_session", label: "Academic Session" },
+    if (isSuperAdmin.value) {
+        cols.push({ key: "school", label: "School / Campus" });
+    }
 
-    { key: "exam_type", label: "Exam Type" },
+    cols.push(
+        { key: "academic_session", label: "Academic Session" },
+        { key: "exam_type", label: "Exam Type" },
+        { key: "start_date", label: "Start Date" },
+        { key: "end_date", label: "End Date" },
+        { key: "marks", label: "Marks" },
+        { key: "result", label: "Result" },
+        { key: "status", label: "Status" },
+        { key: "action", label: "Action" }
+    );
 
-    { key: "start_date", label: "Start Date" },
+    return cols;
+});
 
-    { key: "end_date", label: "End Date" },
+async function loadSchools() {
+    if (isSuperAdmin.value) {
+        try {
+            const res = await axios.get('/tenants');
+            if (res.data?.data?.length) {
+                allSchools.value = res.data.data;
+            }
+        } catch (e) {}
+    }
+}
 
-    { key: "marks", label: "Marks" },
-
-    { key: "result", label: "Result" },
-
-    { key: "status", label: "Status" },
-
-    { key: "action", label: "Action" },
-
-];
+function handleTenantSwitched() {
+    load();
+}
 
 onMounted(async () => {
-
+    if (!authStore.user && authStore.token) {
+        await authStore.loadProfile();
+    }
     await Promise.all([
-
+        loadSchools(),
         load(),
-
         sessionStore.load({ per_page: 1000 }),
-
         examTypeStore.fetch({
             per_page: 1000,
             status: 1
         })
-
     ]);
+    window.addEventListener("tenant-switched", handleTenantSwitched);
+});
 
+onBeforeUnmount(() => {
+    window.removeEventListener("tenant-switched", handleTenantSwitched);
 });
 
 async function load(page = 1) {
@@ -82,6 +109,8 @@ async function load(page = 1) {
 function reset() {
 
     filters.search = "";
+
+    filters.school_id = "";
 
     filters.academic_session_id = "";
 
@@ -155,6 +184,15 @@ async function unpublish(item) {
 
 <template>
 
+<div class="container-fluid py-2">
+
+<AppBreadcrumb
+    :items="[
+        { label: 'Dashboard', to: '/' },
+        { label: 'Examinations' }
+    ]"
+/>
+
 <div class="card shadow-sm">
 
 <div class="card-header d-flex justify-content-between align-items-center">
@@ -180,7 +218,29 @@ Add Exam
 
 <div class="card-body">
 
-<div class="row g-3 mb-3">
+<div class="row g-2 mb-3">
+
+<div class="col-md-2" v-if="isSuperAdmin">
+    <div class="input-group">
+        <span class="input-group-text bg-light border-end-0 text-primary">
+            <i class="bi bi-buildings"></i>
+        </span>
+        <select
+            v-model="filters.school_id"
+            class="form-select border-start-0 fw-semibold"
+            @change="load(1)"
+        >
+            <option value="">All Schools</option>
+            <option
+                v-for="s in allSchools"
+                :key="'ex-sch-' + s.id"
+                :value="s.id"
+            >
+                {{ s.name }} ({{ s.code }})
+            </option>
+        </select>
+    </div>
+</div>
 
 <div class="col-md-2">
 
@@ -313,6 +373,13 @@ Reset
 
 >
 
+<template #school="{ item }">
+    <span v-if="item.school" class="badge bg-light text-dark border">
+        <i class="bi bi-building me-1"></i>{{ item.school.name }} ({{ item.school.code }})
+    </span>
+    <span v-else class="text-muted small">Global</span>
+</template>
+
 <template #academic_session="{ item }">
 
 {{ item.academic_session?.name }}
@@ -431,6 +498,8 @@ Unpublish
 </template>
 
 </AppTable>
+
+</div>
 
 </div>
 

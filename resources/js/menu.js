@@ -25,6 +25,14 @@ export default [
     },
 
     {
+        title: "Root Website CMS",
+        icon: "bi bi-globe-americas",
+        route: "/admin/root-website/manager",
+        permission: "website_settings.view",
+        superAdminOnly: true,
+    },
+
+    {
         title: "Academic",
         icon: "bi bi-book",
         children: [
@@ -47,6 +55,12 @@ export default [
                 title: "Timetables",
                 route: "/timetables",
                 permission: "timetable.view",
+            },
+            {
+                title: "Online Classes",
+                route: "/online-classes",
+                permission: "online_classes.view",
+                feature: "online_classes",
             },
         ],
     },
@@ -74,6 +88,31 @@ export default [
                 title: "Promotions",
                 route: "/student-promotions",
                 permission: "promotion.view",
+            },
+        ],
+    },
+
+    {
+        title: "Admissions & School Web",
+        icon: "bi bi-file-earmark-person",
+        children: [
+            {
+                title: "Applications",
+                route: "/admin/admissions/applications",
+                permission: "online_admissions.view",
+                feature: "online_admissions",
+            },
+            {
+                title: "Website Inquiries",
+                route: "/admin/admissions/inquiries",
+                permission: "website_inquiries.view",
+                feature: "online_admissions",
+            },
+            {
+                title: "School Website CMS",
+                route: "/admin/website/manager",
+                permission: "website_settings.view",
+                feature: "website_cms",
             },
         ],
     },
@@ -136,12 +175,7 @@ export default [
             {
                 title: "Grades",
                 route: "/grades",
-                permission: "grade.view",
-            },
-            {
-                title: "Result Grades",
-                route: "/result-grades",
-                permission: "result_grades.view",
+                permission: "grade.view, result_grades.view",
             },
             {
                 title: "Report Cards",
@@ -271,7 +305,18 @@ export default [
     {
         title: "Library",
         icon: "bi bi-journal-bookmark",
+        feature: "library",
         children: [
+                {
+                    title: "Dashboard",
+                    route: "/library/dashboard",
+                    permission: "library_dashboard.view",
+                },
+                {
+                    title: "Book Categories",
+                    route: "/book-categories",
+                    permission: "book_categories.view",
+                },
                 {
                     title: "Authors",
                     route: "/authors",
@@ -315,6 +360,10 @@ export default [
                     title: 'Library Fines',
                     route: '/library-fines',
                     permission: "library_fines.view",
+                },{
+                    title: 'Fine Collection',
+                    route: '/fine-collections',
+                    permission: "fine_collections.view",
                 },{
                     title: 'Library Reports',
                     route: '/library-reports',
@@ -375,6 +424,7 @@ export default [
     {
         title: "Transport",
         icon: "bi bi-bus-front",
+        feature: "transport",
         children: [
                 {
                 title: "Vehicles",
@@ -425,17 +475,78 @@ export default [
    {
         title: "Hostel",
         icon: "bi bi-house-door",
+        feature: "hostel",
         children: [
-                {
-                    title: "Buildings",
-                    route: "/hostel/buildings",
-                    permission: "hostel_buildings.view",
-                },
-                {
-                    title: 'Rooms',
-                    route: '/hostel/rooms',
-                    permission: 'hostel_rooms.view'
-                }
+            {
+                title: "Dashboard",
+                route: "/hostel/dashboard",
+                permission: "hostel_dashboard.view",
+            },
+            {
+                title: "Hostels",
+                route: "/hostel/hostels",
+                permission: "hostel.view",
+            },
+            {
+                title: "Buildings",
+                route: "/hostel/buildings",
+                permission: "hostel_buildings.view",
+            },
+            {
+                title: "Floors",
+                route: "/hostel/floors",
+                permission: "hostel_floors.view",
+            },
+            {
+                title: "Rooms",
+                route: "/hostel/rooms",
+                permission: "hostel_rooms.view",
+            },
+            {
+                title: "Beds",
+                route: "/hostel/beds",
+                permission: "hostel_beds.view",
+            },
+            {
+                title: "Hostel Students",
+                route: "/hostel/students",
+                permission: "hostel_students.view",
+            },
+            {
+                title: "Room Allocation",
+                route: "/hostel/allocations",
+                permission: "hostel_allocations.view",
+            },
+            {
+                title: "Room Transfer",
+                route: "/hostel/transfers",
+                permission: "hostel_transfers.view",
+            },
+            {
+                title: "Hostel Fees",
+                route: "/hostel/fees",
+                permission: "hostel_fees.view",
+            },
+            {
+                title: "Hostel Attendance",
+                route: "/hostel/attendance",
+                permission: "hostel_attendance.view",
+            },
+            {
+                title: "Complaints",
+                route: "/hostel/complaints",
+                permission: "hostel_complaints.view",
+            },
+            {
+                title: "Visitors",
+                route: "/hostel/visitors",
+                permission: "hostel_visitors.view",
+            },
+            {
+                title: "Hostel Reports",
+                route: "/hostel/reports",
+                permission: "hostel_reports.view",
+            },
         ]
    },
     {

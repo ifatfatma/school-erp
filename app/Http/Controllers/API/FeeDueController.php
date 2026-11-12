@@ -10,18 +10,26 @@ class FeeDueController extends Controller
 {
     public function index(Request $request)
     {
+        $isSuperAdmin = $this->isSuperAdmin($request);
+        $schoolId = $this->resolveSchoolId($request);
+
         $query = StudentFeeDue::query()
-            ->where(
-                'school_id',
-                auth()->user()->school_id
-            )
             ->with([
                 'student',
                 'student.class',
                 'student.section',
                 'feeType',
                 'feeStructure',
+                'school:id,name,code',
             ]);
+
+        if ($request->input('school_id') === 'all') {
+            // all schools
+        } elseif ($schoolId !== null) {
+            $query->where('school_id', $schoolId);
+        } elseif (!$isSuperAdmin && auth()->user()?->school_id) {
+            $query->where('school_id', auth()->user()->school_id);
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -178,14 +186,16 @@ class FeeDueController extends Controller
                 $request->get('per_page', 20)
             );
 
-
-        return response()->json([
-
+        $response = [
             'success' => true,
-
             'data' => $dues,
+        ];
 
-        ]);
+        if ($isSuperAdmin) {
+            $response['all_schools'] = \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']);
+        }
+
+        return response()->json($response);
     }
 
 
@@ -197,11 +207,13 @@ class FeeDueController extends Controller
 
     public function summary(Request $request)
     {
-        $query = StudentFeeDue::query()
-            ->where(
-                'school_id',
-                auth()->user()->school_id
-            );
+        $schoolId = $this->resolveSchoolId($request);
+
+        $query = StudentFeeDue::query();
+
+        if ($schoolId !== null) {
+            $query->where('school_id', $schoolId);
+        }
 
 
         if ($request->filled('academic_session_id')) {

@@ -59,6 +59,7 @@
 
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 import useClass from '@/composables/useSchoolClass'
 
@@ -95,7 +96,11 @@ async function save(){
 
         await createItem(form)
 
-        alert('Class created successfully.')
+        await Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Class created successfully.'
+        })
 
         router.push({
             name:'classes.index'

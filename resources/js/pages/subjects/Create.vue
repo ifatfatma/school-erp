@@ -1,5 +1,13 @@
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid py-2">
+
+        <AppBreadcrumb
+            :items="[
+                { label: 'Dashboard', to: '/' },
+                { label: 'Subjects', to: { name: 'subjects.index' } },
+                { label: 'Create' }
+            ]"
+        />
 
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -175,6 +183,7 @@
 import { reactive, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
+import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
 
 import { useSubject } from '@/composables/useSubject'
 

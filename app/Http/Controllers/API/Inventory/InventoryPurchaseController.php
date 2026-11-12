@@ -19,9 +19,9 @@ class InventoryPurchaseController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    protected function schoolId()
+    protected function schoolId(?\Illuminate\Http\Request $request = null): ?int
     {
-        return auth()->user()->school_id;
+        return $this->resolveSchoolId($request);
     }
 
 
@@ -36,7 +36,7 @@ class InventoryPurchaseController extends Controller
         $schoolId = $this->schoolId();
 
         $query = InventoryPurchase::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->with([
                 'supplier:id,name',
             ]);
@@ -178,7 +178,7 @@ class InventoryPurchaseController extends Controller
 
 
         $suppliers = InventorySupplier::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('status', true)
             ->orderBy('name')
             ->get([
@@ -189,7 +189,7 @@ class InventoryPurchaseController extends Controller
 
 
         $items = InventoryItem::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where('status', true)
             ->with([
                 'unit:id,name,code',
@@ -234,7 +234,7 @@ class InventoryPurchaseController extends Controller
 
 
         $lastPurchase = InventoryPurchase::query()
-            ->where('school_id', $schoolId)
+            ->when($schoolId, fn($q, $id) => $q->where('school_id', $id))
             ->where(
                 'purchase_no',
                 'like',

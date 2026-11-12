@@ -48,6 +48,25 @@ class StoreTimetableRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        $start = $this->start_time;
+        $end = $this->end_time;
+
+        if ($start && strlen($start) >= 8) {
+            $start = substr($start, 0, 5);
+        }
+        if ($end && strlen($end) >= 8) {
+            $end = substr($end, 0, 5);
+        }
+
+        $this->merge([
+            'start_time' => $start,
+            'end_time'   => $end,
+            'status'     => filter_var($this->status, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
+        ]);
+    }
+
     public function attributes(): array
     {
         return [

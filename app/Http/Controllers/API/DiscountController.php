@@ -45,12 +45,26 @@ class DiscountController extends Controller
                 'min:1',
                 'max:100',
             ],
+            'school_id' => [
+                'nullable',
+            ],
         ]);
 
-        return response()->json([
+        $schoolId = $this->resolveSchoolId($request);
+        if ($schoolId !== null) {
+            $filters['school_id'] = $schoolId;
+        }
+
+        $response = [
             'success' => true,
             'data' => $this->service->list($filters),
-        ]);
+        ];
+
+        if ($this->isSuperAdmin($request)) {
+            $response['all_schools'] = \App\Models\School::where('status', true)->orderBy('name')->get(['id', 'name', 'code']);
+        }
+
+        return response()->json($response);
     }
 
 
@@ -71,7 +85,10 @@ class DiscountController extends Controller
      */
     public function store(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->resolveSchoolId($request) ?? auth()->user()?->school_id;
+        if (!$schoolId) {
+            $schoolId = \App\Models\School::first()?->id ?? 1;
+        }
 
         $data = $request->validate([
 
@@ -187,8 +204,10 @@ class DiscountController extends Controller
         int $id
     ) {
 
-        $schoolId =
-            auth()->user()->school_id;
+        $schoolId = $this->resolveSchoolId($request) ?? auth()->user()?->school_id;
+        if (!$schoolId) {
+            $schoolId = \App\Models\School::first()?->id ?? 1;
+        }
 
 
         $discount =

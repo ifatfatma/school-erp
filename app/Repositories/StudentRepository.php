@@ -11,39 +11,48 @@ class StudentRepository
      */
     public function paginate(array $filters = [])
     {
-        return Student::query()
-
+        $query = Student::query()
             ->with([
+                'school:id,name,code',
                 'class',
                 'section',
-            ])
+            ]);
 
+        $user = auth()->user();
+        $isSuperAdmin = $user && (
+            $user->user_type === 'super_admin' || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
+            ($user->roles && $user->roles->contains('name', 'Super Admin'))
+        );
+
+        if (!$isSuperAdmin && $user && $user->school_id) {
+            $query->where('students.school_id', $user->school_id);
+        } else {
+            // Support explicit school_id filter for Super Admin (or 'all' for platform-wide view)
+            if (isset($filters['school_id']) && $filters['school_id'] !== '') {
+                if ($filters['school_id'] === 'all' || $filters['school_id'] === '0') {
+                    $query->withoutGlobalScope(\App\Scopes\SchoolScope::class);
+                } else {
+                    $query->withoutGlobalScope(\App\Scopes\SchoolScope::class)
+                          ->where('students.school_id', $filters['school_id']);
+                }
+            }
+        }
+
+        return $query
             ->when($filters['search'] ?? null, function ($query, $search) {
-
                 $query->search($search);
-
             })
-
             ->when($filters['class_id'] ?? null, function ($query, $classId) {
-
                 $query->where('class_id', $classId);
-
             })
-
             ->when($filters['section_id'] ?? null, function ($query, $sectionId) {
-
                 $query->where('section_id', $sectionId);
-
             })
-
             ->when(isset($filters['status']) && $filters['status'] !== '', function ($query) use ($filters) {
-
                 $query->where('status', $filters['status']);
-
             })
-
-            ->latest()
-
+            ->latest('students.id')
             ->paginate($filters['per_page'] ?? 15);
     }
 

@@ -410,6 +410,8 @@ Aadhaar
 <input
 class="form-control"
 v-model="form.aadhaar_no"
+maxlength="12"
+placeholder="12-digit Aadhaar number"
 />
 <div class="text-danger" v-if="errors.aadhaar_no">
 {{ errors.aadhaar_no[0] }}
@@ -524,19 +526,25 @@ v-model="form.mother_mobile"
 </div>
 
 <div class="col-md-4 mb-3">
-
-<label class="form-label">
-Photo
-</label>
-
-<input
-type="file"
-class="form-control"
-@change="form.photo = $event.target.files[0]"
-/>
-<div class="text-danger" v-if="errors.photo">
-{{ errors.photo[0] }}
-</div>
+    <label class="form-label fw-semibold">Photo</label>
+    <div v-if="form.photo_url" class="d-flex align-items-center gap-2 mb-2">
+        <img
+            :src="form.photo_url"
+            alt="Current photo"
+            class="rounded border bg-light"
+            style="width: 44px; height: 44px; object-fit: cover;"
+        />
+        <small class="text-muted">Current photo</small>
+    </div>
+    <input
+        type="file"
+        class="form-control"
+        accept="image/png, image/jpeg, image/jpg, image/webp"
+        @change="form.photo = $event.target.files[0]"
+    />
+    <div class="text-danger small mt-1" v-if="errors.photo">
+        {{ errors.photo[0] }}
+    </div>
 </div>
 
 </div>

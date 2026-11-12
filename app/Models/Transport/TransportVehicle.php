@@ -1,12 +1,14 @@
 <?php
 namespace App\Models\Transport;
 
+use App\Traits\BelongsToSchool;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TransportVehicle extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToSchool;
 
     protected $table = 'transport_vehicles';
 
@@ -32,4 +34,9 @@ class TransportVehicle extends Model
         'pollution_expiry' => 'date',
         'capacity' => 'integer',
     ];
+
+    public function school()
+    {
+        return $this->belongsTo(\App\Models\School::class);
+    }
 }

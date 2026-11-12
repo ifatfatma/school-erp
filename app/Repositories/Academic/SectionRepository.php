@@ -8,8 +8,18 @@ class SectionRepository
 {
     public function paginate(array $filters = [], int $perPage = 10)
     {
-        return Section::query()
-            ->with('class')
+        $query = Section::query()->with(['class', 'school:id,name,code']);
+
+        if (isset($filters['school_id']) && $filters['school_id'] !== '') {
+            if ($filters['school_id'] === 'all' || $filters['school_id'] === '0') {
+                $query->withoutGlobalScope(\App\Scopes\SchoolScope::class);
+            } else {
+                $query->withoutGlobalScope(\App\Scopes\SchoolScope::class)
+                      ->where('sections.school_id', $filters['school_id']);
+            }
+        }
+
+        return $query
             ->when(!empty($filters['search']), function ($query) use ($filters) {
 
                 $search = trim($filters['search']);
@@ -29,6 +39,14 @@ class SectionRepository
             ->when(!empty($filters['class_id']), function ($query) use ($filters) {
 
                 $query->where('class_id', $filters['class_id']);
+
+            })
+            ->when(isset($filters['status']) && $filters['status'] !== '', function ($query) use ($filters) {
+
+                $status = filter_var($filters['status'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if ($status !== null) {
+                    $query->where('status', $status ? 1 : 0);
+                }
 
             })
             ->latest()
@@ -55,9 +73,11 @@ class SectionRepository
         return $section->delete();
     }
 
-    public function exists(int $schoolId, int $classId, string $name, ?int $ignoreId = null): bool
+    public function exists(?int $schoolId, int $classId, string $name, ?int $ignoreId = null): bool
     {
-        return Section::where('school_id', $schoolId)
+        return Section::when($schoolId, function ($query, $schoolId) {
+                $query->where('school_id', $schoolId);
+            })
             ->where('class_id', $classId)
             ->whereRaw('LOWER(name) = ?', [strtolower(trim($name))])
             ->when($ignoreId, function ($query) use ($ignoreId) {
