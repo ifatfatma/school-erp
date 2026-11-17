@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\SchoolClass;
 use App\Services\TenantManager;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Route::model('class', SchoolClass::class);
+        Route::model('academic_session', \App\Models\AcademicSession::class);
+        Route::model('academic-session', \App\Models\AcademicSession::class);
     }
 }

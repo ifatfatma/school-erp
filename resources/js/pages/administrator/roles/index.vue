@@ -1,6 +1,14 @@
 <template>
 
     <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Administrator' },
+            { label: 'Roles & Permissions' }
+        ]"
+    />
+
 
         <!-- ========================================================= -->
         <!-- HEADER -->
@@ -974,6 +982,7 @@
 
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 import {
     computed,

@@ -24,13 +24,23 @@ api.interceptors.request.use(config => {
 
     }
 
-    const isLogout = config.url && (config.url.includes('/logout') || config.url.endsWith('logout'))
+    const isAuthRoute = config.url && (
+        config.url.includes('/login') || 
+        config.url.includes('/logout') || 
+        config.url.includes('/register') ||
+        config.url.includes('/public/')
+    )
 
-    if (!isLogout) {
+    if (!isAuthRoute) {
         const activeSchoolId = localStorage.getItem("active_school_id")
 
         if (activeSchoolId !== null && activeSchoolId !== undefined && activeSchoolId !== "") {
             config.headers["X-School-Id"] = activeSchoolId
+        }
+
+        const activeStudentId = localStorage.getItem("portal_active_student_id")
+        if (activeStudentId) {
+            config.headers["X-Student-Id"] = activeStudentId
         }
     }
 

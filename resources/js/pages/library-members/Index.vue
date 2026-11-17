@@ -1,5 +1,13 @@
 <template>
     <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Library', to: { name: 'library.dashboard' } },
+            { label: 'Library Members' }
+        ]"
+    />
+
 
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -1170,6 +1178,7 @@
 
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 import {
     onMounted,

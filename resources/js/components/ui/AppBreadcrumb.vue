@@ -9,8 +9,9 @@
                 :aria-current="index === items.length - 1 ? 'page' : null"
             >
                 <RouterLink
-                    v-if="item.to && index !== items.length - 1"
+                    v-if="hasValidLink(item, index)"
                     :to="item.to"
+                    class="text-decoration-none"
                 >
                     {{ item.label }}
                 </RouterLink>
@@ -24,10 +25,27 @@
 </template>
 
 <script setup>
-defineProps({
+import { RouterLink, useRouter } from 'vue-router';
+
+const props = defineProps({
     items: {
         type: Array,
         default: () => []
     }
 });
+
+const router = useRouter();
+
+function hasValidLink(item, index) {
+    if (!item.to || index === props.items.length - 1) {
+        return false;
+    }
+    if (typeof item.to === 'string') {
+        return true;
+    }
+    if (typeof item.to === 'object' && item.to.name) {
+        return router && typeof router.hasRoute === 'function' ? router.hasRoute(item.to.name) : true;
+    }
+    return true;
+}
 </script>

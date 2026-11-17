@@ -74,9 +74,10 @@ class ExamService
      */
     public function update(Exam $exam, array $data): Exam
     {
-        if ($exam->is_marks_locked) {
+        // Only block modifications if marks remain locked and user is not unlocking them
+        if ($exam->is_marks_locked && !empty($data['is_marks_locked'])) {
             throw ValidationException::withMessages([
-                'exam' => ['Marks are locked. This exam cannot be modified.']
+                'exam' => ['Marks are locked. Please unlock marks first before modifying this exam.']
             ]);
         }
 

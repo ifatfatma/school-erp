@@ -122,12 +122,18 @@ class AdminAdmissionController extends Controller
             'enrolled' => (clone $countsQuery)->where('status', 'enrolled')->count(),
         ];
 
-        // Also fetch classes for filter (either school-specific or all)
+        // Also fetch classes for filter and section enrollment (either school-specific or all)
         $classesQuery = SchoolClass::withoutGlobalScopes();
         if ($schoolId) {
             $classesQuery->where('school_id', $schoolId);
         }
-        $classes = $classesQuery->select('id', 'name')->orderBy('id')->get();
+        $classes = $classesQuery->with(['sections' => function ($q) use ($schoolId) {
+            $sq = $q->withoutGlobalScopes();
+            if ($schoolId) {
+                $sq->where('school_id', $schoolId);
+            }
+            $sq->select('id', 'class_id', 'name');
+        }])->select('id', 'name', 'school_id')->orderBy('id')->get();
 
         $allSchools = $isSuper 
             ? School::select('id', 'name', 'code', 'city', 'state')->orderBy('name')->get() 
@@ -239,7 +245,7 @@ class AdminAdmissionController extends Controller
             // Create student record
             $student = Student::create([
                 'school_id' => $schoolId,
-                'academic_session_id' => $application->academic_session_id ?? AcademicSession::where('status', 'active')->value('id'),
+                'academic_session_id' => $application->academic_session_id ?? AcademicSession::where('school_id', $schoolId)->where(function($q) { $q->where('status', 1)->orWhere('is_current', 1); })->value('id') ?? AcademicSession::where(function($q) { $q->where('status', 1)->orWhere('is_current', 1); })->value('id'),
                 'class_id' => $application->class_id,
                 'section_id' => $request->section_id,
                 'admission_no' => $admissionNo,

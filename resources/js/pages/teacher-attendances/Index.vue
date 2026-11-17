@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -114,6 +115,14 @@ function badge(status) {
 </script>
 
 <template>
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Teachers', to: { name: 'teachers.index' } },
+            { label: 'Teacher Attendance' }
+        ]"
+    />
+
 
 <div class="card">
 

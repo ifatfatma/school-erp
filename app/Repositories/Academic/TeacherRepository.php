@@ -97,9 +97,11 @@ class TeacherRepository
         return $teacher->delete();
     }
 
-    public function exists(string $employeeId, ?int $ignoreId = null): bool
+    public function exists(string $employeeId, ?int $ignoreId = null, ?int $schoolId = null): bool
     {
-        $query = Teacher::where('school_id', auth()->user()->school_id)
+        $targetSchoolId = $schoolId ?? auth()->user()?->school_id ?? app(\App\Services\TenantManager::class)->getTenantId();
+
+        $query = Teacher::when($targetSchoolId, fn($q) => $q->where('school_id', $targetSchoolId))
             ->where('employee_id', $employeeId);
 
         if ($ignoreId) {

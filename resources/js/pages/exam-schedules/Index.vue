@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -169,6 +170,14 @@ async function remove(id) {
 </script>
 
 <template>
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Examinations', to: { name: 'exams.index' } },
+            { label: 'Exam Schedules' }
+        ]"
+    />
+
 
 <div class="card shadow-sm">
 

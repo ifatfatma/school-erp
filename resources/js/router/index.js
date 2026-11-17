@@ -430,6 +430,16 @@ const routes = [
                     },
 
                     {
+                        path: "/students/id-cards",
+                        name: "students.id-cards",
+                        component: () => import("@/pages/id-cards/Index.vue"),
+                        meta: {
+                            requiresAuth: true,
+                            permission: "student.view",
+                        },
+                    },
+
+                    {
                         path: "/students/:id",
                         name: "students.show",
                         component: () => import("@/pages/students/Show.vue"),
@@ -491,6 +501,67 @@ const routes = [
 
                 ],
 
+            },
+            {
+                path: "/biometrics",
+                name: "biometrics.index",
+                component: () => import("@/pages/biometrics/Index.vue"),
+                meta: {
+                    title: "Biometric Attendance System",
+                },
+            },
+            {
+                path: "/biometrics/scanner",
+                name: "biometrics.scanner",
+                component: () => import("@/pages/biometrics/LiveScanner.vue"),
+                meta: {
+                    title: "AI Live Face Scanner Kiosk",
+                },
+            },
+            {
+                path: "/biometrics/fingerprint",
+                name: "biometrics.fingerprint",
+                component: () => import("@/pages/biometrics/FingerprintScanner.vue"),
+                meta: {
+                    title: "Fingerprint & PIN Console",
+                },
+            },
+            {
+                path: "/biometrics/enrollment",
+                name: "biometrics.enrollment",
+                component: () => import("@/pages/biometrics/Enrollment.vue"),
+                meta: {
+                    title: "Biometric Credential Enrollment",
+                },
+            },
+            {
+                path: "/biometrics/devices",
+                name: "biometrics.devices",
+                component: () => import("@/pages/biometrics/Devices.vue"),
+                meta: {
+                    title: "Biometric Terminals & Kiosks",
+                },
+            },
+            {
+                path: "/biometrics/logs",
+                name: "biometrics.logs",
+                component: () => import("@/pages/biometrics/Logs.vue"),
+                meta: {
+                    title: "Biometric Attendance Logs",
+                },
+            },
+            {
+                path: "/student-leaves",
+                children: [
+                    {
+                        path: "/student-leaves",
+                        name: "student-leaves.index",
+                        component: () => import("@/pages/student-leaves/Index.vue"),
+                        meta: {
+                            title: "Student Leave Applications",
+                        },
+                    },
+                ],
             },{
                     path: "/guardians",
                     children: [
@@ -1404,6 +1475,16 @@ const routes = [
                 component: () => import("@/pages/portal/OnlineClasses.vue"),
             },
             {
+                path: "homework",
+                name: "portal.homework",
+                component: () => import("@/pages/portal/Homework.vue"),
+            },
+            {
+                path: "notices",
+                name: "portal.notices",
+                component: () => import("@/pages/portal/Notices.vue"),
+            },
+            {
                 path: "fees",
                 name: "portal.fees",
                 component: () => import("@/pages/portal/Fees.vue"),
@@ -1425,6 +1506,70 @@ const routes = [
             },
         ],
     },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dedicated Parent Portal Routes (/parent/*)
+    |--------------------------------------------------------------------------
+    */
+    {
+        path: "/parent",
+        component: () => import("@/layouts/ParentLayout.vue"),
+        meta: {
+            requiresAuth: true,
+        },
+        children: [
+            {
+                path: "",
+                redirect: "/parent/dashboard",
+            },
+            {
+                path: "dashboard",
+                name: "parent.dashboard",
+                component: () => import("@/pages/parent/Dashboard.vue"),
+            },
+            {
+                path: "fees",
+                name: "parent.fees",
+                component: () => import("@/pages/parent/Fees.vue"),
+            },
+            {
+                path: "results",
+                name: "parent.results",
+                component: () => import("@/pages/parent/Results.vue"),
+            },
+            {
+                path: "attendance",
+                name: "parent.attendance",
+                component: () => import("@/pages/parent/Attendance.vue"),
+            },
+            {
+                path: "timetable",
+                name: "parent.timetable",
+                component: () => import("@/pages/parent/Timetable.vue"),
+            },
+            {
+                path: "homework",
+                name: "parent.homework",
+                component: () => import("@/pages/parent/Timetable.vue"),
+            },
+            {
+                path: "notices",
+                name: "parent.notices",
+                component: () => import("@/pages/parent/Notices.vue"),
+            },
+            {
+                path: "leave-application",
+                name: "parent.leave-application",
+                component: () => import("@/pages/parent/LeaveApplication.vue"),
+            },
+            {
+                path: "profile",
+                name: "parent.profile",
+                component: () => import("@/pages/parent/Profile.vue"),
+            },
+        ],
+    },
 ];
 
 const router = createRouter({
@@ -1437,6 +1582,9 @@ router.beforeEach(async (to, from, next) => {
     const requiresAuth = to.matched.some(record => record.meta?.requiresAuth) || !!to.meta?.requiresAuth;
 
     if (requiresAuth && !token) {
+        if (to.path.startsWith("/parent")) {
+            return next("/login");
+        }
         if (to.path.startsWith("/portal")) {
             const schoolCode = localStorage.getItem("portal_school_code") || sessionStorage.getItem("portal_school_code");
             if (schoolCode) {
@@ -1448,7 +1596,15 @@ router.beforeEach(async (to, from, next) => {
     }
 
     if (to.meta?.guest && token) {
-        if (to.path.startsWith("/portal") || to.path.includes("/portal/login")) {
+        const auth = useAuthStore();
+        const user = auth.user;
+        const isParent = user?.user_type === 'parent' || user?.roles?.some(r => r.name?.toLowerCase() === 'parent');
+        const isStudent = user?.user_type === 'student' || user?.roles?.some(r => r.name?.toLowerCase() === 'student');
+
+        if (isParent || to.path.startsWith("/parent")) {
+            return next("/parent/dashboard");
+        }
+        if (isStudent || to.path.startsWith("/portal") || to.path.includes("/portal/login")) {
             return next("/portal/dashboard");
         }
         return next("/dashboard");
@@ -1469,6 +1625,22 @@ router.beforeEach(async (to, from, next) => {
 
             const user = auth.user;
             const isSuperAdminUser = user?.user_type === "super_admin" || user?.roles?.some(r => r.name === "Super Admin");
+            const isParentUser = user?.user_type === "parent" || user?.roles?.some(r => r.name?.toLowerCase() === "parent");
+            const isStudentUser = user?.user_type === "student" || user?.roles?.some(r => r.name?.toLowerCase() === "student");
+
+            // Role Isolation: Parent should NEVER see school-wide admin metrics or admin dashboard
+            if (isParentUser) {
+                if (!to.path.startsWith("/parent") && !to.path.startsWith("/portal") && !to.path.startsWith("/s/")) {
+                    return next("/parent/dashboard");
+                }
+            }
+
+            // Role Isolation: Student should only see portal
+            if (isStudentUser) {
+                if (!to.path.startsWith("/portal") && !to.path.startsWith("/s/")) {
+                    return next("/portal/dashboard");
+                }
+            }
 
             // Super Admin has 100% unrestricted platform-wide access to all modules and routes
             if (isSuperAdminUser) {

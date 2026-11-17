@@ -1,5 +1,12 @@
 <template>
   <div class="container-fluid py-3">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Root Web CMS' }
+        ]"
+    />
+
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
@@ -368,6 +375,7 @@
 </template>
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { ref, reactive, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'

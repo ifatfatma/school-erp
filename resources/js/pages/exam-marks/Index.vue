@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, onMounted, watch,ref } from "vue";
 import examMarkApi from "@/api/examMark";
 import { useExamMarkStore } from "@/stores/examMark";
@@ -364,6 +365,14 @@ async function saveMarks() {
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Examinations', to: { name: 'exams.index' } },
+            { label: 'Exam Marks' }
+        ]"
+    />
+
 
 <div class="card">
 

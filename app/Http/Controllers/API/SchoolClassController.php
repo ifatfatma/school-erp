@@ -83,6 +83,7 @@ class SchoolClassController extends Controller
         DB::beginTransaction();
 
         try {
+            $schoolId = $request->input('school_id') ?: ($request->user()?->school_id ?: app(\App\Services\TenantManager::class)->getSchoolId());
 
             $class = SchoolClass::create([
                 'name'         => $request->name,
@@ -90,7 +91,7 @@ class SchoolClassController extends Controller
                 'remarks'      => $request->remarks,
                 'status'       => $request->status,
                 'created_by'   => auth()->id(),
-                'school_id'    => auth()->user()->school_id
+                'school_id'    => $schoolId
             ]);
 
             DB::commit();
@@ -114,8 +115,11 @@ class SchoolClassController extends Controller
     /**
      * Display the specified class.
      */
-    public function show(SchoolClass $class)
+    public function show($class)
     {
+        if (!($class instanceof SchoolClass)) {
+            $class = SchoolClass::withoutGlobalScopes()->findOrFail($class);
+        }
         $class->load('sections')->loadCount(['sections', 'students']);
 
         return response()->json([
@@ -127,8 +131,14 @@ class SchoolClassController extends Controller
     /**
      * Update the specified class.
      */
-    public function update(UpdateSchoolClassRequest $request, SchoolClass $class)
+    public function update(UpdateSchoolClassRequest $request, $class)
     {
+        if (!($class instanceof SchoolClass)) {
+            $class = SchoolClass::withoutGlobalScopes()->findOrFail($class);
+        }
+
+        $schoolId = $class->school_id ?: ($request->input('school_id') ?: ($request->user()?->school_id ?: app(\App\Services\TenantManager::class)->getSchoolId()));
+
         DB::beginTransaction();
 
         try {
@@ -139,7 +149,7 @@ class SchoolClassController extends Controller
                 'remarks'      => $request->remarks,
                 'status'       => $request->status,
                 'updated_by'   => auth()->id(),
-                'school_id'    => auth()->user()->school_id
+                'school_id'    => $schoolId
             ]);
 
             DB::commit();
@@ -163,8 +173,12 @@ class SchoolClassController extends Controller
     /**
      * Remove the specified class.
      */
-    public function destroy(SchoolClass $class)
+    public function destroy($class)
     {
+        if (!($class instanceof SchoolClass)) {
+            $class = SchoolClass::withoutGlobalScopes()->findOrFail($class);
+        }
+
         DB::beginTransaction();
 
         try {

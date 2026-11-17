@@ -80,6 +80,20 @@ export default [
                 permission: "attendance.view",
             },
             {
+                title: "Biometric Attendance",
+                route: "/biometrics",
+            },
+            {
+                title: "ID Card Generator",
+                route: "/students/id-cards",
+                permission: "student.view",
+            },
+            {
+                title: "Student Leaves",
+                route: "/student-leaves",
+                permission: "student.view",
+            },
+            {
                 title: "Guardians",
                 route: "/guardians",
                 permission: "guardian.view",
@@ -141,6 +155,37 @@ export default [
                 route: "/teacher-attendances",
                 permission: "teacher_attendance.view",
             }
+        ],
+    },
+
+    {
+        title: "Biometric Attendance",
+        icon: "bi bi-fingerprint",
+        children: [
+            {
+                title: "Dashboard & Hub",
+                route: "/biometrics",
+            },
+            {
+                title: "Live Face Scanner",
+                route: "/biometrics?tab=scanner",
+            },
+            {
+                title: "Fingerprint Console",
+                route: "/biometrics?tab=fingerprint",
+            },
+            {
+                title: "Credential Enrollment",
+                route: "/biometrics?tab=enrollment",
+            },
+            {
+                title: "Terminals & Kiosks",
+                route: "/biometrics?tab=devices",
+            },
+            {
+                title: "Audit Punch Logs",
+                route: "/biometrics?tab=logs",
+            },
         ],
     },
 

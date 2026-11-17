@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -21,6 +22,14 @@ onMounted(async () => {
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Guardians', to: { name: 'guardians.index' } },
+            { label: 'Guardian Details' }
+        ]"
+    />
+
 
 <div class="card shadow-sm">
 
@@ -41,10 +50,7 @@ Back
 
 <RouterLink
 class="btn btn-warning"
-:to="{
-name:'guardians.edit',
-params:{id:guardian?.id}
-}"
+v-if="guardian" :to="{ name: 'guardians.edit', params: { id: guardian.id } }"
 >
 Edit
 </RouterLink>

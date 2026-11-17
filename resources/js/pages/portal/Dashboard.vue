@@ -156,7 +156,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
 const student = ref(null)
@@ -193,7 +193,16 @@ async function loadDashboard() {
   }
 }
 
+function handleStudentSwitch() {
+  loadDashboard()
+}
+
 onMounted(() => {
   loadDashboard()
+  window.addEventListener('portal-student-switched', handleStudentSwitch)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('portal-student-switched', handleStudentSwitch)
 })
 </script>

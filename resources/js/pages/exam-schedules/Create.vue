@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
 
@@ -66,6 +67,14 @@ function cancel() {
 </script>
 
 <template>
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Exam Schedules', to: { name: 'exam-schedules.index' } },
+            { label: 'Create Schedule' }
+        ]"
+    />
+
 
 <Form
 

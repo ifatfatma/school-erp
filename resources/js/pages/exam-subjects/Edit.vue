@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
@@ -114,6 +115,14 @@ async function submit()
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Exam Subjects', to: { name: 'exam-subjects.index' } },
+            { label: 'Edit Exam Subject' }
+        ]"
+    />
+
 
     <div class="card">
 

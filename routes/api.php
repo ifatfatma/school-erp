@@ -17,8 +17,11 @@ use App\Http\Controllers\API\LeaveTypeController;
 use App\Http\Controllers\API\LeaveRequestController;
 use App\Http\Controllers\Api\TeacherAttendanceController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\API\StudentLeaveApplicationController;
 use App\Http\Controllers\API\StudentImportExportController;
+use App\Http\Controllers\API\IdCardController;
 use App\Http\Controllers\Api\StudentAttendanceController;
+use App\Http\Controllers\API\BiometricAttendanceController;
 use App\Http\Controllers\Api\GuardianController;
 use App\Http\Controllers\Api\StudentPromotionController;
 use App\Http\Controllers\Api\ExamTypeController;
@@ -103,6 +106,7 @@ use App\Http\Controllers\Api\Hostel\HostelReportController;
 use App\Http\Controllers\API\PublicAdmissionController;
 use App\Http\Controllers\API\AdminAdmissionController;
 use App\Http\Controllers\API\StudentPortalController;
+use App\Http\Controllers\API\ParentPortalController;
 use App\Http\Controllers\API\WebsiteManagerController;
 use App\Http\Controllers\API\SaasPlatformController;
 
@@ -147,6 +151,7 @@ Route::prefix('public')->group(function () {
 });
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::match(['get', 'post'], '/biometrics/device/webhook', [BiometricAttendanceController::class, 'deviceWebhook']);
 Route::middleware('auth:sanctum')->group(function () {
     // Multi-Tenant Context & School Switching
     Route::get('/schools/switcher', [TenantController::class, 'index']);
@@ -204,6 +209,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('teacher-leaves/{id}/approve', [LeaveRequestController::class, 'approve']);
     Route::post('teacher-leaves/{id}/reject', [LeaveRequestController::class, 'reject']);
     Route::apiResource('teacher-attendances', TeacherAttendanceController::class);
+    // Student Leave Applications (Admin Review & Approval)
+    Route::get('student-leaves', [StudentLeaveApplicationController::class, 'index']);
+    Route::post('student-leaves/{id}/approve', [StudentLeaveApplicationController::class, 'approve']);
+    Route::post('student-leaves/{id}/reject', [StudentLeaveApplicationController::class, 'reject']);
+    Route::delete('student-leaves/{id}', [StudentLeaveApplicationController::class, 'destroy']);
     // Student Bulk Excel Import & Export
     Route::get('students/export/excel', [StudentImportExportController::class, 'exportExcel']);
     Route::get('students/export/template', [StudentImportExportController::class, 'downloadTemplate']);
@@ -213,10 +223,38 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('students-active', [StudentController::class, 'active']);
     Route::get('students-by-class', [StudentController::class, 'byClass']);
 
+    // Automated Student Identity Card Generator & Batch Printing
+    Route::prefix('id-cards')->group(function () {
+        Route::get('/template', [IdCardController::class, 'getTemplate']);
+        Route::post('/template', [IdCardController::class, 'saveTemplate']);
+        Route::post('/upload-signature', [IdCardController::class, 'uploadSignature']);
+        Route::post('/upload-logo', [IdCardController::class, 'uploadLogo']);
+        Route::get('/students', [IdCardController::class, 'getStudents']);
+        Route::post('/students/{id}/photo', [IdCardController::class, 'uploadStudentPhoto']);
+    });
+
     Route::apiResource('student-attendances', StudentAttendanceController::class);
     Route::post('student-attendances/bulk', [StudentAttendanceController::class, 'bulkStore']);
     Route::get('student-attendances/monthly', [StudentAttendanceController::class, 'monthly']);
     Route::get('student-attendances/summary', [StudentAttendanceController::class, 'summary']);
+
+    // Biometric & AI Face Recognition Attendance
+    Route::prefix('biometrics')->group(function () {
+        Route::get('/overview', [BiometricAttendanceController::class, 'overview']);
+        Route::get('/candidates', [BiometricAttendanceController::class, 'scannerCandidates']);
+        Route::post('/face-punch', [BiometricAttendanceController::class, 'facePunch']);
+        Route::post('/finger-punch', [BiometricAttendanceController::class, 'fingerPunch']);
+        Route::get('/enrollments', [BiometricAttendanceController::class, 'enrollments']);
+        Route::post('/enroll', [BiometricAttendanceController::class, 'saveEnrollment']);
+        Route::delete('/enrollments', [BiometricAttendanceController::class, 'deleteEnrollment']);
+        Route::post('/enroll/delete', [BiometricAttendanceController::class, 'deleteEnrollment']);
+        Route::get('/devices', [BiometricAttendanceController::class, 'devices']);
+        Route::post('/devices', [BiometricAttendanceController::class, 'storeDevice']);
+        Route::put('/devices/{id}', [BiometricAttendanceController::class, 'updateDevice'])->whereNumber('id');
+        Route::delete('/devices/{id}', [BiometricAttendanceController::class, 'deleteDevice'])->whereNumber('id');
+        Route::post('/devices/{id}/ping', [BiometricAttendanceController::class, 'pingDevice'])->whereNumber('id');
+        Route::get('/logs', [BiometricAttendanceController::class, 'logs']);
+    });
     Route::apiResource('guardians', GuardianController::class);
     Route::apiResource('student-promotions', StudentPromotionController::class);
     Route::post('student-promotions/bulk', [StudentPromotionController::class, 'bulkPromotion']);
@@ -2619,6 +2657,7 @@ Route::middleware('auth:sanctum')
         Route::get('/content', [WebsiteManagerController::class, 'getAll']);
         Route::post('/content/{section}', [WebsiteManagerController::class, 'updateSection']);
         Route::post('/content/{section}/reset', [WebsiteManagerController::class, 'resetSection']);
+        Route::post('/upload-asset', [WebsiteManagerController::class, 'uploadAsset']);
 
         Route::get('/notices', [WebsiteManagerController::class, 'noticesIndex']);
         Route::post('/notices', [WebsiteManagerController::class, 'noticesStore']);
@@ -2643,14 +2682,42 @@ Route::middleware('auth:sanctum')
     |--------------------------------------------------------------------------
     */
     Route::prefix('portal')->group(function () {
+        Route::get('/children', [StudentPortalController::class, 'children']);
         Route::get('/dashboard', [StudentPortalController::class, 'dashboard']);
         Route::get('/attendance', [StudentPortalController::class, 'attendance']);
         Route::get('/timetable', [StudentPortalController::class, 'timetable']);
         Route::get('/online-classes', [StudentPortalController::class, 'onlineClasses']);
         Route::get('/fees', [StudentPortalController::class, 'fees']);
+        Route::post('/fees/pay', [StudentPortalController::class, 'payFees']);
+        Route::get('/fees/receipt/{id}', [StudentPortalController::class, 'feeReceipt']);
         Route::get('/results', [StudentPortalController::class, 'results']);
+        Route::get('/results/report-card/{exam_id}', [StudentPortalController::class, 'reportCard']);
+        Route::get('/homework', [StudentPortalController::class, 'homework']);
+        Route::get('/notices', [StudentPortalController::class, 'notices']);
         Route::get('/library', [StudentPortalController::class, 'library']);
         Route::get('/profile', [StudentPortalController::class, 'profile']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dedicated Parent Portal API (/api/parent/*)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('parent')->group(function () {
+        Route::get('/children', [ParentPortalController::class, 'children']);
+        Route::get('/dashboard', [ParentPortalController::class, 'dashboard']);
+        Route::get('/fees', [ParentPortalController::class, 'fees']);
+        Route::post('/fees/pay', [ParentPortalController::class, 'payFees']);
+        Route::get('/fees/receipt/{id}', [ParentPortalController::class, 'feeReceipt']);
+        Route::get('/results', [ParentPortalController::class, 'results']);
+        Route::get('/results/report-card/{exam_id}', [ParentPortalController::class, 'reportCard']);
+        Route::get('/attendance', [ParentPortalController::class, 'attendance']);
+        Route::get('/timetable', [ParentPortalController::class, 'timetable']);
+        Route::get('/homework', [ParentPortalController::class, 'homework']);
+        Route::get('/notices', [ParentPortalController::class, 'notices']);
+        Route::get('/leave-applications', [ParentPortalController::class, 'leaveApplications']);
+        Route::post('/leave-applications', [ParentPortalController::class, 'applyLeave']);
+        Route::get('/profile', [ParentPortalController::class, 'profile']);
     });
 
 });

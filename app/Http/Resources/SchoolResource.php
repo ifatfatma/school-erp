@@ -39,6 +39,8 @@ class SchoolResource extends JsonResource
             'postal_code'   => $this->postal_code,
             'logo'          => $logoUrl,
             'logo_path'     => $logoUrl ? $rawLogo : null,
+            'login_background'      => $this->login_background_url,
+            'login_background_path' => $this->login_background,
             'status'        => (bool) $this->status,
             'subscription_plan'       => $this->subscription_plan ?? 'starter',
             'subscription_plan_label' => \App\Services\SubscriptionPlanService::getPlanLabel($this->subscription_plan ?? 'starter'),

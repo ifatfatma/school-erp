@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { ref, reactive, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 
@@ -114,6 +115,14 @@ onMounted(async () => {
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Teachers', to: { name: 'teachers.index' } },
+            { label: 'Teacher Leaves' }
+        ]"
+    />
+
 
     <div class="card">
 

@@ -27,8 +27,7 @@ class SectionService
 
     public function store(array $data): Section
     {
-        // Get logged-in user's school
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $data['school_id'] ?? auth()->user()?->school_id ?? app(\App\Services\TenantManager::class)->getTenantId();
 
         $data['school_id'] = $schoolId;
 
@@ -49,7 +48,7 @@ class SectionService
 
     public function update(Section $section, array $data): Section
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $data['school_id'] ?? $section->school_id ?? auth()->user()?->school_id ?? app(\App\Services\TenantManager::class)->getTenantId();
 
         if (
             $this->repository->exists(

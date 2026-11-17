@@ -1,10 +1,26 @@
 <template>
   <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'School Management' },
+            { label: 'Schools' }
+        ]"
+    />
+
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="mb-0">Schools</h3>
-      <button v-if="isSuperAdmin" class="btn btn-primary" @click="openCreateModal">
-        <i class="bi bi-plus-circle me-1"></i> Add School
-      </button>
+      <div>
+        <h3 class="mb-0 fw-bold">{{ isSuperAdmin ? 'Schools' : 'School Profile & Branding' }}</h3>
+        <small class="text-muted" v-if="!isSuperAdmin">Manage your institution's official details, contact info, school logo, and login page picture.</small>
+      </div>
+      <div>
+        <button v-if="isSuperAdmin" class="btn btn-primary" @click="openCreateModal">
+          <i class="bi bi-plus-circle me-1"></i> Add School
+        </button>
+        <button v-else-if="store.schools.length > 0" class="btn btn-primary" @click="openEditModal(store.schools[0])">
+          <i class="bi bi-pencil-square me-1"></i> Edit School, Logo & Login Backdrop
+        </button>
+      </div>
     </div>
 
     <!-- Search -->
@@ -43,7 +59,7 @@
         <table class="table table-bordered table-hover align-middle mb-0">
           <thead class="table-light">
             <tr>
-              <th width="70">Logo</th>
+              <th width="110" class="text-center">Branding</th>
               <th>Name</th>
               <th>Code</th>
               <th>Email</th>
@@ -56,21 +72,33 @@
           <tbody>
             <tr v-for="school in store.schools" :key="school.id">
               <td class="text-center">
-                <img
-                  v-if="isValidLogo(school)"
-                  :src="school.logo"
-                  alt="Logo"
-                  class="rounded border bg-white p-1"
-                  style="width: 44px; height: 44px; object-fit: contain;"
-                  @error="onLogoError(school.id)"
-                />
-                <div
-                  v-else
-                  class="rounded bg-light text-secondary border d-flex align-items-center justify-content-center mx-auto"
-                  style="width: 44px; height: 44px;"
-                  title="No logo"
-                >
-                  <i class="bi bi-building fs-5"></i>
+                <div class="d-flex align-items-center justify-content-center gap-1">
+                  <img
+                    v-if="isValidLogo(school)"
+                    :src="school.logo"
+                    alt="Logo"
+                    class="rounded border bg-white p-1"
+                    style="width: 40px; height: 40px; object-fit: contain;"
+                    title="School Logo"
+                    @error="onLogoError(school.id)"
+                  />
+                  <div
+                    v-else
+                    class="rounded bg-light text-secondary border d-flex align-items-center justify-content-center"
+                    style="width: 40px; height: 40px;"
+                    title="No logo"
+                  >
+                    <i class="bi bi-building fs-5"></i>
+                  </div>
+
+                  <img
+                    v-if="school.login_background"
+                    :src="school.login_background"
+                    alt="Login Backdrop"
+                    class="rounded border"
+                    style="width: 40px; height: 40px; object-fit: cover;"
+                    title="Custom Login Background Active"
+                  />
                 </div>
               </td>
               <td>
@@ -160,6 +188,7 @@
 </template>
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { ref, reactive, computed, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import { useSchoolStore } from '@/stores/school';

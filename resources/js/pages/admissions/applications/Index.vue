@@ -143,7 +143,7 @@
               </td>
               <td>
                 <div class="fw-semibold">{{ app.first_name }} {{ app.last_name || '' }}</div>
-                <small class="text-muted text-capitalize">{{ app.gender }} &bull; DOB: {{ app.dob || '-' }}</small>
+                <small class="text-muted text-capitalize">{{ app.gender }} &bull; DOB: {{ formatDate(app.dob) }}</small>
               </td>
               <td><span class="badge bg-light text-dark">{{ app.class?.name || '-' }}</span></td>
               <td>{{ app.father_name || '-' }}</td>
@@ -192,12 +192,12 @@
     </div>
 
     <!-- View Details Modal -->
-    <div class="modal fade" id="viewModal" tabindex="-1">
+    <div v-if="showViewModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); z-index: 1055;">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow">
           <div class="modal-header bg-primary text-white border-0 py-3">
             <h5 class="modal-title fw-bold">Application Details: {{ activeApp?.application_no }}</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-white" @click="showViewModal = false"></button>
           </div>
           <div class="modal-body p-4" v-if="activeApp">
             <div class="row g-3">
@@ -225,7 +225,7 @@
               </div>
               <div class="col-md-3">
                 <small class="text-muted d-block">Date of Birth</small>
-                <span>{{ activeApp.dob || '-' }}</span>
+                <span>{{ formatDate(activeApp.dob) }}</span>
               </div>
               <div class="col-md-3">
                 <small class="text-muted d-block">Blood Group</small>
@@ -293,19 +293,19 @@
             </div>
           </div>
           <div class="modal-footer border-0">
-            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary rounded-pill px-4" @click="showViewModal = false">Close</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Update Status Modal -->
-    <div class="modal fade" id="statusModal" tabindex="-1">
+    <div v-if="showStatusModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); z-index: 1055;">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow">
           <div class="modal-header bg-primary text-white border-0 py-3">
             <h5 class="modal-title fw-bold">Update Application Status</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-white" @click="showStatusModal = false"></button>
           </div>
           <div class="modal-body p-4" v-if="activeApp">
             <div class="mb-3">
@@ -323,7 +323,7 @@
             </div>
           </div>
           <div class="modal-footer border-0">
-            <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary rounded-pill" @click="showStatusModal = false">Cancel</button>
             <button type="button" class="btn btn-primary rounded-pill px-4" @click="saveStatus">Update Status</button>
           </div>
         </div>
@@ -331,12 +331,12 @@
     </div>
 
     <!-- Enroll Student Modal -->
-    <div class="modal fade" id="enrollModal" tabindex="-1">
+    <div v-if="showEnrollModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); z-index: 1055;">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow">
           <div class="modal-header bg-success text-white border-0 py-3">
             <h5 class="modal-title fw-bold"><i class="bi bi-person-check-fill me-2"></i> Enroll Student Into ERP</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-white" @click="showEnrollModal = false"></button>
           </div>
           <div class="modal-body p-4" v-if="activeApp">
             <p class="small text-muted mb-3">
@@ -369,7 +369,7 @@
             </div>
           </div>
           <div class="modal-footer border-0">
-            <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary rounded-pill" @click="showEnrollModal = false">Cancel</button>
             <button type="button" class="btn btn-success rounded-pill px-4" :disabled="enrolling || !enrollForm.section_id" @click="confirmEnroll">
               <span v-if="enrolling" class="spinner-border spinner-border-sm me-1"></span>
               {{ enrolling ? 'Enrolling...' : 'Confirm & Enroll' }}
@@ -410,6 +410,9 @@ const selectedStatus = ref('')
 const selectedClass = ref('')
 const search = ref('')
 const activeApp = ref(null)
+const showViewModal = ref(false)
+const showStatusModal = ref(false)
+const showEnrollModal = ref(false)
 
 const pagination = reactive({
   current_page: 1,
@@ -523,21 +526,25 @@ function statusBadge(status) {
 
 function formatDate(dt) {
   if (!dt) return '-'
-  return new Date(dt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+  try {
+    const d = new Date(dt)
+    if (isNaN(d.getTime())) return dt
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+  } catch (e) {
+    return dt
+  }
 }
 
 function openViewModal(app) {
   activeApp.value = app
-  const modal = new window.bootstrap.Modal(document.getElementById('viewModal'))
-  modal.show()
+  showViewModal.value = true
 }
 
 function openStatusModal(app) {
   activeApp.value = app
   statusForm.status = app.status
   statusForm.admin_notes = app.admin_notes || ''
-  const modal = new window.bootstrap.Modal(document.getElementById('statusModal'))
-  modal.show()
+  showStatusModal.value = true
 }
 
 async function saveStatus() {
@@ -546,8 +553,7 @@ async function saveStatus() {
     const res = await axios.post(`/api/admin/admissions/applications/${activeApp.value.id}/status`, statusForm, getAuthConfig())
     if (res.data.success) {
       Swal.fire({ icon: 'success', title: 'Status Updated', timer: 1200, showConfirmButton: false })
-      const modal = window.bootstrap.Modal.getInstance(document.getElementById('statusModal'))
-      if (modal) modal.hide()
+      showStatusModal.value = false
       loadApplications(pagination.current_page)
     }
   } catch (err) {
@@ -567,8 +573,7 @@ function openEnrollModal(app) {
     enrollForm.section_id = availableSections.value[0].id
   }
 
-  const modal = new window.bootstrap.Modal(document.getElementById('enrollModal'))
-  modal.show()
+  showEnrollModal.value = true
 }
 
 async function confirmEnroll() {
@@ -582,8 +587,7 @@ async function confirmEnroll() {
         title: 'Student Enrolled!',
         text: res.data.message,
       })
-      const modal = window.bootstrap.Modal.getInstance(document.getElementById('enrollModal'))
-      if (modal) modal.hide()
+      showEnrollModal.value = false
       loadApplications(pagination.current_page)
     }
   } catch (err) {

@@ -119,7 +119,7 @@ const lastPage = computed(() =>
         : props.lastPage
 )
 
-const emit = defineEmits(['page-change'])
+const emit = defineEmits(['page-change', 'change', 'update:page'])
 
 const startPage = computed(() => {
 
@@ -170,6 +170,8 @@ function changePage(page){
     }
 
     emit('page-change', page)
+    emit('change', page)
+    emit('update:page', page)
 
 }
 </script>

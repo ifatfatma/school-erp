@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -97,6 +98,14 @@ function cancel() {
 </script>
 
 <template>
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Teacher Attendance', to: { name: 'teacher-attendances.index' } },
+            { label: 'Edit Attendance' }
+        ]"
+    />
+
 
     <div class="card">
 

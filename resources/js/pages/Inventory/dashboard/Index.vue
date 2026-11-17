@@ -1,5 +1,13 @@
 <template>
     <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Inventory' },
+            { label: 'Dashboard' }
+        ]"
+    />
+
 
         <!-- =========================================================
              HEADER
@@ -933,6 +941,7 @@
 
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 import { onMounted, onBeforeUnmount,
     ref

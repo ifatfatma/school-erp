@@ -65,6 +65,18 @@ class SchoolController extends Controller
             }
         }
 
+        if ($request->hasFile('login_background') || ($request->file('login_background') instanceof \Illuminate\Http\UploadedFile)) {
+            $file = $request->file('login_background');
+            $data['login_background'] = $file->store('schools/backgrounds', 'public');
+        } elseif (isset($data['login_background'])) {
+            if ($data['login_background'] instanceof \Illuminate\Http\UploadedFile) {
+                $data['login_background'] = $data['login_background']->store('schools/backgrounds', 'public');
+            } elseif (is_string($data['login_background'])) {
+                $trimmedBg = trim($data['login_background']);
+                $data['login_background'] = ($trimmedBg === '' || $trimmedBg === '[]' || $trimmedBg === 'null' || $trimmedBg === '{}') ? null : $trimmedBg;
+            }
+        }
+
         if (isset($data['status'])) {
             $data['status'] = filter_var($data['status'], FILTER_VALIDATE_BOOLEAN);
         }
@@ -131,6 +143,26 @@ class SchoolController extends Controller
                 $data['logo'] = ($trimmed === '' || $trimmed === '[]' || $trimmed === 'null' || $trimmed === '{}') ? null : $trimmed;
             } else {
                 $data['logo'] = null;
+            }
+        }
+
+        if ($request->hasFile('login_background') || ($request->file('login_background') instanceof \Illuminate\Http\UploadedFile)) {
+            if (is_string($school->login_background) && !empty($school->login_background) && Storage::disk('public')->exists($school->login_background)) {
+                Storage::disk('public')->delete($school->login_background);
+            }
+            $file = $request->file('login_background');
+            $data['login_background'] = $file->store('schools/backgrounds', 'public');
+        } elseif ($request->boolean('remove_login_background')) {
+            if (is_string($school->login_background) && !empty($school->login_background) && Storage::disk('public')->exists($school->login_background)) {
+                Storage::disk('public')->delete($school->login_background);
+            }
+            $data['login_background'] = null;
+        } elseif (isset($data['login_background'])) {
+            if ($data['login_background'] instanceof \Illuminate\Http\UploadedFile) {
+                $data['login_background'] = $data['login_background']->store('schools/backgrounds', 'public');
+            } elseif (is_string($data['login_background'])) {
+                $trimmedBg = trim($data['login_background']);
+                $data['login_background'] = ($trimmedBg === '' || $trimmedBg === '[]' || $trimmedBg === 'null' || $trimmedBg === '{}') ? null : $trimmedBg;
             }
         }
 

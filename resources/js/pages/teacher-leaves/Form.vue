@@ -77,7 +77,7 @@ const submit = () => {
                     :key="teacher.id"
                     :value="teacher.id"
                 >
-                    {{ teacher.name }}
+                    {{ teacher.name || (teacher.first_name + ' ' + (teacher.last_name || '')) }} [{{ teacher.employee_id || ('TCH-' + teacher.id) }}]
                 </option>
 
             </select>
@@ -109,7 +109,7 @@ const submit = () => {
                     :key="type.id"
                     :value="type.id"
                 >
-                    {{ type.name }}
+                    {{ type.name }} (Max: {{ type.max_days }} days{{ type.is_paid ? ' - Paid' : ' - Unpaid' }})
                 </option>
 
             </select>

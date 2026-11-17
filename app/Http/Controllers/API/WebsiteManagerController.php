@@ -33,7 +33,29 @@ class WebsiteManagerController extends Controller
         if ($school && $school->logo) {
             $raw = is_array($school->logo) ? reset($school->logo) : $school->logo;
             if ($raw && is_string($raw) && $raw !== '[]' && $raw !== 'null' && $raw !== '{}') {
-                $logoUrl = str_starts_with($raw, 'http') ? $raw : asset('storage/' . ltrim($raw, '/'));
+                $raw = trim($raw);
+                if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/(storage/.*)$#', $raw, $matches)) {
+                    $logoUrl = '/' . $matches[3];
+                } elseif (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+                    $logoUrl = $raw;
+                } else {
+                    $logoUrl = '/storage/' . ltrim($raw, '/');
+                }
+            }
+        }
+
+        $bgUrl = null;
+        if ($school && $school->login_background) {
+            $rawBg = is_array($school->login_background) ? reset($school->login_background) : $school->login_background;
+            if ($rawBg && is_string($rawBg) && $rawBg !== '[]' && $rawBg !== 'null' && $rawBg !== '{}') {
+                $rawBg = trim($rawBg);
+                if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/(storage/.*)$#', $rawBg, $matches)) {
+                    $bgUrl = '/' . $matches[3];
+                } elseif (str_starts_with($rawBg, 'http://') || str_starts_with($rawBg, 'https://')) {
+                    $bgUrl = $rawBg;
+                } else {
+                    $bgUrl = '/storage/' . ltrim($rawBg, '/');
+                }
             }
         }
 
@@ -54,6 +76,7 @@ class WebsiteManagerController extends Controller
                 'pincode' => $pincode,
                 'office_hours' => 'Mon - Sat: 8:00 AM - 3:30 PM',
                 'logo' => $logoUrl,
+                'login_background' => $bgUrl,
                 'social_facebook' => 'https://facebook.com',
                 'social_instagram' => 'https://instagram.com',
                 'social_youtube' => 'https://youtube.com',
@@ -218,6 +241,14 @@ class WebsiteManagerController extends Controller
             }
         }
 
+        // Clean hardcoded localhost origin from general assets so they load reliably across all ports/hosts
+        if (isset($result['general']['logo']) && is_string($result['general']['logo'])) {
+            $result['general']['logo'] = preg_replace('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/#', '/', $result['general']['logo']);
+        }
+        if (isset($result['general']['login_background']) && is_string($result['general']['login_background'])) {
+            $result['general']['login_background'] = preg_replace('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/#', '/', $result['general']['login_background']);
+        }
+
         $isSuper = $this->isSuperAdmin($request);
         $allSchools = $isSuper 
             ? School::select('id', 'name', 'code', 'city', 'state', 'logo', 'subscription_plan')->orderBy('name')->get() 
@@ -271,10 +302,87 @@ class WebsiteManagerController extends Controller
             ]
         );
 
+        // If general section updated, sync logo & contact details back to the School model
+        if ($sectionKey === 'general' && $school) {
+            $content = $validated['content'];
+            $needsSave = false;
+
+            if (isset($content['logo']) && is_string($content['logo'])) {
+                $trimmedLogo = trim($content['logo']);
+                if ($trimmedLogo !== '' && $trimmedLogo !== '[]' && $trimmedLogo !== 'null') {
+                    $cleanLogo = preg_replace('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/#', '/', $trimmedLogo);
+                    $school->logo = $cleanLogo;
+                    $needsSave = true;
+                }
+            }
+
+            if (isset($content['login_background']) && is_string($content['login_background'])) {
+                $trimmedBg = trim($content['login_background']);
+                $cleanBg = ($trimmedBg !== '' && $trimmedBg !== '[]' && $trimmedBg !== 'null')
+                    ? preg_replace('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/#', '/', $trimmedBg)
+                    : null;
+                $school->login_background = $cleanBg;
+                $needsSave = true;
+            }
+
+            if (!empty($content['school_name']) && $content['school_name'] !== $school->name) {
+                $school->name = $content['school_name'];
+                $needsSave = true;
+            }
+
+            if (!empty($content['phone_primary']) && $content['phone_primary'] !== $school->phone) {
+                $school->phone = $content['phone_primary'];
+                $needsSave = true;
+            }
+
+            if (!empty($content['email_primary']) && $content['email_primary'] !== $school->email) {
+                $school->email = $content['email_primary'];
+                $needsSave = true;
+            }
+
+            if ($needsSave) {
+                $school->save();
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => ucfirst($sectionKey) . ' section updated successfully!',
             'data' => $setting->content,
+        ]);
+    }
+
+    /**
+     * Upload an asset file (Logo or Login Backdrop) directly from Website Content Management
+     */
+    public function uploadAsset(Request $request)
+    {
+        $schoolId = $this->getSchoolId($request);
+        $school = School::find($schoolId);
+
+        $request->validate([
+            'file' => 'required|image|max:10240',
+            'type' => 'nullable|string|in:logo,login_background,general',
+        ]);
+
+        $type = $request->input('type', 'general');
+        $folder = $type === 'login_background' ? 'schools/backgrounds' : 'schools';
+        $path = $request->file('file')->store($folder, 'public');
+        $url = '/storage/' . $path;
+
+        if ($school) {
+            if ($type === 'logo') {
+                $school->update(['logo' => $path]);
+            } elseif ($type === 'login_background') {
+                $school->update(['login_background' => $path]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'path' => $path,
+            'url' => $url,
+            'message' => 'Image uploaded and updated successfully.',
         ]);
     }
 

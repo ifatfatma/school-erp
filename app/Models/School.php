@@ -34,12 +34,44 @@ class School extends Model
         'country',
         'postal_code',
         'logo',
+        'login_background',
         'status',
         'subscription_plan',
         'subscription_status',
         'subscription_expires_at',
         'subscription_features',
     ];
+
+    protected $appends = [
+        'logo_url',
+        'login_background_url',
+    ];
+
+    public function getLoginBackgroundUrlAttribute(): ?string
+    {
+        $raw = $this->login_background;
+        if (!is_string($raw) || trim($raw) === '' || $raw === 'null' || $raw === '[]' || $raw === '{}') {
+            return null;
+        }
+        $raw = trim($raw);
+        return str_starts_with($raw, 'http') ? $raw : asset('storage/' . ltrim($raw, '/'));
+    }
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        $raw = $this->logo;
+        if (is_array($raw)) {
+            $raw = reset($raw);
+        }
+        if (!is_string($raw)) {
+            return null;
+        }
+        $raw = trim($raw);
+        if ($raw === '' || $raw === '[]' || $raw === 'null' || $raw === '{}') {
+            return null;
+        }
+        return str_starts_with($raw, 'http') ? $raw : asset('storage/' . ltrim($raw, '/'));
+    }
 
     protected function casts(): array
     {

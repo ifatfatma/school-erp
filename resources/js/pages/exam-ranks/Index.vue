@@ -1,5 +1,13 @@
 <template>
     <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Examinations', to: { name: 'exams.index' } },
+            { label: 'Exam Ranks' }
+        ]"
+    />
+
 
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -346,6 +354,7 @@
 
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 
 import {
     ref,

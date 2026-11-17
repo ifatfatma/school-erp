@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Swal from "sweetalert2";
@@ -141,6 +142,14 @@ function cancel() {
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Guardians', to: { name: 'guardians.index' } },
+            { label: 'Edit Guardian' }
+        ]"
+    />
+
 
     <div class="row">
 

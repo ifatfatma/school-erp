@@ -32,6 +32,9 @@ export default {
         const formData = new FormData();
 
         Object.keys(data).forEach(key => {
+            if (key === 'photo' && typeof data[key] === 'string') {
+                return;
+            }
             if (data[key] !== null && data[key] !== "") {
                 formData.append(key, data[key]);
             }

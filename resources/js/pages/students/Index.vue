@@ -141,7 +141,7 @@ onMounted(async () => {
 });
 
 async function load() {
-    const res = await studentStore.fetch(filters);
+    const res = await studentStore.fetch({ ...filters });
     if ((!allSchools.value || allSchools.value.length === 0) && studentStore.allSchools?.length) {
         allSchools.value = studentStore.allSchools;
     }
@@ -290,6 +290,7 @@ async function submitImport() {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
+            timeout: 300000,
         });
 
         importResult.value = response.data;
@@ -399,6 +400,16 @@ async function remove(id) {
                     <i class="bi bi-file-earmark-arrow-up-fill"></i>
                     <span>Import Excel</span>
                 </button>
+
+                <!-- ID Cards Generator Button -->
+                <RouterLink
+                    to="/students/id-cards"
+                    class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1"
+                    title="Design and batch print student identity cards"
+                >
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>ID Cards</span>
+                </RouterLink>
 
                 <!-- Add Student Button -->
                 <RouterLink
@@ -606,6 +617,7 @@ async function remove(id) {
                 <AppPagination
                     :pagination="studentStore.pagination"
                     @change="onPageChange"
+                    @page-change="onPageChange"
                 />
             </div>
         </div>

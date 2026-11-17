@@ -827,6 +827,11 @@ import {
 
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+
+const router = useRouter();
+const auth = useAuthStore();
 
 
 /*
@@ -1235,6 +1240,11 @@ const onTenantSwitched = () => {
 };
 
 onMounted(() => {
+    if (auth.user?.user_type === 'parent' || auth.user?.roles?.some(r => r.name?.toLowerCase() === 'parent')) {
+        router.push('/parent/dashboard');
+        return;
+    }
+
     loadDashboard();
     window.addEventListener('tenant-switched', onTenantSwitched);
 

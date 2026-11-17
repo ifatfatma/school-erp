@@ -109,6 +109,102 @@
             <p class="small text-muted mb-4">This information appears across the website header, announcement top-bar, and footer.</p>
 
             <div class="row g-3">
+              <!-- School Logo & Branding Card -->
+              <div class="col-12">
+                <div class="card border rounded-4 bg-light p-3">
+                  <label class="form-label fw-semibold d-block mb-1">
+                    <i class="bi bi-image text-primary me-1"></i> School Logo & Emblem
+                    <small class="text-muted fw-normal">(Appears on public website header, hero, portals & receipts)</small>
+                  </label>
+                  <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 mt-2">
+                    <div class="rounded-3 border bg-white d-flex align-items-center justify-content-center shadow-sm overflow-hidden" style="width: 85px; height: 85px; min-width: 85px;">
+                      <img
+                        v-if="settings.general.logo"
+                        :src="formatAssetUrl(settings.general.logo)"
+                        alt="School Logo"
+                        style="max-width: 76px; max-height: 76px; object-fit: contain;"
+                      />
+                      <div v-else class="text-muted text-center p-1">
+                        <i class="bi bi-building fs-3 d-block text-secondary opacity-50"></i>
+                        <small style="font-size: 0.65rem;">No Logo</small>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-white fw-semibold text-muted">Logo URL / Path</span>
+                        <input
+                          type="text"
+                          v-model="settings.general.logo"
+                          class="form-control"
+                          placeholder="https://... or /storage/schools/..."
+                        />
+                      </div>
+                      <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <label class="btn btn-primary btn-sm mb-0 cursor-pointer shadow-sm">
+                          <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Logo File
+                          <input type="file" class="d-none" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" @change="handleLogoUpload" />
+                        </label>
+                        <span v-if="logoUploading" class="spinner-border spinner-border-sm text-primary"></span>
+                        <small class="text-muted">Directly upload your official school logo (PNG, JPG, SVG, WEBP).</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Login Page Left Background Picture Card -->
+              <div class="col-12">
+                <div class="card border rounded-4 bg-light p-3">
+                  <label class="form-label fw-semibold d-block mb-1">
+                    <i class="bi bi-camera-fill text-primary me-1"></i> Login Page Left Panel Campus Picture
+                    <small class="text-muted fw-normal">(Campus photo, building, or modern school backdrop shown on the login page)</small>
+                  </label>
+                  <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 mt-2">
+                    <div
+                      class="rounded-3 border bg-dark d-flex align-items-center justify-content-center shadow-sm overflow-hidden"
+                      style="width: 130px; height: 85px; min-width: 130px; background-size: cover; background-position: center;"
+                      :style="settings.general.login_background ? { backgroundImage: `linear-gradient(rgba(15,23,42,0.45), rgba(15,23,42,0.7)), url('${formatAssetUrl(settings.general.login_background)}')` } : {}"
+                    >
+                      <div v-if="!settings.general.login_background" class="text-white-50 text-center p-1">
+                        <i class="bi bi-camera fs-4 d-block opacity-75"></i>
+                        <small style="font-size: 0.65rem;">Default Blue</small>
+                      </div>
+                      <div v-else class="text-white text-center p-1">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <small class="d-block text-white-50" style="font-size: 0.65rem;">Custom Picture</small>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="input-group input-group-sm mb-2">
+                        <span class="input-group-text bg-white fw-semibold text-muted">Picture URL / Path</span>
+                        <input
+                          type="text"
+                          v-model="settings.general.login_background"
+                          class="form-control"
+                          placeholder="https://... or /storage/schools/backgrounds/..."
+                        />
+                      </div>
+                      <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <label class="btn btn-outline-primary btn-sm mb-0 cursor-pointer shadow-sm">
+                          <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Campus Picture
+                          <input type="file" class="d-none" accept="image/png, image/jpeg, image/jpg, image/webp" @change="handleBgUpload" />
+                        </label>
+                        <button
+                          v-if="settings.general.login_background"
+                          type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          @click="settings.general.login_background = null"
+                        >
+                          <i class="bi bi-trash me-1"></i> Reset to Default
+                        </button>
+                        <span v-if="bgUploading" class="spinner-border spinner-border-sm text-primary"></span>
+                        <small class="text-muted">Landscape photo (1920x1080 recommended). Displays with an elegant dark overlay on the left side of the login page.</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="col-md-6">
                 <label class="form-label fw-semibold">School Name</label>
                 <input type="text" v-model="settings.general.school_name" class="form-control">
@@ -708,6 +804,90 @@ async function onSchoolChange() {
   await tenantStore.switchTenant(selectedSchoolId.value)
   await loadSettings(selectedSchoolId.value)
   await loadNotices(selectedSchoolId.value)
+}
+
+function formatAssetUrl(url) {
+  if (!url) return ''
+  if (typeof url !== 'string') return ''
+  const match = url.match(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/(storage\/.*)$/)
+  if (match) {
+    return '/' + match[3]
+  }
+  return url
+}
+
+const logoUploading = ref(false)
+const bgUploading = ref(false)
+
+async function handleLogoUpload(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  logoUploading.value = true
+  try {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('type', 'logo')
+    const sid = selectedSchoolId.value || currentSchool.value?.id || null
+    if (sid) fd.append('school_id', sid)
+
+    const res = await api.post('/admin/website/upload-asset', fd)
+    if (res.data.success) {
+      settings.general.logo = res.data.url
+      Swal.fire({
+        icon: 'success',
+        title: 'Logo Uploaded!',
+        text: 'School logo updated successfully.',
+        timer: 1500,
+        showConfirmButton: false
+      })
+      window.dispatchEvent(new CustomEvent('school-logo-updated', {
+        detail: { logo: res.data.url }
+      }))
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Upload Failed',
+      text: err.response?.data?.message || 'Could not upload logo image.'
+    })
+  } finally {
+    logoUploading.value = false
+    e.target.value = ''
+  }
+}
+
+async function handleBgUpload(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  bgUploading.value = true
+  try {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('type', 'login_background')
+    const sid = selectedSchoolId.value || currentSchool.value?.id || null
+    if (sid) fd.append('school_id', sid)
+
+    const res = await api.post('/admin/website/upload-asset', fd)
+    if (res.data.success) {
+      settings.general.login_background = res.data.url
+      Swal.fire({
+        icon: 'success',
+        title: 'Backdrop Uploaded!',
+        text: 'Login page campus picture updated successfully.',
+        timer: 1500,
+        showConfirmButton: false
+      })
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Upload Failed',
+      text: err.response?.data?.message || 'Could not upload campus image.'
+    })
+  } finally {
+    bgUploading.value = false
+    e.target.value = ''
+  }
 }
 
 async function saveSection(sectionKey) {

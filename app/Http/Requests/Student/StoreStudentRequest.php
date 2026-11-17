@@ -93,12 +93,14 @@ class StoreStudentRequest extends FormRequest
 
             'aadhaar_no' => [
                 'nullable',
-                'digits:12',
+                'string',
+                'max:20',
             ],
 
             'mobile' => [
                 'nullable',
-                'digits_between:10,15',
+                'string',
+                'max:20',
             ],
 
             'email' => [
@@ -120,7 +122,8 @@ class StoreStudentRequest extends FormRequest
 
             'father_mobile' => [
                 'nullable',
-                'digits_between:10,15',
+                'string',
+                'max:20',
             ],
 
             'father_occupation' => [
@@ -137,7 +140,8 @@ class StoreStudentRequest extends FormRequest
 
             'mother_mobile' => [
                 'nullable',
-                'digits_between:10,15',
+                'string',
+                'max:20',
             ],
 
             'guardian_name' => [
@@ -148,14 +152,15 @@ class StoreStudentRequest extends FormRequest
 
             'guardian_mobile' => [
                 'nullable',
-                'digits_between:10,15',
+                'string',
+                'max:20',
             ],
 
             'photo' => [
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048',
+                'max:10240',
             ],
 
             'status' => [

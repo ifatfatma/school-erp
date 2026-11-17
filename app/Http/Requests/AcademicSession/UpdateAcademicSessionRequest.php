@@ -21,38 +21,48 @@ class UpdateAcademicSessionRequest extends FormRequest
      * @return array<string, ValidationRule|array<mixed>|string>
      */
 
-public function rules(): array
-{
-    $academicSession = $this->route('academic_session');
+    public function rules(): array
+    {
+        $routeParam = $this->route('academic_session') ?? $this->route('academic-session');
+        $sessionModel = $routeParam instanceof \App\Models\AcademicSession
+            ? $routeParam 
+            : (is_numeric($routeParam) ? \App\Models\AcademicSession::withoutGlobalScopes()->find($routeParam) : null);
+        $sessionId = $sessionModel?->id ?? (is_numeric($routeParam) ? (int)$routeParam : null);
 
-    return [
+        $tenantManager = app(\App\Services\TenantManager::class);
+        $schoolId = $this->input('school_id')
+            ?: ($sessionModel?->school_id
+            ?: ($this->user()?->school_id
+            ?: ($tenantManager->getTenantId() ?: 1)));
 
-        'school_id' => ['required', 'exists:schools,id'],
+        return [
 
-        'name' => [
+            'school_id' => ['nullable', 'exists:schools,id'],
 
-            'required',
+            'name' => [
 
-            'string',
+                'required',
 
-            'max:100',
+                'string',
 
-            Rule::unique('academic_sessions', 'name')
-                ->ignore($academicSession)
-                ->where(fn ($q) =>
-                    $q->where('school_id', $this->school_id)
-                ),
+                'max:100',
 
-        ],
+                Rule::unique('academic_sessions', 'name')
+                    ->ignore($sessionId)
+                    ->where(fn ($q) =>
+                        $q->where('school_id', $schoolId)
+                    ),
 
-        'start_date' => ['required', 'date'],
+            ],
 
-        'end_date' => ['required', 'date', 'after:start_date'],
+            'start_date' => ['required', 'date'],
 
-        'status' => ['required', 'boolean'],
+            'end_date' => ['required', 'date', 'after:start_date'],
 
-        'is_current' => ['required', 'boolean'],
+            'status' => ['required', 'boolean'],
 
-    ];
-}
+            'is_current' => ['required', 'boolean'],
+
+        ];
+    }
 }

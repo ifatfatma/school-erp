@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -84,6 +85,14 @@ onMounted(loadDropdowns);
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Teacher Leaves', to: { name: 'teacher-leaves.index' } },
+            { label: 'Apply Leave' }
+        ]"
+    />
+
 
     <div class="card">
 

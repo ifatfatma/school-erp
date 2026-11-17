@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -46,7 +47,15 @@ onMounted(async () => {
 
     const item = await scheduleStore.find(route.params.id);
 
-    Object.assign(form, item);
+    if (item) {
+        Object.assign(form, item);
+        if (form.start_time && form.start_time.length > 5) {
+            form.start_time = form.start_time.substring(0, 5);
+        }
+        if (form.end_time && form.end_time.length > 5) {
+            form.end_time = form.end_time.substring(0, 5);
+        }
+    }
 
 });
 
@@ -78,6 +87,14 @@ function cancel() {
 </script>
 
 <template>
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Exam Schedules', to: { name: 'exam-schedules.index' } },
+            { label: 'Edit Schedule' }
+        ]"
+    />
+
 
 <Form
 

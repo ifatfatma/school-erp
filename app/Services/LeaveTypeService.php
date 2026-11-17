@@ -47,7 +47,7 @@ class LeaveTypeService
     {
         return DB::transaction(function () use ($data) {
 
-            $data['school_id'] = Auth::user()->school_id;
+            $data['school_id'] = Auth::user()?->school_id ?? $data['school_id'] ?? app(\App\Services\TenantManager::class)->getTenantId() ?? 1;
             $data['created_by'] = Auth::id();
             $data['updated_by'] = Auth::id();
 
