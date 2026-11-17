@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, ref, onMounted } from "vue";
 
 import { useStudentAttendanceStore } from "@/stores/studentAttendance";
@@ -67,6 +68,14 @@ async function loadReport() {
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Student Attendance', to: { name: 'student-attendance.index' } },
+            { label: 'Monthly Report' }
+        ]"
+    />
+
 
 <div class="card">
 

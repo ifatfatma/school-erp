@@ -2,6 +2,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
+import Swal from "sweetalert2";
 import axios from "@/api/axios";
 
 import AppTable from "@/components/ui/AppTable.vue";
@@ -140,45 +141,64 @@ function edit(id) {
 }
 
 async function remove(id) {
+    const res = await Swal.fire({
+        title: "Delete this Exam?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, delete it!"
+    });
+    if (!res.isConfirmed) return;
 
-    if (!confirm("Delete this Exam?")) return;
-
-    await examStore.delete(id);
-
-    load(filters.page);
-
+    try {
+        await examStore.delete(id);
+        Swal.fire({ icon: "success", title: "Deleted!", text: "Exam deleted successfully.", timer: 1500, showConfirmButton: false });
+        load(filters.page);
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Error", text: e.response?.data?.message || "Failed to delete exam." });
+    }
 }
 
 async function lock(item) {
-
-    await examStore.lockMarks(item.id);
-
-    load(filters.page);
-
+    try {
+        await examStore.lockMarks(item.id);
+        Swal.fire({ icon: "success", title: "Marks Locked", text: "Marks have been locked for this exam.", timer: 1500, showConfirmButton: false });
+        load(filters.page);
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Error", text: e.response?.data?.message || "Failed to lock marks." });
+    }
 }
 
 async function unlock(item) {
-
-    await examStore.unlockMarks(item.id);
-
-    load(filters.page);
-
+    try {
+        await examStore.unlockMarks(item.id);
+        Swal.fire({ icon: "success", title: "Marks Unlocked", text: "Marks have been unlocked for this exam.", timer: 1500, showConfirmButton: false });
+        load(filters.page);
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Error", text: e.response?.data?.message || "Failed to unlock marks." });
+    }
 }
 
 async function publish(item) {
-
-    await examStore.publishResult(item.id);
-
-    load(filters.page);
-
+    try {
+        await examStore.publishResult(item.id);
+        Swal.fire({ icon: "success", title: "Results Published", text: "Results are now published for this exam.", timer: 1500, showConfirmButton: false });
+        load(filters.page);
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Error", text: e.response?.data?.message || "Failed to publish result." });
+    }
 }
 
 async function unpublish(item) {
-
-    await examStore.unpublishResult(item.id);
-
-    load(filters.page);
-
+    try {
+        await examStore.unpublishResult(item.id);
+        Swal.fire({ icon: "success", title: "Results Unpublished", text: "Results have been unpublished for this exam.", timer: 1500, showConfirmButton: false });
+        load(filters.page);
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Error", text: e.response?.data?.message || "Failed to unpublish result." });
+    }
 }
 </script>
 

@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useLeaveTypeStore } from "@/stores/leaveType";
@@ -60,6 +61,14 @@ onMounted(load);
 <template>
 
     <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Leave Types', to: { name: 'leave-types.index' } },
+            { label: 'Edit Leave Type' }
+        ]"
+    />
+
 
         <div class="card">
 

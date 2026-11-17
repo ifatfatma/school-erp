@@ -1,4 +1,5 @@
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
@@ -89,6 +90,14 @@ function resetForm()
 <template>
 
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Exam Subjects', to: { name: 'exam-subjects.index' } },
+            { label: 'Create Exam Subject' }
+        ]"
+    />
+
 
     <div class="card">
 

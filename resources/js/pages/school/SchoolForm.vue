@@ -143,6 +143,83 @@
                 </div>
               </div>
 
+              <!-- Login Page Left Background Image Section -->
+              <div class="col-md-12 mb-3">
+                <label class="form-label fw-semibold d-block">
+                  <i class="bi bi-image text-primary me-1"></i>
+                  Login Page Left Panel Background Picture
+                  <small class="text-muted fw-normal">(Campus photo, building, or modern school backdrop)</small>
+                </label>
+
+                <div class="card bg-light border-dashed p-3">
+                  <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                    <!-- Thumbnail Preview -->
+                    <div class="position-relative text-center">
+                      <div
+                        class="rounded-3 border bg-dark d-flex align-items-center justify-content-center shadow-sm overflow-hidden"
+                        style="width: 140px; height: 90px; min-width: 140px; background-size: cover; background-position: center;"
+                        :style="previewBgUrl ? { backgroundImage: `linear-gradient(rgba(15,23,42,0.45), rgba(15,23,42,0.7)), url(${previewBgUrl})` } : {}"
+                      >
+                        <div v-if="!previewBgUrl" class="text-white-50 text-center p-2">
+                          <i class="bi bi-camera fs-3 d-block opacity-75"></i>
+                          <small style="font-size: 0.65rem;">Default Blue</small>
+                        </div>
+                        <div v-else class="text-white text-center p-1">
+                          <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                          <small class="d-block text-white-50" style="font-size: 0.65rem;">Custom Photo</small>
+                        </div>
+                      </div>
+
+                      <button
+                        v-if="previewBgUrl"
+                        type="button"
+                        class="btn btn-sm btn-outline-danger py-0 px-2 mt-1"
+                        style="font-size: 0.75rem;"
+                        @click="removeBackground"
+                        title="Remove background"
+                      >
+                        <i class="bi bi-trash me-1"></i> Reset to Default
+                      </button>
+                    </div>
+
+                    <!-- Upload Controls -->
+                    <div class="flex-grow-1">
+                      <div class="mb-2">
+                        <label class="btn btn-outline-primary btn-sm mb-1 cursor-pointer">
+                          <i class="bi bi-cloud-arrow-up-fill me-1"></i>
+                          {{ previewBgUrl ? 'Change Campus Picture' : 'Upload School Picture' }}
+                          <input
+                            type="file"
+                            class="d-none"
+                            accept="image/png, image/jpeg, image/jpg, image/webp"
+                            @change="onBgFileSelected"
+                            ref="bgFileInput"
+                          />
+                        </label>
+                        <span v-if="selectedBgFileName" class="ms-2 small text-success fw-semibold">
+                          <i class="bi bi-check-circle-fill me-1"></i>{{ selectedBgFileName }}
+                        </span>
+                      </div>
+                      <small class="text-muted d-block mb-2">
+                        Recommended: High quality landscape picture (1920x1080 or 1200x800, max 5MB). An elegant dark gradient is applied so your school name and logo stay crisp and readable.
+                      </small>
+
+                      <!-- Optional URL Input -->
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white text-muted">Or URL</span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="form.login_background"
+                          placeholder="https://example.com/campus.jpg"
+                          @input="onBgUrlInput"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Subscription Plan (Super Admin only can edit) -->
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-semibold">Subscription Plan</label>
@@ -203,6 +280,7 @@ const isSuperAdmin = computed(() => {
 
 const modal = ref(null);
 const fileInput = ref(null);
+const bgFileInput = ref(null);
 let bsModal = null;
 
 const isEdit = ref(false);
@@ -212,6 +290,11 @@ const selectedFile = ref(null);
 const selectedFileName = ref('');
 const previewUrl = ref('');
 const isLogoRemoved = ref(false);
+
+const selectedBgFile = ref(null);
+const selectedBgFileName = ref('');
+const previewBgUrl = ref('');
+const isBgRemoved = ref(false);
 
 const form = reactive({
   name: '',
@@ -224,6 +307,7 @@ const form = reactive({
   country: '',
   postal_code: '',
   logo: '',
+  login_background: '',
   subscription_plan: 'starter',
   status: 1,
 });
@@ -263,6 +347,39 @@ function removeLogo() {
   }
 }
 
+function onBgFileSelected(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  selectedBgFile.value = file;
+  selectedBgFileName.value = file.name;
+  isBgRemoved.value = false;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    previewBgUrl.value = event.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function onBgUrlInput() {
+  if (form.login_background && !selectedBgFile.value) {
+    previewBgUrl.value = form.login_background;
+    isBgRemoved.value = false;
+  }
+}
+
+function removeBackground() {
+  selectedBgFile.value = null;
+  selectedBgFileName.value = '';
+  previewBgUrl.value = '';
+  form.login_background = '';
+  isBgRemoved.value = true;
+  if (bgFileInput.value) {
+    bgFileInput.value.value = '';
+  }
+}
+
 const open = (school = null) => {
   isEdit.value = !!school;
   selectedFile.value = null;
@@ -272,12 +389,24 @@ const open = (school = null) => {
     fileInput.value.value = '';
   }
 
+  selectedBgFile.value = null;
+  selectedBgFileName.value = '';
+  isBgRemoved.value = false;
+  if (bgFileInput.value) {
+    bgFileInput.value.value = '';
+  }
+
   if (school) {
     currentId.value = school.id;
     const rawLogo = Array.isArray(school.logo) ? school.logo[0] : school.logo;
     const cleanLogo = (typeof rawLogo === 'string' && rawLogo.trim() !== '' && rawLogo !== '[]' && !rawLogo.endsWith('/[]') && rawLogo !== 'null' && rawLogo !== '{}')
       ? rawLogo.trim()
       : '';
+
+    const cleanBg = (typeof school.login_background === 'string' && school.login_background.trim() !== '' && school.login_background !== '[]' && school.login_background !== 'null')
+      ? school.login_background.trim()
+      : '';
+
     Object.assign(form, {
       name: school.name || '',
       code: school.code || '',
@@ -289,18 +418,22 @@ const open = (school = null) => {
       country: school.country || '',
       postal_code: school.postal_code || '',
       logo: cleanLogo,
+      login_background: cleanBg,
       subscription_plan: school.subscription_plan || 'starter',
       status: school.status ? 1 : 0
     });
     previewUrl.value = cleanLogo;
+    previewBgUrl.value = cleanBg;
   } else {
     currentId.value = null;
     Object.assign(form, {
       name: '', code: '', email: '', phone: '', address: '',
       city: '', state: '', country: '', postal_code: '', logo: '',
+      login_background: '',
       subscription_plan: 'starter', status: 1
     });
     previewUrl.value = '';
+    previewBgUrl.value = '';
   }
 
   store.error = null;
@@ -338,6 +471,17 @@ const submit = async () => {
       const clean = form.logo.trim();
       if (clean && clean !== '[]' && clean !== 'null' && clean !== '{}') {
         formData.append('logo', clean);
+      }
+    }
+
+    if (selectedBgFile.value) {
+      formData.append('login_background', selectedBgFile.value);
+    } else if (isBgRemoved.value) {
+      formData.append('remove_login_background', '1');
+    } else if (form.login_background && typeof form.login_background === 'string') {
+      const cleanBg = form.login_background.trim();
+      if (cleanBg && cleanBg !== '[]' && cleanBg !== 'null' && cleanBg !== '{}') {
+        formData.append('login_background', cleanBg);
       }
     }
 

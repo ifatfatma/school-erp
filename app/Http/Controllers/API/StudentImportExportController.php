@@ -36,6 +36,10 @@ class StudentImportExportController extends Controller
      */
     public function importExcel(Request $request)
     {
+        @ini_set('max_execution_time', '0');
+        @set_time_limit(0);
+        @ini_set('memory_limit', '512M');
+
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240',
             'default_class_id' => 'nullable|exists:classes,id',

@@ -19,6 +19,8 @@ class ExamScheduleRepository
      */
     public function paginate(array $filters = []): LengthAwarePaginator
     {
+        $schoolId = auth()->user()?->school_id ?? app(\App\Services\TenantManager::class)->getTenantId();
+
         return $this->model
 
             ->with([
@@ -31,7 +33,7 @@ class ExamScheduleRepository
                 'updater',
             ])
 
-            ->where('school_id', auth()->user()->school_id)
+            ->when($schoolId, fn($q) => $q->where('school_id', $schoolId))
 
             ->filter($filters)
 
@@ -47,6 +49,8 @@ class ExamScheduleRepository
      */
     public function find(int $id): ExamSchedule
     {
+        $schoolId = auth()->user()?->school_id ?? app(\App\Services\TenantManager::class)->getTenantId();
+
         return $this->model
 
             ->with([
@@ -59,7 +63,7 @@ class ExamScheduleRepository
                 'updater',
             ])
 
-            ->where('school_id', auth()->user()->school_id)
+            ->when($schoolId, fn($q) => $q->where('school_id', $schoolId))
 
             ->findOrFail($id);
     }
@@ -106,9 +110,11 @@ class ExamScheduleRepository
      */
     public function active()
     {
+        $schoolId = auth()->user()?->school_id ?? app(\App\Services\TenantManager::class)->getTenantId();
+
         return $this->model
 
-            ->where('school_id', auth()->user()->school_id)
+            ->when($schoolId, fn($q) => $q->where('school_id', $schoolId))
 
             ->where('status', true)
 
@@ -129,10 +135,11 @@ class ExamScheduleRepository
         int $subjectId,
         ?int $ignoreId = null
     ): bool {
+        $schoolId = auth()->user()?->school_id ?? app(\App\Services\TenantManager::class)->getTenantId();
 
         return $this->model
 
-            ->where('school_id', auth()->user()->school_id)
+            ->when($schoolId, fn($q) => $q->where('school_id', $schoolId))
 
             ->where('exam_id', $examId)
 

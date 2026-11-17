@@ -528,6 +528,22 @@ v-model="form.mother_mobile"
 </div>
 
 <div class="col-md-4 mb-3">
+    <label class="form-label">Guardian Name</label>
+    <input class="form-control" v-model="form.guardian_name" placeholder="Optional or Father's Name" />
+    <div class="text-danger" v-if="errors.guardian_name">
+        {{ errors.guardian_name[0] }}
+    </div>
+</div>
+
+<div class="col-md-4 mb-3">
+    <label class="form-label">Guardian Mobile</label>
+    <input class="form-control" v-model="form.guardian_mobile" placeholder="10-digit mobile number" />
+    <div class="text-danger" v-if="errors.guardian_mobile">
+        {{ errors.guardian_mobile[0] }}
+    </div>
+</div>
+
+<div class="col-md-4 mb-3">
     <label class="form-label fw-semibold">Photo</label>
     <div v-if="form.photo_url" class="d-flex align-items-center gap-2 mb-2">
         <img

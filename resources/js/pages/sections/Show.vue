@@ -1,5 +1,6 @@
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -38,6 +39,14 @@ onMounted(load);
 </script>
 
 <template>
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Sections', to: { name: 'sections.index' } },
+            { label: 'Section Details' }
+        ]"
+    />
+
 
     <AppLoader v-if="store.loading" />
 

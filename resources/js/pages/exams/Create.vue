@@ -1,6 +1,7 @@
 <script setup>
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
+import Swal from "sweetalert2";
 
 import Form from "./Form.vue";
 import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
@@ -36,21 +37,26 @@ const form = reactive({
 });
 
 async function save() {
-
     try {
-
         await examStore.create(form);
-
+        await Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Exam created successfully.",
+            timer: 1500,
+            showConfirmButton: false
+        });
         router.push({
             name: "exams.index"
         });
-
     } catch (e) {
-
         console.error(e);
-
+        Swal.fire({
+            icon: "error",
+            title: "Creation Failed",
+            text: e.response?.data?.message || (e.response?.data?.errors?.exam ? e.response.data.errors.exam[0] : "Failed to create exam.")
+        });
     }
-
 }
 
 function cancel() {

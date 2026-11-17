@@ -122,6 +122,10 @@ onBeforeUnmount(() => {
 
 <div class="card-body">
 
+<div v-if="errors.exam" class="alert alert-danger mb-3">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errors.exam[0] }}
+</div>
+
 <div class="row">
 
 <!-- Target School / Campus (Super Admin) -->

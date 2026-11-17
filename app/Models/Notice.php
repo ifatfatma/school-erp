@@ -32,6 +32,15 @@ class Notice extends Model
         'status' => 'boolean',
     ];
 
+    protected $appends = [
+        'description',
+    ];
+
+    public function getDescriptionAttribute()
+    {
+        return $this->content;
+    }
+
     public function school()
     {
         return $this->belongsTo(School::class);

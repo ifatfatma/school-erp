@@ -2,25 +2,69 @@
     <div class="container-fluid vh-100">
         <div class="row h-100">
 
-            <div class="col-md-7 d-none d-md-flex bg-primary text-white justify-content-center align-items-center">
-                <div class="text-center p-4">
+            <div
+                class="col-md-7 d-none d-md-flex text-white justify-content-center align-items-center position-relative overflow-hidden"
+                :style="leftPanelStyle"
+            >
+                <!-- Elegant Glassmorphic Ambient Glow & Vignette -->
+                <div
+                    class="position-absolute top-0 start-0 w-100 h-100 pointer-events-none"
+                    :style="{
+                        background: hasCustomBg
+                            ? 'radial-gradient(circle at center, transparent 30%, rgba(10, 15, 30, 0.55) 100%)'
+                            : 'radial-gradient(circle at top left, rgba(255,255,255,0.12) 0%, transparent 60%)'
+                    }"
+                ></div>
 
-                    <img
-                        v-if="schoolInfo?.logo"
-                        :src="schoolInfo.logo"
-                        alt="School Logo"
-                        class="mb-3 rounded bg-white p-2 shadow"
-                        style="max-height: 90px; max-width: 140px; object-fit: contain;"
-                    />
+                <div class="text-center p-4 p-lg-5 position-relative z-1" style="max-width: 620px;">
 
-                    <h1 class="display-5 fw-bold">
+                    <!-- Pill Badge -->
+                    <div class="mb-3">
+                        <span class="badge bg-white bg-opacity-20 text-white backdrop-blur border border-white border-opacity-25 px-3 py-2 rounded-pill text-uppercase fw-semibold shadow-sm" style="letter-spacing: 1.5px; font-size: 0.72rem;">
+                            <i class="bi bi-mortarboard-fill me-1 text-warning"></i> Official School Portal
+                        </span>
+                    </div>
+
+                    <!-- School Logo with Modern Glassmorphism Frame -->
+                    <div v-if="schoolInfo?.logo" class="mb-3">
+                        <div class="d-inline-flex p-3 rounded-4 bg-white shadow-lg border border-white border-opacity-75">
+                            <img
+                                :src="schoolInfo.logo"
+                                alt="School Logo"
+                                style="max-height: 85px; max-width: 160px; object-fit: contain;"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- School Name -->
+                    <h1 class="display-4 fw-black text-white mb-2" style="font-weight: 800; text-shadow: 0 4px 16px rgba(0,0,0,0.45); letter-spacing: -0.5px;">
                         {{ schoolInfo?.name || 'School ERP' }}
                     </h1>
 
-                    <p class="lead">
+                    <!-- Location / Subtitle -->
+                    <p class="lead text-white-50 mb-4" style="text-shadow: 0 2px 8px rgba(0,0,0,0.35); font-size: 1.15rem;">
+                        <i class="bi bi-geo-alt-fill text-danger me-1" v-if="schoolInfo?.city"></i>
                         {{ schoolInfo?.city ? `${schoolInfo.city}, ${schoolInfo.state || ''}` : 'Complete School Management System' }}
                     </p>
 
+                    <!-- Feature Badges -->
+                    <div class="d-flex justify-content-center gap-2 flex-wrap pt-2">
+                        <span class="badge bg-white bg-opacity-15 border border-white border-opacity-20 text-white rounded-pill px-3 py-2 small shadow-sm">
+                            <i class="bi bi-mortarboard text-warning me-1"></i> Academic Hub
+                        </span>
+                        <span class="badge bg-white bg-opacity-15 border border-white border-opacity-20 text-white rounded-pill px-3 py-2 small shadow-sm">
+                            <i class="bi bi-fingerprint text-info me-1"></i> Biometrics & AI
+                        </span>
+                        <span class="badge bg-white bg-opacity-15 border border-white border-opacity-20 text-white rounded-pill px-3 py-2 small shadow-sm">
+                            <i class="bi bi-shield-check text-success me-1"></i> Cloud ERP
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- Subtle bottom brand copyright -->
+                <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center text-white-50 small z-1" style="font-size: 0.78rem;">
+                    &copy; {{ new Date().getFullYear() }} {{ schoolInfo?.name || 'School ERP' }} &bull; All Rights Reserved
                 </div>
             </div>
 
@@ -48,12 +92,14 @@
 
                             <div class="mb-3">
 
-                                <label>Email</label>
+                                <label>Email or Admission No</label>
 
                                 <input
-                                    type="email"
+                                    type="text"
                                     class="form-control"
                                     v-model="form.email"
+                                    placeholder="email@example.com or admission no"
+                                    required
                                 >
 
                             </div>
@@ -143,6 +189,25 @@ const loading = ref(false);
 const showPassword = ref(false);
 const schoolInfo = ref(null);
 
+const hasCustomBg = computed(() => {
+    const bg = schoolInfo.value?.login_background;
+    return typeof bg === 'string' && bg.trim() !== '' && bg !== 'null' && bg !== '[]' && bg !== '{}';
+});
+
+const leftPanelStyle = computed(() => {
+    if (hasCustomBg.value) {
+        return {
+            backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.78) 0%, rgba(30, 58, 138, 0.68) 100%), url('${schoolInfo.value.login_background}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+        };
+    }
+    return {
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #1d4ed8 100%)',
+    };
+});
+
 const schoolCodeParam = computed(() => {
     return route.params.schoolCode || route.query.school || "";
 });
@@ -180,23 +245,30 @@ async function submit(){
 
     try{
 
-        await auth.login(form);
+        const response = await auth.login(form);
 
         Swal.fire({
-
             icon:"success",
-
             title:"Welcome",
-
             timer:1000,
-
             showConfirmButton:false
-
         });
 
-        router.push("/dashboard");
+        const loggedUser = response?.data?.user || auth.user;
+        const isParent = loggedUser?.user_type === 'parent' || loggedUser?.roles?.some(r => r.name?.toLowerCase() === 'parent');
+        const isStudent = loggedUser?.user_type === 'student' || loggedUser?.roles?.some(r => r.name?.toLowerCase() === 'student');
+
+        if (isParent) {
+            router.push("/parent/dashboard");
+        } else if (isStudent) {
+            router.push("/portal/dashboard");
+        } else {
+            router.push("/dashboard");
+        }
 
     }catch(error){
+
+        console.error("Login error:", error);
 
         Swal.fire({
 
@@ -215,3 +287,13 @@ async function submit(){
 }
 
 </script>
+
+<style scoped>
+.backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.text-shadow {
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+</style>

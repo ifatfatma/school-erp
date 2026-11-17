@@ -7,7 +7,6 @@ use App\Models\SchoolClass;
 use App\Models\Section;
 use App\Models\Student;
 use App\Models\User;
-use App\Services\TenantManager;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -43,9 +42,17 @@ class StudentImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
-        $activeSession = AcademicSession::where('is_current', true)->first();
+        @ini_set('max_execution_time', '0');
+        @set_time_limit(0);
+        @ini_set('memory_limit', '512M');
+
+        // 1. Resolve Active Session for this School
+        $activeSession = AcademicSession::where('school_id', $this->schoolId)->where('is_current', true)->first()
+            ?: (AcademicSession::where('school_id', $this->schoolId)->first()
+            ?: AcademicSession::where('is_current', true)->first());
         $academicSessionId = $activeSession ? $activeSession->id : 1;
 
+        // 2. Pre-fetch Classes & Sections for this School into memory
         $classesCache = SchoolClass::withoutGlobalScopes()
             ->where('school_id', $this->schoolId)
             ->get();
@@ -54,19 +61,55 @@ class StudentImport implements ToCollection, WithHeadingRow
             ->where('school_id', $this->schoolId)
             ->get();
 
+        // 3. Pre-fetch existing admission numbers for this school to avoid N+1 DB queries
+        $existingAdmissionNos = Student::withoutGlobalScopes()
+            ->where('school_id', $this->schoolId)
+            ->pluck('admission_no')
+            ->map(fn($v) => strtolower(trim((string)$v)))
+            ->flip()
+            ->toArray();
+
+        // 4. Pre-fetch existing user accounts to avoid N+1 DB queries
+        $existingUsers = User::whereNotNull('email')
+            ->orWhereNotNull('username')
+            ->get(['id', 'email', 'username']);
+
+        $existingEmailsMap = [];
+        $existingUsernamesMap = [];
+        foreach ($existingUsers as $u) {
+            if (!empty($u->email)) {
+                $existingEmailsMap[strtolower(trim($u->email))] = $u->id;
+            }
+            if (!empty($u->username)) {
+                $existingUsernamesMap[strtolower(trim($u->username))] = $u->id;
+            }
+        }
+
+        // 5. Pre-hash default portal password ONCE (massive performance boost vs hashing 500x)
+        $defaultPasswordHash = Hash::make('12345678');
+
+        // 6. Role lookup
         $studentRole = Role::where('name', 'Student')->where('guard_name', 'sanctum')->first();
 
-        $rowNumber = 1; // Heading is row 1, data starts at row 2
+        // 7. Base student count for auto-generating admission numbers
+        $baseStudentCount = Student::withoutGlobalScopes()->where('school_id', $this->schoolId)->count();
+        $currentYear = date('Y');
+        $rowNumber = 1;
 
         foreach ($rows as $rawRow)
         {
             $rowNumber++;
+
+            if ($rowNumber % 25 === 0) {
+                @set_time_limit(180);
+            }
+
             $row = $this->normalizeKeys($rawRow->toArray());
 
-            // Check if row is empty
+            // Skip empty rows
             $firstName = trim($row['first_name'] ?? '');
             if (empty($firstName)) {
-                continue; // Skip blank lines silently
+                continue;
             }
 
             $lastName = trim($row['last_name'] ?? '');
@@ -77,7 +120,9 @@ class StudentImport implements ToCollection, WithHeadingRow
             $classInput = trim($row['class'] ?? ($row['class_name'] ?? ''));
             if (!empty($classInput)) {
                 $matchedClass = $classesCache->first(function ($c) use ($classInput) {
-                    return strcasecmp($c->name, $classInput) === 0 || (string)$c->id === $classInput;
+                    return strcasecmp($c->name, $classInput) === 0 
+                        || (string)$c->id === $classInput
+                        || (string)$c->numeric_name === $classInput;
                 });
                 if ($matchedClass) {
                     $classId = $matchedClass->id;
@@ -119,7 +164,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                 $sectionId = $this->defaultSectionId;
             }
 
-            // If still no section, use the first section for that class if available
+            // Fallback: pick first section of that class
             if (!$sectionId) {
                 $firstSec = $sectionsCache->firstWhere('class_id', $classId);
                 if ($firstSec) {
@@ -129,18 +174,13 @@ class StudentImport implements ToCollection, WithHeadingRow
 
             // 3. Auto-generate Admission Number if empty
             if (empty($admissionNo)) {
-                $count = Student::withoutGlobalScopes()->where('school_id', $this->schoolId)->count() + $this->importedCount + $this->skippedCount + 1;
-                $year = date('Y');
-                $admissionNo = sprintf("ADM-%s-%04d", $year, $count);
+                $count = $baseStudentCount + $this->importedCount + $this->skippedCount + 1;
+                $admissionNo = sprintf("ADM-%s-%04d", $currentYear, $count);
             }
 
-            // 4. Duplicate Check
-            $exists = Student::withoutGlobalScopes()
-                ->where('school_id', $this->schoolId)
-                ->where('admission_no', $admissionNo)
-                ->exists();
-
-            if ($exists) {
+            // 4. Duplicate Check (in-memory)
+            $normAdmissionNo = strtolower($admissionNo);
+            if (isset($existingAdmissionNos[$normAdmissionNo])) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'name' => "{$firstName} {$lastName}",
@@ -150,6 +190,8 @@ class StudentImport implements ToCollection, WithHeadingRow
                 $this->skippedCount++;
                 continue;
             }
+            // Mark as used in memory for remaining rows
+            $existingAdmissionNos[$normAdmissionNo] = true;
 
             // 5. Gender Normalization
             $genderRaw = strtolower(trim($row['gender'] ?? 'male'));
@@ -177,32 +219,43 @@ class StudentImport implements ToCollection, WithHeadingRow
                 DB::transaction(function () use (
                     $admissionNo, $rollNo, $firstName, $lastName, $classId, $sectionId,
                     $academicSessionId, $gender, $dob, $admissionDate, $mobile, $email,
-                    $bloodGroup, $fatherName, $fatherMobile, $motherName, $address, $studentRole
+                    $bloodGroup, $fatherName, $fatherMobile, $motherName, $address,
+                    $studentRole, $defaultPasswordHash, &$existingEmailsMap, &$existingUsernamesMap
                 ) {
                     $userId = null;
 
                     // Create User Account if requested
                     if ($this->createPortalAccounts) {
-                        $userEmail = $email ?: strtolower($admissionNo) . '@school.internal';
-                        
-                        // Ensure unique email for user
-                        $user = User::where('email', $userEmail)->first();
-                        if (!$user) {
+                        $userEmail = $email ? strtolower(trim($email)) : strtolower($admissionNo) . '@school.internal';
+                        $username = strtolower($admissionNo);
+
+                        if (isset($existingEmailsMap[$userEmail])) {
+                            $userId = $existingEmailsMap[$userEmail];
+                        } elseif (isset($existingUsernamesMap[$username])) {
+                            $userId = $existingUsernamesMap[$username];
+                        } else {
                             $user = User::create([
                                 'school_id' => $this->schoolId,
                                 'name' => trim("{$firstName} {$lastName}"),
-                                'username' => strtolower($admissionNo),
+                                'username' => $username,
                                 'email' => $userEmail,
-                                'password' => Hash::make('12345678'),
+                                'password' => $defaultPasswordHash,
                                 'user_type' => 'student',
                                 'status' => 1,
                             ]);
 
                             if ($studentRole) {
-                                $user->assignRole($studentRole);
+                                DB::table('model_has_roles')->insertOrIgnore([
+                                    'role_id' => $studentRole->id,
+                                    'model_type' => User::class,
+                                    'model_id' => $user->id,
+                                ]);
                             }
+
+                            $userId = $user->id;
+                            $existingEmailsMap[$userEmail] = $userId;
+                            $existingUsernamesMap[$username] = $userId;
                         }
-                        $userId = $user->id;
                     }
 
                     // Create Student Record
@@ -251,7 +304,7 @@ class StudentImport implements ToCollection, WithHeadingRow
     {
         $normalized = [];
         foreach ($row as $key => $value) {
-            $cleanKey = strtolower(trim($key));
+            $cleanKey = strtolower(trim((string)$key));
             $cleanKey = preg_replace('/[^a-z0-9_]/', '_', $cleanKey);
             $cleanKey = preg_replace('/_+/', '_', $cleanKey);
             $cleanKey = trim($cleanKey, '_');

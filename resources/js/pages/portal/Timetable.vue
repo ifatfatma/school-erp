@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -74,7 +74,16 @@ async function loadTimetable() {
   }
 }
 
+function handleStudentSwitch() {
+  loadTimetable()
+}
+
 onMounted(() => {
   loadTimetable()
+  window.addEventListener('portal-student-switched', handleStudentSwitch)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('portal-student-switched', handleStudentSwitch)
 })
 </script>

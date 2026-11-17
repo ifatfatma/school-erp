@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSchoolClassRequest extends FormRequest
 {
@@ -19,12 +20,23 @@ class StoreSchoolClassRequest extends FormRequest
      */
     public function rules(): array
     {
+        $tenantManager = app(\App\Services\TenantManager::class);
+        $schoolId = $this->input('school_id') 
+            ?: ($this->user()?->school_id 
+            ?: ($tenantManager->getSchoolId() ?: 1));
+
         return [
+            'school_id' => [
+                'nullable',
+                'integer',
+                'exists:schools,id'
+            ],
+
             'name' => [
                 'required',
                 'string',
                 'max:100',
-                'unique:classes,name'
+                Rule::unique('classes', 'name')->where(fn ($q) => $q->where('school_id', $schoolId))
             ],
 
             'numeric_name' => [
@@ -51,7 +63,7 @@ class StoreSchoolClassRequest extends FormRequest
     {
         return [
             'name.required' => 'Class name is required.',
-            'name.unique' => 'This class already exists.',
+            'name.unique' => 'This class already exists for this school.',
             'status.required' => 'Please select a status.',
         ];
     }

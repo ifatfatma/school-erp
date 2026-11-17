@@ -47,15 +47,22 @@ class AcademicSessionController extends Controller
         return new AcademicSessionResource($session);
     }
 
-    public function show(AcademicSession $academicSession)
+    public function show($academicSession)
     {
+        if (!($academicSession instanceof AcademicSession)) {
+            $academicSession = AcademicSession::withoutGlobalScopes()->findOrFail($academicSession);
+        }
         return new AcademicSessionResource($academicSession);
     }
 
     public function update(
         UpdateAcademicSessionRequest $request,
-        AcademicSession $academicSession
+        $academicSession
     ) {
+        if (!($academicSession instanceof AcademicSession)) {
+            $academicSession = AcademicSession::withoutGlobalScopes()->findOrFail($academicSession);
+        }
+
         $session = $this->service->update(
             $academicSession,
             $request->validated()
@@ -68,8 +75,12 @@ class AcademicSessionController extends Controller
         ]);
     }
 
-    public function destroy(AcademicSession $academicSession)
+    public function destroy($academicSession)
     {
+        if (!($academicSession instanceof AcademicSession)) {
+            $academicSession = AcademicSession::withoutGlobalScopes()->findOrFail($academicSession);
+        }
+
         $this->service->delete($academicSession);
 
         return response()->json([

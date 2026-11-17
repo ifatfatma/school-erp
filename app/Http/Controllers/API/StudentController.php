@@ -32,7 +32,7 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user() ?: auth('sanctum')->user() ?: auth()->user();
         $isSuperAdmin = $user && (
             $user->user_type === 'super_admin' || 
             (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
@@ -52,6 +52,8 @@ class StudentController extends Controller
             'section_id' => $request->section_id,
             'status'     => $request->status,
             'per_page'   => $request->per_page ?? 15,
+            'page'       => $request->page ?? 1,
+            'user'       => $user,
         ]);
 
         $resource = StudentResource::collection($students);

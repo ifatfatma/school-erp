@@ -46,7 +46,14 @@
                     aria-expanded="false"
                     title="Switch Active Institution / Campus"
                 >
-                    <i class="bi bi-buildings text-primary"></i>
+                    <img
+                        v-if="currentSchoolLogo"
+                        :src="currentSchoolLogo"
+                        alt="Logo"
+                        class="rounded"
+                        style="width: 22px; height: 22px; object-fit: contain;"
+                    />
+                    <i v-else class="bi bi-buildings text-primary"></i>
                     <span class="text-dark text-truncate" style="max-width: 190px;">
                         {{ currentSchoolName || 'Select School' }}
                     </span>
@@ -75,9 +82,21 @@
                             :class="{ active: String(tenantStore.activeSchoolId) === String(t.id) }"
                             @click="onTenantSelect(t.id)"
                         >
-                            <div class="text-truncate me-2">
-                                <div class="fw-semibold text-truncate" style="max-width: 220px;">{{ t.name }}</div>
-                                <small class="text-muted font-monospace">{{ t.code }}</small>
+                            <div class="d-flex align-items-center gap-2 text-truncate me-2">
+                                <img
+                                    v-if="t.logo"
+                                    :src="t.logo"
+                                    alt="Logo"
+                                    class="rounded border bg-white p-0 flex-shrink-0"
+                                    style="width: 24px; height: 24px; object-fit: contain;"
+                                />
+                                <div v-else class="rounded bg-light border d-flex align-items-center justify-content-center flex-shrink-0" style="width: 24px; height: 24px;">
+                                    <i class="bi bi-building text-secondary" style="font-size: 0.75rem;"></i>
+                                </div>
+                                <div class="text-truncate">
+                                    <div class="fw-semibold text-truncate" style="max-width: 200px;">{{ t.name }}</div>
+                                    <small class="text-muted font-monospace">{{ t.code }}</small>
+                                </div>
                             </div>
                             <i v-if="String(tenantStore.activeSchoolId) === String(t.id)" class="bi bi-check-lg text-primary"></i>
                         </button>
@@ -89,7 +108,14 @@
                 class="d-flex align-items-center gap-2 me-2 px-3 py-1 rounded-pill bg-light border text-muted small shadow-sm"
                 title="Active Institution"
             >
-                <i class="bi bi-building text-primary"></i>
+                <img
+                    v-if="currentSchoolLogo"
+                    :src="currentSchoolLogo"
+                    alt="Logo"
+                    class="rounded"
+                    style="width: 22px; height: 22px; object-fit: contain;"
+                />
+                <i v-else class="bi bi-building text-primary"></i>
                 <span class="fw-semibold text-dark text-truncate" style="max-width: 200px;">
                     {{ currentSchoolName }}
                 </span>
@@ -286,8 +312,19 @@ function handleTenantSwitched(e) {
     }
 }
 
+function handleSchoolLogoUpdated(e) {
+    logoError.value = false;
+    if (auth.user?.school) {
+        auth.user.school.logo = e.detail?.logo || auth.user.school.logo;
+    }
+    if (tenantStore.currentTenant) {
+        tenantStore.currentTenant.logo = e.detail?.logo || tenantStore.currentTenant.logo;
+    }
+}
+
 onMounted(async () => {
     window.addEventListener('tenant-switched', handleTenantSwitched);
+    window.addEventListener('school-logo-updated', handleSchoolLogoUpdated);
     if (!auth.user && auth.token) {
         await auth.loadProfile();
     }
@@ -303,6 +340,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
     window.removeEventListener('tenant-switched', handleTenantSwitched);
+    window.removeEventListener('school-logo-updated', handleSchoolLogoUpdated);
 });
 
 async function onTenantSelect(id) {
@@ -311,12 +349,17 @@ async function onTenantSelect(id) {
 
 const logoError = ref(false);
 
-const schoolLogo = computed(() => {
+const currentSchoolLogo = computed(() => {
     if (logoError.value) return null;
-    const l = auth.user?.school?.logo;
-    if (!l || l === "[]" || l.endsWith("/[]") || l === "null") return null;
+    if (tenantStore.isGlobal || tenantStore.activeSchoolId === 'all') {
+        return null;
+    }
+    const l = tenantStore.currentTenant?.logo || auth.user?.school?.logo;
+    if (!l || l === "[]" || l.endsWith("/[]") || l === "null" || l === "{}") return null;
     return l;
 });
+
+const schoolLogo = currentSchoolLogo;
 
 
 /*

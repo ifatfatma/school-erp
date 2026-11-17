@@ -90,6 +90,12 @@ class DashboardController extends Controller
                 abort(401, 'Unauthenticated.');
             }
 
+            // Role Isolation: Parent should NEVER see school-wide metrics (1001 students, income, etc.)
+            $isParent = ($user->user_type === 'parent' || $user->user_type === 'guardian' || $user->hasRole('Parent') || $user->hasRole('parent'));
+            if ($isParent) {
+                return app(\App\Http\Controllers\API\ParentPortalController::class)->dashboard($request);
+            }
+
             $tenantManager = app(TenantManager::class);
             $isSuperAdmin = $tenantManager->isSuperAdmin($user);
 

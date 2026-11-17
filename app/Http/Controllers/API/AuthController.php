@@ -18,24 +18,25 @@ class AuthController extends Controller
     */
     public function login(LoginRequest $request)
     {
+        $identifier = strtolower(trim($request->email));
         $credentials = [
-            'email' => strtolower(
-                trim($request->email)
-            ),
+            'email' => $identifier,
             'password' => $request->password,
         ];
 
 
         /*
         |--------------------------------------------------------------------------
-        | FIND USER
+        | FIND USER (BY EMAIL OR USERNAME / ADMISSION NO)
         |--------------------------------------------------------------------------
         */
 
-        $user = User::where(
-            'email',
-            $credentials['email']
-        )->first();
+        $user = User::withoutGlobalScopes()
+            ->where(function ($q) use ($identifier) {
+                $q->where('email', $identifier)
+                  ->orWhere('username', $identifier);
+            })
+            ->first();
 
 
         /*

@@ -81,9 +81,12 @@
                   </div>
 
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">Academic Session</label>
-                    <select v-model="form.academic_session_id" class="form-select">
-                      <option v-for="s in sessions" :key="s.id" :value="s.id">{{ s.name }} ({{ s.status }})</option>
+                    <label class="form-label fw-semibold">Academic Session <span class="text-danger">*</span></label>
+                    <select v-model="form.academic_session_id" class="form-select" required>
+                      <option value="">-- Select Academic Session --</option>
+                      <option v-for="s in sessions" :key="s.id" :value="s.id">
+                        {{ s.name }} {{ s.is_current ? '(Current Session)' : '' }}
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -290,7 +293,7 @@ async function fetchMetadata(customSchool = '') {
       }
 
       if (sessions.value.length > 0) {
-        const active = sessions.value.find(s => s.status === 'active') || sessions.value[0]
+        const active = sessions.value.find(s => s.is_current) || sessions.value.find(s => s.status) || sessions.value[0]
         form.academic_session_id = active.id
       }
       if (classes.value.length > 0) {
@@ -367,4 +370,16 @@ function resetForm() {
 onMounted(() => {
   fetchMetadata()
 })
+
+watch(
+  () => [websiteData.school, route.params.schoolCode, route.query.school],
+  () => {
+    const code = route.params.schoolCode || route.query.school || websiteData.school?.code
+    if (code && code !== selectedSchoolCode.value) {
+      selectedSchoolCode.value = code
+      fetchMetadata(code)
+    }
+  },
+  { deep: true }
+)
 </script>

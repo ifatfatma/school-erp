@@ -27,6 +27,8 @@ class SchoolRequest extends FormRequest
             'postal_code'  => 'nullable|string|max:20',
             'logo'         => 'nullable',
             'remove_logo'  => 'nullable|boolean',
+            'login_background'        => 'nullable',
+            'remove_login_background' => 'nullable|boolean',
             'status'       => 'nullable',
             'subscription_plan'   => 'nullable|string|in:starter,basic,growth,professional,enterprise',
             'subscription_status' => 'nullable|string|in:active,trial,expired,cancelled',

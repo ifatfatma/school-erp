@@ -283,7 +283,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 
@@ -359,6 +359,11 @@ function getPlatformBadge(platform) {
 
 onMounted(() => {
   loadPortalOnlineClasses()
+  window.addEventListener('portal-student-switched', loadPortalOnlineClasses)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('portal-student-switched', loadPortalOnlineClasses)
 })
 </script>
 

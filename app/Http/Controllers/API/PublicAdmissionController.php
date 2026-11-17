@@ -165,9 +165,22 @@ class PublicAdmissionController extends Controller
 
         $sessions = AcademicSession::withoutGlobalScopes()
             ->where('school_id', $schoolId)
-            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->where('status', true)->orWhere('status', 1)->orWhere('is_current', true);
+            })
+            ->orderBy('is_current', 'desc')
             ->orderBy('id', 'desc')
-            ->get(['id', 'name', 'start_date', 'end_date', 'status']);
+            ->get(['id', 'name', 'start_date', 'end_date', 'status', 'is_current']);
+
+        if ($sessions->isEmpty()) {
+            $sessions = AcademicSession::withoutGlobalScopes()
+                ->where(function ($q) {
+                    $q->where('status', true)->orWhere('is_current', true);
+                })
+                ->orderBy('is_current', 'desc')
+                ->orderBy('id', 'desc')
+                ->get(['id', 'name', 'start_date', 'end_date', 'status', 'is_current']);
+        }
 
         $classes = SchoolClass::withoutGlobalScopes()
             ->where('school_id', $schoolId)
@@ -235,7 +248,10 @@ class PublicAdmissionController extends Controller
         if (empty($validated['academic_session_id'])) {
             $activeSession = AcademicSession::withoutGlobalScopes()
                 ->where('school_id', $schoolId)
-                ->where('status', 'active')
+                ->where(function ($q) {
+                    $q->where('is_current', true)->orWhere('status', true)->orWhere('status', 1);
+                })
+                ->orderBy('is_current', 'desc')
                 ->first();
             $validated['academic_session_id'] = $activeSession ? $activeSession->id : null;
         }

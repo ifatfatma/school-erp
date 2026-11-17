@@ -23,9 +23,17 @@ class StoreSubjectRequest extends FormRequest
      */
     public function rules(): array
     {
+        $schoolId = $this->input('school_id') ?: (auth()->user()?->school_id ?: 1);
+
         return [
+            'school_id'   => 'nullable|integer|exists:schools,id',
             'name'        => 'required|string|max:255',
-            'code'        => 'required|string|max:20|unique:subjects,code',
+            'code'        => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('subjects', 'code')->where('school_id', $schoolId),
+            ],
             'type'        => 'required|in:Theory,Practical,Both',
             'description' => 'nullable|string',
             'status'      => 'required|boolean',

@@ -110,6 +110,22 @@ class ExamRepository
     }
 
     /**
+     * Check if exam exists
+     */
+    public function exists(string $name, $academicSessionId, $examTypeId, ?int $ignoreId = null, ?int $schoolId = null): bool
+    {
+        $targetSchoolId = $schoolId ?? $this->resolveSchoolId();
+
+        return $this->model
+            ->when($targetSchoolId, fn($q) => $q->where('school_id', $targetSchoolId))
+            ->where('name', $name)
+            ->where('academic_session_id', $academicSessionId)
+            ->where('exam_type_id', $examTypeId)
+            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+            ->exists();
+    }
+
+    /**
      * Delete
      */
     public function delete(Exam $exam): bool

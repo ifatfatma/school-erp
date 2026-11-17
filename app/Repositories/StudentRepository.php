@@ -18,7 +18,7 @@ class StudentRepository
                 'section',
             ]);
 
-        $user = auth()->user();
+        $user = $filters['user'] ?? auth('sanctum')->user() ?? auth()->user();
         $isSuperAdmin = $user && (
             $user->user_type === 'super_admin' || 
             (method_exists($user, 'hasRole') && ($user->hasRole('Super Admin') || $user->hasRole('super_admin'))) ||
@@ -53,7 +53,7 @@ class StudentRepository
                 $query->where('status', $filters['status']);
             })
             ->latest('students.id')
-            ->paginate($filters['per_page'] ?? 15);
+            ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? null);
     }
 
     /**

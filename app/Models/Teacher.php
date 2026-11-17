@@ -38,10 +38,22 @@ class Teacher extends Model
 
     protected $appends = [
         'name',
+        'full_name',
+        'photo_url',
     ];
 
     public function getNameAttribute()
     {
         return trim($this->first_name . ' ' . $this->last_name);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return trim($this->first_name . ' ' . $this->last_name);
+    }
+
+    public function getPhotoUrlAttribute()
+    {
+        return $this->photo ? asset('storage/' . $this->photo) : null;
     }
 }

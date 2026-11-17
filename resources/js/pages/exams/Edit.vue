@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Swal from "sweetalert2";
 
 import Form from "./Form.vue";
 import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
@@ -46,21 +47,26 @@ onMounted(async () => {
 });
 
 async function update() {
-
     try {
-
         await examStore.update(form.id, form);
-
+        await Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Exam updated successfully.",
+            timer: 1500,
+            showConfirmButton: false
+        });
         router.push({
             name: "exams.index"
         });
-
     } catch (e) {
-
         console.error(e);
-
+        Swal.fire({
+            icon: "error",
+            title: "Update Failed",
+            text: e.response?.data?.message || (e.response?.data?.errors?.exam ? e.response.data.errors.exam[0] : "Failed to update exam.")
+        });
     }
-
 }
 
 function cancel() {

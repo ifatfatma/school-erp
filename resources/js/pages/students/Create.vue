@@ -9,6 +9,7 @@ import { useClassStore } from "@/stores/class";
 import { useAcademicSessionStore } from "@/stores/academicSession";
 import { useSectionStore } from "@/stores/section";
 import AppBreadcrumb from '@/components/ui/AppBreadcrumb.vue'
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 
@@ -95,45 +96,62 @@ onMounted(async () => {
 });
 
 async function submit() {
-
     loading.value = true;
-
     studentStore.errors = {};
 
     try {
-
         const fd = new FormData();
 
         Object.keys(form).forEach(key => {
-
-            if (form[key] !== null) {
-
-                fd.append(key, form[key]);
-
+            if (key === "photo") {
+                if (form.photo instanceof File) {
+                    fd.append("photo", form.photo);
+                }
+                return;
             }
 
+            if (form[key] !== null && form[key] !== undefined) {
+                fd.append(key, form[key]);
+            }
         });
 
         await studentStore.create(fd);
+
+        await Swal.fire({
+            icon: "success",
+            title: "Student Created!",
+            text: "New student has been created successfully.",
+            timer: 1600,
+            showConfirmButton: false,
+        });
 
         router.push({
             name: "students.index"
         });
 
     } catch (e) {
+        console.error("Student creation failed:", e);
 
-    console.log("Status:", e.response?.status);
-    console.log("Response:", e.response?.data);
-    console.log("Errors:", e.response?.data?.errors);
+        const errors = e.response?.data?.errors;
+        let htmlMsg = e.response?.data?.message || "Could not create student. Please check the fields and try again.";
+        if (errors && typeof errors === "object") {
+            const list = Object.values(errors).flat();
+            if (list.length) {
+                htmlMsg = list.map(m => `• ${m}`).join("<br>");
+            }
+        }
 
-    console.error(e);
+        Swal.fire({
+            icon: "error",
+            title: "Creation Failed",
+            html: htmlMsg,
+        });
 
-} finally {
+        window.scrollTo({ top: 0, behavior: "smooth" });
 
+    } finally {
         loading.value = false;
-
     }
-
 }
 
 function cancel() {

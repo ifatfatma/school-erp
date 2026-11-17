@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
 const activeIssues = ref([])
@@ -103,7 +103,16 @@ async function loadLibrary() {
   }
 }
 
+function handleStudentSwitch() {
+  loadLibrary()
+}
+
 onMounted(() => {
   loadLibrary()
+  window.addEventListener('portal-student-switched', handleStudentSwitch)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('portal-student-switched', handleStudentSwitch)
 })
 </script>

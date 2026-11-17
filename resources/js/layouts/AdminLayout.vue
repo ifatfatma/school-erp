@@ -92,7 +92,7 @@ import {
     onMounted,
     onBeforeUnmount
 } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useTenantStore } from "@/stores/tenant";
 
@@ -101,6 +101,7 @@ import Navbar from "@/components/layout/Navbar.vue";
 import Footer from "@/components/layout/Footer.vue";
 
 const route = useRoute();
+const router = useRouter();
 const auth = useAuthStore();
 const tenantStore = useTenantStore();
 
@@ -302,6 +303,11 @@ function handleResize() {
 */
 
 onMounted(() => {
+    const isParent = auth.user?.user_type === 'parent' || auth.user?.roles?.some(r => r.name?.toLowerCase() === 'parent');
+    if (isParent) {
+        router.push('/parent/dashboard');
+        return;
+    }
 
     window.addEventListener(
         "keydown",

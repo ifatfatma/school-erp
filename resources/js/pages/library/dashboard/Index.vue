@@ -1,5 +1,13 @@
 <template>
 <div class="container-fluid">
+    <AppBreadcrumb
+        :items="[
+            { label: 'Dashboard', to: '/' },
+            { label: 'Library' },
+            { label: 'Dashboard' }
+        ]"
+    />
+
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -264,6 +272,7 @@
 </template>
 
 <script setup>
+import AppBreadcrumb from "@/components/ui/AppBreadcrumb.vue";
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 
