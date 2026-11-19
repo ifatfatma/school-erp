@@ -22,25 +22,35 @@ class TenantController extends Controller
     }
 
     /**
-     * Get list of active schools for the switcher (Super Admin only).
+     * Get list of active schools for the switcher.
+     * Super Admin gets all schools; multi-school admins get their assigned schools.
      */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
+        $isSuperAdmin = $this->tenantManager->isSuperAdmin($user);
 
-        if (!$this->tenantManager->isSuperAdmin($user)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. Only Super Admin can access the school switcher.',
-            ], 403);
+        if ($isSuperAdmin) {
+            $schools = School::where('status', true)->orderBy('name')->get();
+        } else {
+            $schools = $user ? $user->getAssignedSchools() : collect();
         }
 
-        $schools = School::where('status', true)->orderBy('name')->get();
+        $maxSchools = $user ? $user->maxAllowedSchools() : 1;
+        $canCreateSchool = $isSuperAdmin || ($user && $user->canAddMoreSchools());
+        $canSwitch = $isSuperAdmin || ($maxSchools > 1 && $schools->count() > 1);
 
         return response()->json([
             'success' => true,
             'data'    => SchoolResource::collection($schools),
-            'is_super_admin' => true,
+            'is_super_admin' => $isSuperAdmin,
+            'can_create_school' => $canCreateSchool,
+            'can_switch' => $canSwitch,
+            'total_schools' => $schools->count(),
+            'max_schools' => $maxSchools,
+            'owned_count' => $schools->count(),
+            'active_plan' => $user?->subscription?->plan?->name ?? 'Starter / Basic Plan',
+            'active_plan_slug' => $user?->subscription?->plan?->slug ?? 'basic',
         ]);
     }
 
@@ -79,6 +89,14 @@ class TenantController extends Controller
             ], 404);
         }
 
+        // Security check: ensure user has access to this tenant school
+        if (!$isSuperAdmin && !$user->canAccessSchool($school->id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access to this school.',
+            ], 403);
+        }
+
         // Gather tenant counts
         $studentsCount = Student::where('school_id', $school->id)->count();
         $teachersCount = Teacher::where('school_id', $school->id)->count();
@@ -98,7 +116,7 @@ class TenantController extends Controller
     }
 
     /**
-     * Switch active tenant context by body input (Super Admin only).
+     * Switch active tenant context by body input.
      */
     public function switch(Request $request): JsonResponse
     {
@@ -106,7 +124,7 @@ class TenantController extends Controller
     }
 
     /**
-     * Switch active tenant context by URL param (Super Admin only).
+     * Switch active tenant context by URL param.
      */
     public function switchByParam($school, Request $request): JsonResponse
     {
@@ -116,19 +134,22 @@ class TenantController extends Controller
 
     /**
      * Core switch processing logic.
+     * Accessible by Super Admins and School Admins with assigned schools.
      */
     protected function processSwitch($schoolId, Request $request): JsonResponse
     {
         $user = $request->user();
+        $isSuperAdmin = $this->tenantManager->isSuperAdmin($user);
 
-        if (!$this->tenantManager->isSuperAdmin($user)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. Only Super Admin can switch schools.',
-            ], 403);
-        }
-
+        // Global mode (all schools) is restricted to Super Admin only
         if ($schoolId === 'all' || $schoolId === '0' || $schoolId === null || $schoolId === '') {
+            if (!$isSuperAdmin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. Global mode is restricted to Super Administrators.',
+                ], 403);
+            }
+
             $this->tenantManager->setTenantId(null);
             session()->forget('active_school_id');
 
@@ -141,7 +162,17 @@ class TenantController extends Controller
             ]);
         }
 
-        $school = School::find($schoolId);
+        $targetSchoolId = (int) $schoolId;
+
+        // Security check: Super Admin or user explicitly authorized for this school
+        if (!$isSuperAdmin && !$user->canAccessSchool($targetSchoolId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. You do not have access to this school.',
+            ], 403);
+        }
+
+        $school = School::find($targetSchoolId);
 
         if (!$school) {
             return response()->json([

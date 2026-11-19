@@ -176,6 +176,160 @@ class WebsiteManagerController extends Controller
                     'Identity & Address Proof: Aadhaar Card, Passport, or Utility Bill copy.',
                 ]
             ],
+            'gallery' => [
+                'badge' => 'Campus Life & Visual Tour',
+                'title' => 'Photo & Event Gallery',
+                'subtitle' => 'Explore the vibrant life, achievements, celebrations, sports meets, and modern campus infrastructure at our institution.',
+                'categories' => [
+                    [
+                        'id' => 'campus',
+                        'name' => 'Campus & Classrooms',
+                        'icon' => 'bi-building',
+                        'description' => 'Explore our modern digital classrooms, STEM labs, central library, and architectural campus grounds.'
+                    ],
+                    [
+                        'id' => 'sports',
+                        'name' => 'Sports & Athletics',
+                        'icon' => 'bi-trophy',
+                        'description' => 'Annual sports day, football and cricket tournaments, athletics, track events, and indoor sports.'
+                    ],
+                    [
+                        'id' => 'annual_function',
+                        'name' => 'Annual Function & Cultural',
+                        'icon' => 'bi-music-note-beamed',
+                        'description' => 'Grand annual day celebrations, drama, choir, classical dance competitions, and award presentations.'
+                    ],
+                    [
+                        'id' => 'academic',
+                        'name' => 'Science & Academic Fairs',
+                        'icon' => 'bi-lightbulb',
+                        'description' => 'Science exhibitions, robotics displays, math olympiads, and inter-school academic symposiums.'
+                    ],
+                    [
+                        'id' => 'celebrations',
+                        'name' => 'Celebrations & Festivals',
+                        'icon' => 'bi-stars',
+                        'description' => 'Independence Day, Republic Day, Teachers Day, Childrens Day, and national institutional observances.'
+                    ],
+                ],
+                'albums' => [
+                    [
+                        'id' => 1,
+                        'category' => 'campus',
+                        'title' => 'Campus Infrastructure & Digital Classrooms',
+                        'event_date' => 'Academic Session 2026-27',
+                        'description' => 'A visual tour of our sprawling campus, high-tech smart classrooms, air-conditioned computer labs, and peaceful library reading spaces.',
+                        'cover_image' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1000&q=80',
+                        'images' => [
+                            [
+                                'id' => 101,
+                                'url' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Main Institutional Academic Building & Landscaped Grounds'
+                            ],
+                            [
+                                'id' => 102,
+                                'url' => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Interactive Smart Classroom with High-Resolution Digital Displays'
+                            ],
+                            [
+                                'id' => 103,
+                                'url' => 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Modern STEM Computer & Robotics Laboratory'
+                            ],
+                            [
+                                'id' => 104,
+                                'url' => 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Central Reference Library & Research Section'
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => 2,
+                        'category' => 'sports',
+                        'title' => 'Annual Sports Meet & Athletic Championship',
+                        'event_date' => 'November 2026',
+                        'description' => 'Spirited student athletes competing in 100m sprints, relay races, high jumps, inter-house football matches, and martial arts exhibitions.',
+                        'cover_image' => 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1000&q=80',
+                        'images' => [
+                            [
+                                'id' => 201,
+                                'url' => 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Torch Lighting & Grand March Past of House Contingents'
+                            ],
+                            [
+                                'id' => 202,
+                                'url' => 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Inter-House Senior Football Championship Final'
+                            ],
+                            [
+                                'id' => 203,
+                                'url' => 'https://images.unsplash.com/photo-1519766304817-4f37bda74a29?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Track & Field 4x100m Relay Finals'
+                            ],
+                            [
+                                'id' => 204,
+                                'url' => 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Podium Trophy Ceremony for Best Athlete of the Year'
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => 3,
+                        'category' => 'annual_function',
+                        'title' => 'Annual Cultural Fest & Stage Extravaganza',
+                        'event_date' => 'October 2026',
+                        'description' => 'A spectacular celebration of student creativity featuring classical orchestra, theatrical plays, contemporary dance, and academic prize distributions.',
+                        'cover_image' => 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1000&q=80',
+                        'images' => [
+                            [
+                                'id' => 301,
+                                'url' => 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Opening Symphony by the Senior School Choir'
+                            ],
+                            [
+                                'id' => 302,
+                                'url' => 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Classical Drama Performance on Historical Heritage'
+                            ],
+                            [
+                                'id' => 303,
+                                'url' => 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Vibrant Folk & Contemporary Fusion Dance Recital'
+                            ],
+                            [
+                                'id' => 304,
+                                'url' => 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Felicitating Board Toppers & Distinction Scholars'
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => 4,
+                        'category' => 'academic',
+                        'title' => 'Young Innovators Science & Robotics Exhibition',
+                        'event_date' => 'September 2026',
+                        'description' => 'Hands-on scientific models, working solar prototypes, autonomous robotics demonstrations, and AI programming showcases designed by students.',
+                        'cover_image' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1000&q=80',
+                        'images' => [
+                            [
+                                'id' => 401,
+                                'url' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Students Demonstrating Working Eco-Energy Models'
+                            ],
+                            [
+                                'id' => 402,
+                                'url' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Autonomous Robotics Obstacle Navigation Showcase'
+                            ],
+                            [
+                                'id' => 403,
+                                'url' => 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=1000&q=80',
+                                'caption' => 'Interactive Chemistry Live Reactions Exhibition'
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -362,11 +516,15 @@ class WebsiteManagerController extends Controller
 
         $request->validate([
             'file' => 'required|image|max:10240',
-            'type' => 'nullable|string|in:logo,login_background,general',
+            'type' => 'nullable|string|in:logo,login_background,general,gallery',
         ]);
 
         $type = $request->input('type', 'general');
-        $folder = $type === 'login_background' ? 'schools/backgrounds' : 'schools';
+        $folder = match ($type) {
+            'login_background' => 'schools/backgrounds',
+            'gallery' => "schools/gallery/{$schoolId}",
+            default => 'schools',
+        };
         $path = $request->file('file')->store($folder, 'public');
         $url = '/storage/' . $path;
 

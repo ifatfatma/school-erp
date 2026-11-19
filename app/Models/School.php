@@ -40,12 +40,32 @@ class School extends Model
         'subscription_status',
         'subscription_expires_at',
         'subscription_features',
+        'custom_domain',
+        'domain_status',
+        'domain_verified_at',
+        'dns_cname_target',
     ];
 
     protected $appends = [
         'logo_url',
         'login_background_url',
+        'website_url',
+        'has_custom_domain',
     ];
+
+    public function getHasCustomDomainAttribute(): bool
+    {
+        return !empty($this->custom_domain);
+    }
+
+    public function getWebsiteUrlAttribute(): string
+    {
+        if (!empty($this->custom_domain) && in_array($this->domain_status, ['active', 'verified'])) {
+            $scheme = request()->isSecure() ? 'https://' : 'http://';
+            return $scheme . $this->custom_domain;
+        }
+        return url('/s/' . $this->code);
+    }
 
     public function getLoginBackgroundUrlAttribute(): ?string
     {
@@ -54,7 +74,13 @@ class School extends Model
             return null;
         }
         $raw = trim($raw);
-        return str_starts_with($raw, 'http') ? $raw : asset('storage/' . ltrim($raw, '/'));
+        if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/(storage/.*)$#', $raw, $matches)) {
+            return '/' . $matches[3];
+        }
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+            return $raw;
+        }
+        return '/storage/' . ltrim($raw, '/');
     }
 
     public function getLogoUrlAttribute(): ?string
@@ -70,7 +96,13 @@ class School extends Model
         if ($raw === '' || $raw === '[]' || $raw === 'null' || $raw === '{}') {
             return null;
         }
-        return str_starts_with($raw, 'http') ? $raw : asset('storage/' . ltrim($raw, '/'));
+        if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/(storage/.*)$#', $raw, $matches)) {
+            return '/' . $matches[3];
+        }
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+            return $raw;
+        }
+        return '/storage/' . ltrim($raw, '/');
     }
 
     protected function casts(): array
@@ -146,6 +178,13 @@ class School extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function assignedUsers()
+    {
+        return $this->belongsToMany(User::class, 'school_user')
+            ->withPivot('role', 'is_primary')
+            ->withTimestamps();
     }
 
     public function exams()

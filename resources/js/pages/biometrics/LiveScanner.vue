@@ -128,12 +128,30 @@
               </small>
             </div>
 
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <!-- Hands-Free Auto Check-in Toggle -->
+              <div class="form-check form-switch mb-0 d-flex align-items-center gap-2 bg-black bg-opacity-50 px-3 py-1 rounded-pill border border-secondary border-opacity-50 shadow-sm">
+                <input
+                  class="form-check-input mt-0 cursor-pointer"
+                  type="checkbox"
+                  role="switch"
+                  id="autoScanSwitch"
+                  v-model="autoScanEnabled"
+                  @change="toggleAutoScan"
+                />
+                <label class="form-check-label small fw-bold cursor-pointer text-white" for="autoScanSwitch">
+                  <i class="bi bi-robot text-info me-1"></i>
+                  Hands-Free Auto Check-in:
+                  <span :class="autoScanEnabled ? 'text-success' : 'text-white-50'">{{ autoScanEnabled ? 'ON' : 'OFF' }}</span>
+                </label>
+              </div>
+
               <button
                 v-if="cameraActive"
-                class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm"
+                class="btn btn-sm btn-outline-light rounded-pill px-3 fw-bold shadow-sm"
                 :disabled="punchSubmitting || candidateList.length === 0"
                 @click="forceRecognizeNow"
+                title="Verify face snapshot immediately"
               >
                 <i class="bi bi-camera-fill me-1"></i> Verify Face Now
               </button>
@@ -238,7 +256,7 @@
               </div>
               <div class="d-flex justify-content-between">
                 <span>Confidence:</span>
-                <strong class="text-success">{{ lastPunch.confidence_score }}% Match</strong>
+                <strong class="text-success">{{ (lastPunch.confidence_score || 95) }}% Match</strong>
               </div>
             </div>
 
@@ -329,6 +347,7 @@ const filteredCandidates = ref([])
 const manualQuery = ref('')
 const selectedCandidateId = ref('')
 const punchSubmitting = ref(false)
+const autoScanEnabled = ref(true)
 
 const allSchools = ref([])
 const selectedSchoolId = ref('')
@@ -339,8 +358,10 @@ const todayPunches = ref([])
 const cooldownMap = ref(new Map())
 
 let animationFrameId = null
-let scanInterval = null
+let autoScanTimer = null
 let mediaStream = null
+let laserY = 0
+let laserDirection = 1
 
 const isSuperAdmin = computed(() => {
   const u = auth.user
@@ -457,6 +478,46 @@ function onSchoolChange() {
 // -------------------------------------------------------------
 // CAMERA & AI CANVAS RECOGNITION LOOP
 // -------------------------------------------------------------
+function startAutoScanLoop() {
+  if (autoScanTimer) clearInterval(autoScanTimer)
+  autoScanTimer = setInterval(async () => {
+    if (!cameraActive.value || !autoScanEnabled.value || punchSubmitting.value) {
+      return
+    }
+    // Only auto-scan if video frame is ready and active
+    if (!videoRef.value || videoRef.value.videoWidth === 0) {
+      return
+    }
+    if (candidateList.value.length === 0) {
+      return
+    }
+    await executeBiometricPunch(null, true)
+  }, 1800)
+}
+
+function stopAutoScanLoop() {
+  if (autoScanTimer) {
+    clearInterval(autoScanTimer)
+    autoScanTimer = null
+  }
+}
+
+function toggleAutoScan() {
+  if (autoScanEnabled.value) {
+    scannerStatusText.value = 'Hands-Free Auto-Scan Active'
+    scannerStatusBadgeClass.value = 'bg-primary'
+    scannerBoxClass.value = 'border-primary'
+    if (cameraActive.value) {
+      startAutoScanLoop()
+    }
+  } else {
+    stopAutoScanLoop()
+    scannerStatusText.value = 'Auto-Scan Paused • Click Verify Face'
+    scannerStatusBadgeClass.value = 'bg-secondary'
+    scannerBoxClass.value = 'border-secondary'
+  }
+}
+
 async function startCamera() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     try {
@@ -472,6 +533,9 @@ async function startCamera() {
           cameraActive.value = true
           scanning.value = true
           startDetectionLoop()
+          if (autoScanEnabled.value) {
+            startAutoScanLoop()
+          }
         }
       }
     } catch (err) {
@@ -479,15 +543,22 @@ async function startCamera() {
       cameraActive.value = true
       scanning.value = true
       startDetectionLoop()
+      if (autoScanEnabled.value) {
+        startAutoScanLoop()
+      }
     }
   } else {
     cameraActive.value = true
     scanning.value = true
     startDetectionLoop()
+    if (autoScanEnabled.value) {
+      startAutoScanLoop()
+    }
   }
 }
 
 function stopCamera() {
+  stopAutoScanLoop()
   cameraActive.value = false
   scanning.value = false
   if (mediaStream) {
@@ -496,10 +567,6 @@ function stopCamera() {
   }
   if (videoRef.value) {
     videoRef.value.srcObject = null
-  }
-  if (scanInterval) {
-    clearInterval(scanInterval)
-    scanInterval = null
   }
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId)
@@ -526,7 +593,7 @@ function startDetectionLoop() {
       const boxX = (canvas.width - boxWidth) / 2
       const boxY = (canvas.height - boxHeight) / 2
 
-      ctx.strokeStyle = punchSubmitting.value ? '#10b981' : '#3b82f6'
+      ctx.strokeStyle = punchSubmitting.value ? '#10b981' : (autoScanEnabled.value ? '#3b82f6' : '#64748b')
       ctx.lineWidth = 3
       ctx.lineCap = 'round'
 
@@ -540,6 +607,25 @@ function startDetectionLoop() {
       ctx.beginPath(); ctx.moveTo(boxX, boxY + boxHeight - cornerLength); ctx.lineTo(boxX, boxY + boxHeight); ctx.lineTo(boxX + cornerLength, boxY + boxHeight); ctx.stroke();
       // Bottom-Right
       ctx.beginPath(); ctx.moveTo(boxX + boxWidth - cornerLength, boxY + boxHeight); ctx.lineTo(boxX + boxWidth, boxY + boxHeight); ctx.lineTo(boxX + boxWidth, boxY + boxHeight - cornerLength); ctx.stroke();
+
+      // Futuristic sweep scan laser line
+      if (scanning.value && autoScanEnabled.value) {
+        laserY += 3 * laserDirection
+        if (laserY > boxHeight - 8) { laserY = boxHeight - 8; laserDirection = -1 }
+        if (laserY < 8) { laserY = 8; laserDirection = 1 }
+
+        const gradient = ctx.createLinearGradient(boxX, boxY + laserY, boxX + boxWidth, boxY + laserY)
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0)')
+        gradient.addColorStop(0.5, punchSubmitting.value ? 'rgba(16, 185, 129, 0.9)' : 'rgba(59, 130, 246, 0.9)')
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0)')
+
+        ctx.strokeStyle = gradient
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(boxX + 12, boxY + laserY)
+        ctx.lineTo(boxX + boxWidth - 12, boxY + laserY)
+        ctx.stroke()
+      }
     }
 
     animationFrameId = requestAnimationFrame(renderFrame)
@@ -590,53 +676,73 @@ async function forceRecognizeNow() {
   // Check cooldown if candidate chosen
   if (cand) {
     const lastPunchTime = cooldownMap.value.get(cand.id) || 0
-    if (Date.now() - lastPunchTime < 180000) {
+    if (Date.now() - lastPunchTime < 45000) {
       Swal.fire({
         icon: 'warning',
         title: 'Already Checked In',
-        text: `${cand.name} was already verified recently today. Please wait before punching again.`,
-        timer: 2500,
+        text: `${cand.name} was already verified recently. Please wait before punching again.`,
+        timer: 2000,
         showConfirmButton: false
       })
       return
     }
   }
 
-  await executeBiometricPunch(cand)
+  await executeBiometricPunch(cand, false)
 }
 
 async function triggerManualPunch() {
   await forceRecognizeNow()
 }
 
-async function executeBiometricPunch(cand = null) {
+async function executeBiometricPunch(cand = null, isAuto = false) {
   punchSubmitting.value = true
-  scannerStatusText.value = cand ? `Comparing Face: ${cand.name}...` : 'AI Face Recognition Active...'
-  scannerStatusBadgeClass.value = 'bg-warning text-dark'
-  scannerBoxClass.value = 'border-warning'
 
-  // Capture live snapshot frame from video feed
+  if (!isAuto) {
+    scannerStatusText.value = cand ? `Comparing Face: ${cand.name}...` : 'AI Face Recognition Active...'
+    scannerStatusBadgeClass.value = 'bg-warning text-dark'
+    scannerBoxClass.value = 'border-warning'
+  } else {
+    scannerStatusText.value = 'AI Scanning Face...'
+    scannerStatusBadgeClass.value = 'bg-primary'
+    scannerBoxClass.value = 'border-primary'
+  }
+
+  // Capture live snapshot frame from video feed (Cropping center reticle region where face is positioned)
   let snapshotBase64 = null
   if (videoRef.value && videoRef.value.videoWidth > 0) {
     try {
+      const video = videoRef.value
+      const vw = video.videoWidth
+      const vh = video.videoHeight
+
+      // Crop the center portrait/face region matching the reticle guide
+      const boxSize = Math.min(vw, vh) * 0.70
+      const cropX = Math.max(0, (vw - boxSize) / 2)
+      const cropY = Math.max(0, (vh - boxSize) / 2)
+
       const snapCanvas = document.createElement('canvas')
       snapCanvas.width = 320
-      snapCanvas.height = 240
+      snapCanvas.height = 320
       const ctx = snapCanvas.getContext('2d')
-      ctx.drawImage(videoRef.value, 0, 0, snapCanvas.width, snapCanvas.height)
-      snapshotBase64 = snapCanvas.toDataURL('image/jpeg', 0.8)
-    } catch (e) {}
+      ctx.drawImage(video, cropX, cropY, boxSize, boxSize, 0, 0, 320, 320)
+      snapshotBase64 = snapCanvas.toDataURL('image/jpeg', 0.85)
+    } catch (e) {
+      console.error('Snapshot capture error:', e)
+    }
   }
 
   if (!snapshotBase64) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Camera Inactive',
-      text: 'Please start the live camera before verifying face attendance.',
-    })
     punchSubmitting.value = false
-    scannerStatusText.value = 'Camera Inactive'
-    scannerStatusBadgeClass.value = 'bg-danger'
+    if (!isAuto) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Camera Inactive',
+        text: 'Please start the live camera before verifying face attendance.',
+      })
+      scannerStatusText.value = 'Camera Inactive'
+      scannerStatusBadgeClass.value = 'bg-danger'
+    }
     return
   }
 
@@ -651,6 +757,20 @@ async function executeBiometricPunch(cand = null) {
     if (res.data.success) {
       const punchData = res.data.punch
       const personKey = (punchData.person_code || '') + '_' + (punchData.person_name || '')
+
+      // Check client-side anti-re-trigger cooldown (e.g. 45 seconds for same student)
+      const lastTime = cooldownMap.value.get(personKey) || 0
+      const isRecent = (Date.now() - lastTime) < 45000
+
+      if (isRecent && isAuto) {
+        // Person is still in view after recent punch - show subtle verified badge without re-triggering sound
+        scannerStatusText.value = `✓ ${punchData.person_name} Verified`
+        scannerStatusBadgeClass.value = 'bg-success'
+        scannerBoxClass.value = 'border-success'
+        punchSubmitting.value = false
+        return
+      }
+
       cooldownMap.value.set(personKey, Date.now())
       if (cand) cooldownMap.value.set(cand.id, Date.now())
 
@@ -659,37 +779,56 @@ async function executeBiometricPunch(cand = null) {
         scannerStatusText.value = `${punchData.person_name} Already Checked In`
         scannerStatusBadgeClass.value = 'bg-warning text-dark'
         lastPunch.value = { ...punchData, is_duplicate: true }
-        return
+      } else {
+        playAudioNotification('success')
+        if (voiceEnabled.value) {
+          speakText(res.data.voice_prompt || `Welcome, ${punchData.person_name}. Attendance marked.`)
+        }
+
+        lastPunch.value = punchData
+        todayPunches.value.unshift({
+          id: punchData.id || Date.now(),
+          person_name: punchData.person_name,
+          person_code: punchData.person_code,
+          punch_time: punchData.punch_time,
+          attendance_status: punchData.attendance_status,
+        })
+
+        // Reset manual candidate query so next student is scanned fresh
+        selectedCandidateId.value = ''
+        manualQuery.value = ''
+        filteredCandidates.value = candidateList.value
+
+        scannerStatusText.value = `Verified: ${punchData.person_name} (${punchData.confidence_score}% Match)`
+        scannerStatusBadgeClass.value = 'bg-success'
+        scannerBoxClass.value = 'border-success'
       }
 
-      playAudioNotification('success')
-      if (voiceEnabled.value && res.data.voice_prompt) {
-        speakText(res.data.voice_prompt)
-      }
-
-      lastPunch.value = punchData
-      todayPunches.value.unshift({
-        id: punchData.id || Date.now(),
-        person_name: punchData.person_name,
-        person_code: punchData.person_code,
-        punch_time: punchData.punch_time,
-        attendance_status: punchData.attendance_status,
-      })
-
-      // Reset selection so the next person in line is tested fresh
-      selectedCandidateId.value = ''
-      manualQuery.value = ''
-      filteredCandidates.value = candidateList.value
-
-      scannerStatusText.value = `Verified: ${punchData.person_name} (${punchData.confidence_score}% Match)`
-      scannerStatusBadgeClass.value = 'bg-success'
-      scannerBoxClass.value = 'border-success'
+      // Display verification for 3 seconds, then return smoothly to auto-scanning
+      setTimeout(() => {
+        punchSubmitting.value = false
+        scannerStatusText.value = autoScanEnabled.value ? 'Hands-Free AI Auto-Scan Active' : 'Face Detection Active'
+        scannerStatusBadgeClass.value = 'bg-primary'
+        scannerBoxClass.value = 'border-primary'
+      }, 3000)
+      return
     }
   } catch (err) {
-    console.error('Biometric punch error', err)
-    playAudioNotification('error')
-
     const errData = err.response?.data || {}
+
+    if (isAuto) {
+      // In hands-free mode: do NOT show blocking popup dialogs! Keep scanning seamlessly.
+      punchSubmitting.value = false
+      if (errData.face_not_recognized || errData.face_mismatch) {
+        scannerStatusText.value = 'Face Unrecognized • Position in Center or Select Candidate'
+        scannerStatusBadgeClass.value = 'bg-secondary'
+        scannerBoxClass.value = 'border-secondary'
+      }
+      return
+    }
+
+    // Manual button clicks: Show informative Swal feedback
+    playAudioNotification('error')
 
     if (errData.face_mismatch) {
       scannerStatusText.value = `Face Mismatch (${errData.confidence_score || 0}% Match) • Rejected`
@@ -761,13 +900,13 @@ async function executeBiometricPunch(cand = null) {
         text: errData.message || 'Could not verify biometric punch. Please try again.',
       })
     }
-  } finally {
+
     setTimeout(() => {
       punchSubmitting.value = false
-      scannerStatusText.value = 'AI Face Detection Active'
+      scannerStatusText.value = autoScanEnabled.value ? 'Hands-Free AI Auto-Scan Active' : 'Face Detection Active'
       scannerStatusBadgeClass.value = 'bg-primary'
       scannerBoxClass.value = 'border-primary'
-    }, 4000)
+    }, 2500)
   }
 }
 

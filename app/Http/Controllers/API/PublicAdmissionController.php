@@ -22,6 +22,21 @@ class PublicAdmissionController extends Controller
      */
     protected function resolveSchool(Request $request): School
     {
+        // 1. Direct Custom Domain Check (e.g. www.pajschool.com or pajschool.com)
+        $host = strtolower($request->getHost());
+        $cleanHost = preg_replace('/^www\./i', '', $host);
+        $customDomainSchool = School::where('status', true)
+            ->whereNotNull('custom_domain')
+            ->where(function ($q) use ($host, $cleanHost) {
+                $q->where('custom_domain', $cleanHost)
+                  ->orWhere('custom_domain', $host);
+            })
+            ->first();
+
+        if ($customDomainSchool) {
+            return $customDomainSchool;
+        }
+
         $identifier = $request->input('school')
             ?? $request->input('school_code')
             ?? $request->input('code')
@@ -111,7 +126,14 @@ class PublicAdmissionController extends Controller
                 if ($s->logo) {
                     $raw = is_array($s->logo) ? reset($s->logo) : $s->logo;
                     if ($raw && is_string($raw) && $raw !== '[]' && $raw !== 'null' && $raw !== '{}') {
-                        $logoUrl = str_starts_with($raw, 'http') ? $raw : asset('storage/' . ltrim($raw, '/'));
+                        $raw = trim($raw);
+                        if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/(storage/.*)$#', $raw, $matches)) {
+                            $logoUrl = '/' . $matches[3];
+                        } elseif (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+                            $logoUrl = $raw;
+                        } else {
+                            $logoUrl = '/storage/' . ltrim($raw, '/');
+                        }
                     }
                 }
                 return [
@@ -128,7 +150,14 @@ class PublicAdmissionController extends Controller
         if ($school && $school->logo) {
             $raw = is_array($school->logo) ? reset($school->logo) : $school->logo;
             if ($raw && is_string($raw) && $raw !== '[]' && $raw !== 'null' && $raw !== '{}') {
-                $schoolLogo = str_starts_with($raw, 'http') ? $raw : asset('storage/' . ltrim($raw, '/'));
+                $raw = trim($raw);
+                if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/(storage/.*)$#', $raw, $matches)) {
+                    $schoolLogo = '/' . $matches[3];
+                } elseif (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+                    $schoolLogo = $raw;
+                } else {
+                    $schoolLogo = '/storage/' . ltrim($raw, '/');
+                }
             }
         }
 
@@ -147,6 +176,9 @@ class PublicAdmissionController extends Controller
                     'country' => $school->country,
                     'postal_code' => $school->postal_code,
                     'logo' => $schoolLogo,
+                    'custom_domain' => $school->custom_domain,
+                    'has_custom_domain' => $school->has_custom_domain,
+                    'website_url' => $school->website_url,
                 ],
                 'content' => $content,
                 'notices' => $notices,

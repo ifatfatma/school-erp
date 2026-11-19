@@ -37,8 +37,8 @@
         ====================================================== -->
         <div class="navbar-right d-flex align-items-center">
 
-            <!-- Active School Switcher for Super Admin / Static Badge for School Admin -->
-            <div v-if="isSuperAdmin && tenantStore.tenants.length > 0" class="dropdown me-2">
+            <!-- Active School Switcher for Super Admin & Multi-School Admins / Static Badge for Single-School Users -->
+            <div v-if="canSwitchSchool" class="dropdown me-2">
                 <button
                     class="btn btn-sm btn-light border rounded-pill d-flex align-items-center gap-2 px-3 py-1 shadow-sm dropdown-toggle fw-semibold"
                     type="button"
@@ -63,7 +63,9 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-1 py-1" style="max-height: 400px; overflow-y: auto; min-width: 280px;">
                     <li><h6 class="dropdown-header small text-uppercase fw-bold text-muted">Switch Active Campus</h6></li>
-                    <li>
+                    
+                    <!-- Global / All Schools (Super Admin Only) -->
+                    <li v-if="isSuperAdmin">
                         <button
                             type="button"
                             class="dropdown-item d-flex align-items-center justify-content-between py-2"
@@ -74,7 +76,9 @@
                             <i v-if="tenantStore.activeSchoolId === 'all' || tenantStore.isGlobal" class="bi bi-check-lg text-primary ms-2"></i>
                         </button>
                     </li>
-                    <li><hr class="dropdown-divider my-1"></li>
+                    <li v-if="isSuperAdmin"><hr class="dropdown-divider my-1"></li>
+
+                    <!-- Schools List -->
                     <li v-for="t in tenantStore.tenants" :key="'nav-t-'+t.id">
                         <button
                             type="button"
@@ -100,6 +104,26 @@
                             </div>
                             <i v-if="String(tenantStore.activeSchoolId) === String(t.id)" class="bi bi-check-lg text-primary"></i>
                         </button>
+                    </li>
+
+                    <!-- Manage / Add Schools shortcut if permitted -->
+                    <li v-if="canAddSchool">
+                        <hr class="dropdown-divider my-1">
+                        <router-link to="/schools" class="dropdown-item py-2 text-primary fw-semibold small">
+                            <i class="bi bi-plus-circle me-2"></i> Add School ({{ tenantStore.ownedCount }}/{{ tenantStore.maxSchools }})
+                        </router-link>
+                    </li>
+                    <li v-else-if="!isSuperAdmin && tenantStore.maxSchools > 1">
+                        <hr class="dropdown-divider my-1">
+                        <router-link to="/subscription/billing" class="dropdown-item py-2 text-warning fw-semibold small">
+                            <i class="bi bi-arrow-up-circle me-2"></i> Limit Reached ({{ tenantStore.ownedCount }}/{{ tenantStore.maxSchools }}) • Upgrade
+                        </router-link>
+                    </li>
+                    <li v-if="!isSuperAdmin">
+                        <hr v-if="!canAddSchool && tenantStore.maxSchools <= 1" class="dropdown-divider my-1">
+                        <router-link to="/subscription/billing" class="dropdown-item py-2 text-secondary small">
+                            <i class="bi bi-credit-card-2-front me-2"></i> Subscription & Invoices
+                        </router-link>
                     </li>
                 </ul>
             </div>
@@ -289,6 +313,16 @@ const currentSchoolCode = computed(() => {
         return null;
     }
     return tenantStore.currentTenant?.code || auth.user?.school?.code || null;
+});
+
+const canSwitchSchool = computed(() => {
+    // Only show switcher dropdown if Super Admin OR (user's plan allows > 1 school AND user has > 1 school)
+    return isSuperAdmin.value || (tenantStore.maxSchools > 1 && tenantStore.tenants.length > 1);
+});
+
+const canAddSchool = computed(() => {
+    if (isSuperAdmin.value) return true;
+    return !!tenantStore.canCreateSchool && (tenantStore.ownedCount < tenantStore.maxSchools);
 });
 
 const canAccessSchoolWebsiteCms = computed(() => {

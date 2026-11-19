@@ -235,7 +235,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, inject } from 'vue'
+import { ref, reactive, onMounted, inject, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'

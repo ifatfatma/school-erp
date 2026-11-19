@@ -9,6 +9,12 @@ export const useTenantStore = defineStore("tenant", {
         isGlobal: false,
         tenants: [],
         isSuperAdmin: false,
+        canCreateSchool: false,
+        canSwitch: false,
+        maxSchools: 1,
+        ownedCount: 1,
+        activePlan: 'Starter / Basic Plan',
+        activePlanSlug: 'basic',
         stats: null,
         loading: false,
     }),
@@ -35,6 +41,13 @@ export const useTenantStore = defineStore("tenant", {
                 const response = await api.get("/tenants");
                 this.tenants = response.data.data || [];
                 this.isSuperAdmin = !!response.data.is_super_admin;
+                this.canCreateSchool = !!response.data.can_create_school;
+                this.maxSchools = Number(response.data.max_schools || 1);
+                this.ownedCount = Number(response.data.owned_count || this.tenants.length);
+                this.activePlan = response.data.active_plan || 'Starter / Basic Plan';
+                this.activePlanSlug = response.data.active_plan_slug || 'basic';
+                // Only allow switching if Super Admin OR (Plan allows multiple schools AND user has > 1 school)
+                this.canSwitch = this.isSuperAdmin || (this.maxSchools > 1 && this.tenants.length > 1);
             } catch (e) {
                 console.error("Failed fetching tenants list:", e);
             }

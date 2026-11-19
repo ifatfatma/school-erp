@@ -94,6 +94,13 @@
               <i class="bi bi-megaphone-fill me-1"></i> Notice Board
             </button>
           </li>
+          <li class="nav-item">
+            <button class="nav-link py-2 px-3 fw-semibold" :class="{ 'active bg-primary text-white': activeTab === 'domain' }" @click="activeTab = 'domain'">
+              <i class="bi bi-globe me-1"></i> Personal Domain &amp; DNS
+              <span v-if="customDomainData.custom_domain && customDomainData.domain_status === 'active'" class="badge bg-success rounded-pill ms-1 font-monospace" style="font-size: 0.65rem;">Active</span>
+              <span v-else-if="customDomainData.custom_domain" class="badge bg-warning text-dark rounded-pill ms-1 font-monospace" style="font-size: 0.65rem;">Pending</span>
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -653,6 +660,230 @@
               </table>
             </div>
           </div>
+
+          <!-- TAB: Personal Domain & DNS -->
+          <div v-if="activeTab === 'domain'">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+              <div>
+                <h5 class="fw-bold text-primary mb-1">
+                  <i class="bi bi-globe me-2"></i>Personal Custom Domain &amp; DNS Management
+                </h5>
+                <p class="small text-muted mb-0">
+                  Connect your school's own branded domain (e.g., <code>stgeorge.edu</code> or <code>portal.myschool.com</code>) while keeping full backward compatibility with default URLs.
+                </p>
+              </div>
+              <div v-if="customDomainData.custom_domain" class="d-flex align-items-center gap-2">
+                <span v-if="customDomainData.domain_status === 'active'" class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill fs-6">
+                  <i class="bi bi-check-circle-fill me-1"></i> Active &amp; Verified
+                </span>
+                <span v-else-if="customDomainData.domain_status === 'pending'" class="badge bg-warning-subtle text-warning-emphasis border border-warning px-3 py-2 rounded-pill fs-6">
+                  <i class="bi bi-clock-history me-1"></i> Pending DNS Verification
+                </span>
+                <span v-else class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 rounded-pill fs-6">
+                  <i class="bi bi-exclamation-triangle me-1"></i> DNS Verification Failed
+                </span>
+              </div>
+            </div>
+
+            <!-- Existing System Feature Banner (Guaranteed Dual Mode) -->
+            <div class="alert alert-info border-0 rounded-4 shadow-sm p-3 mb-4 d-flex align-items-start gap-3">
+              <i class="bi bi-shield-check fs-3 text-info mt-1"></i>
+              <div class="flex-grow-1">
+                <div class="fw-bold text-dark">Default ERP System Link (Always Available)</div>
+                <div class="small text-secondary mb-2">
+                  Schools without a custom domain use this permanent default URL. Even if you connect a personal domain, this link remains 100% active and functional as a safe fallback.
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <code class="bg-white px-3 py-1 rounded border font-monospace text-primary fw-semibold fs-6">
+                    {{ customDomainData.default_url || ('/s/' + (currentSchool?.code || '')) }}
+                  </code>
+                  <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" @click="copyToClipboard(customDomainData.default_url || ('/s/' + (currentSchool?.code || '')))">
+                    <i class="bi bi-clipboard me-1"></i> Copy
+                  </button>
+                  <a :href="customDomainData.default_url || ('/s/' + (currentSchool?.code || ''))" target="_blank" class="btn btn-sm btn-primary rounded-pill px-3">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Visit Default Portal
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <!-- Left Column: Domain Input & Actions -->
+              <div class="col-lg-6">
+                <div class="card border rounded-4 shadow-sm h-100">
+                  <div class="card-header bg-light border-bottom rounded-top-4 py-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                      <i class="bi bi-link-45deg me-2 text-primary"></i>Custom Domain Setup
+                    </h6>
+                  </div>
+                  <div class="card-body p-4">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">School Personal Domain</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-light text-muted">https://</span>
+                        <input
+                          type="text"
+                          v-model="domainInput"
+                          class="form-control"
+                          placeholder="e.g. schoolname.com or portal.myschool.edu"
+                          :disabled="savingDomain || verifyingDomain"
+                        >
+                      </div>
+                      <div class="form-text">
+                        Enter your domain or subdomain without <code>http://</code> or trailing slashes.
+                      </div>
+                    </div>
+
+                    <div v-if="customDomainData.custom_domain" class="card bg-light border-0 rounded-3 p-3 mb-4">
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small text-muted">Configured Domain:</span>
+                        <span class="fw-bold font-monospace text-primary">{{ customDomainData.custom_domain }}</span>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small text-muted">Status:</span>
+                        <span class="badge text-uppercase" :class="{
+                          'bg-success': customDomainData.domain_status === 'active',
+                          'bg-warning text-dark': customDomainData.domain_status === 'pending',
+                          'bg-danger': customDomainData.domain_status === 'failed'
+                        }">{{ customDomainData.domain_status }}</span>
+                      </div>
+                      <div v-if="customDomainData.domain_verified_at" class="d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Verified At:</span>
+                        <span class="small text-secondary">{{ new Date(customDomainData.domain_verified_at).toLocaleString() }}</span>
+                      </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        class="btn btn-primary rounded-pill px-4"
+                        :disabled="savingDomain || !domainInput"
+                        @click="saveCustomDomain"
+                      >
+                        <span v-if="savingDomain" class="spinner-border spinner-border-sm me-1"></span>
+                        <i v-else class="bi bi-save me-1"></i>
+                        {{ customDomainData.custom_domain ? 'Update Domain' : 'Connect Custom Domain' }}
+                      </button>
+
+                      <button
+                        v-if="customDomainData.custom_domain"
+                        type="button"
+                        class="btn btn-outline-success rounded-pill px-3"
+                        :disabled="verifyingDomain"
+                        @click="verifyCustomDomain"
+                      >
+                        <span v-if="verifyingDomain" class="spinner-border spinner-border-sm me-1"></span>
+                        <i v-else class="bi bi-patch-check me-1"></i> Verify DNS Now
+                      </button>
+
+                      <button
+                        v-if="customDomainData.custom_domain"
+                        type="button"
+                        class="btn btn-outline-danger rounded-pill px-3 ms-auto"
+                        :disabled="removingDomain"
+                        @click="removeCustomDomain"
+                      >
+                        <span v-if="removingDomain" class="spinner-border spinner-border-sm me-1"></span>
+                        <i v-else class="bi bi-trash me-1"></i> Disconnect
+                      </button>
+                    </div>
+
+                    <div v-if="customDomainData.custom_domain && customDomainData.domain_status === 'active'" class="mt-4 pt-3 border-top">
+                      <a :href="'https://' + customDomainData.custom_domain" target="_blank" class="btn btn-outline-primary w-100 rounded-pill">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Visit https://{{ customDomainData.custom_domain }}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: DNS Setup Instructions -->
+              <div class="col-lg-6">
+                <div class="card border rounded-4 shadow-sm h-100">
+                  <div class="card-header bg-light border-bottom rounded-top-4 py-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                      <i class="bi bi-hdd-network me-2 text-primary"></i>DNS Records Configuration Guide
+                    </h6>
+                  </div>
+                  <div class="card-body p-4">
+                    <p class="small text-muted mb-3">
+                      Add either of the following records to your domain registrar (GoDaddy, Namecheap, Cloudflare, Route53, Hostinger):
+                    </p>
+
+                    <!-- CNAME Setup (Recommended for Subdomains) -->
+                    <div class="border rounded-3 p-3 mb-3 bg-white">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="badge bg-primary-subtle text-primary fw-bold">Option 1: CNAME Record (Subdomain / Portal)</span>
+                        <span class="small text-muted font-monospace">Recommended</span>
+                      </div>
+                      <table class="table table-sm table-borderless mb-0 small">
+                        <tbody>
+                          <tr>
+                            <td class="text-muted" style="width: 25%;">Record Type:</td>
+                            <td class="fw-bold font-monospace">CNAME</td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">Host / Name:</td>
+                            <td class="fw-bold font-monospace">@ <span class="fw-normal text-muted">(or your subdomain, e.g. <code>portal</code>)</span></td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">Target / Value:</td>
+                            <td>
+                              <div class="d-flex align-items-center gap-2">
+                                <code class="text-primary fw-bold font-monospace">{{ customDomainData.dns_cname_target || 'domains.yourschoolerp.com' }}</code>
+                                <button type="button" class="btn btn-xs btn-outline-secondary p-0 px-1" @click="copyToClipboard(customDomainData.dns_cname_target)">
+                                  <i class="bi bi-clipboard"></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">TTL:</td>
+                            <td class="font-monospace">Automatic / 300s</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- A Record Setup (For Root / Apex Domains) -->
+                    <div class="border rounded-3 p-3 mb-3 bg-white">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="badge bg-secondary-subtle text-secondary fw-bold">Option 2: A Record (Root / Apex Domain)</span>
+                      </div>
+                      <table class="table table-sm table-borderless mb-0 small">
+                        <tbody>
+                          <tr>
+                            <td class="text-muted" style="width: 25%;">Record Type:</td>
+                            <td class="fw-bold font-monospace">A</td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">Host / Name:</td>
+                            <td class="fw-bold font-monospace">@</td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">Points to / IP:</td>
+                            <td>
+                              <div class="d-flex align-items-center gap-2">
+                                <code class="text-primary fw-bold font-monospace">{{ customDomainData.server_ip || 'Server Public IP' }}</code>
+                                <button v-if="customDomainData.server_ip" type="button" class="btn btn-xs btn-outline-secondary p-0 px-1" @click="copyToClipboard(customDomainData.server_ip)">
+                                  <i class="bi bi-clipboard"></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="alert alert-light border rounded-3 p-2 small mb-0 text-muted">
+                      <i class="bi bi-info-circle me-1 text-primary"></i>
+                      DNS propagation usually takes 5 to 30 minutes, but can take up to 24 hours depending on registrar TTL. In local dev mode, DNS verification resolves automatically.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -742,6 +973,19 @@ const currentSchool = ref(null)
 const allSchools = ref([])
 const selectedSchoolId = ref(null)
 
+const customDomainData = ref({
+  custom_domain: null,
+  domain_status: 'none',
+  domain_verified_at: null,
+  dns_cname_target: '',
+  default_url: '',
+  server_ip: ''
+})
+const domainInput = ref('')
+const savingDomain = ref(false)
+const verifyingDomain = ref(false)
+const removingDomain = ref(false)
+
 const isSuperAdmin = computed(() => {
   const u = authStore.user
   return u?.user_type === 'super_admin' || u?.roles?.some(r => {
@@ -804,6 +1048,7 @@ async function onSchoolChange() {
   await tenantStore.switchTenant(selectedSchoolId.value)
   await loadSettings(selectedSchoolId.value)
   await loadNotices(selectedSchoolId.value)
+  await fetchCustomDomain(selectedSchoolId.value)
 }
 
 function formatAssetUrl(url) {
@@ -1072,12 +1317,132 @@ async function deleteNotice(notice) {
   }
 }
 
+async function fetchCustomDomain(schoolId = null) {
+  try {
+    const sid = schoolId || selectedSchoolId.value || currentSchool.value?.id || null
+    const res = await api.get('/school/custom-domain', {
+      params: sid ? { school_id: sid } : {}
+    })
+    if (res.data.success) {
+      customDomainData.value = res.data.data
+      domainInput.value = res.data.data.custom_domain || ''
+    }
+  } catch (err) {
+    console.error('Failed to load custom domain data', err)
+  }
+}
+
+async function saveCustomDomain() {
+  if (!domainInput.value.trim()) {
+    Swal.fire({ icon: 'warning', title: 'Input required', text: 'Please enter a domain name (e.g. myschool.com or portal.myschool.com)' })
+    return
+  }
+  savingDomain.value = true
+  try {
+    const sid = selectedSchoolId.value || currentSchool.value?.id || null
+    const res = await api.post('/school/custom-domain', {
+      domain: domainInput.value.trim(),
+      school_id: sid
+    })
+    if (res.data.success) {
+      customDomainData.value = res.data.data
+      domainInput.value = res.data.data.custom_domain || ''
+      Swal.fire({
+        icon: 'success',
+        title: 'Domain Saved',
+        text: res.data.message || 'Domain saved! Configure DNS records to complete setup.'
+      })
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Failed to Save Domain',
+      text: err.response?.data?.message || 'Could not save personal domain'
+    })
+  } finally {
+    savingDomain.value = false
+  }
+}
+
+async function verifyCustomDomain() {
+  verifyingDomain.value = true
+  try {
+    const sid = selectedSchoolId.value || currentSchool.value?.id || null
+    const res = await api.post('/school/custom-domain/verify', {
+      school_id: sid
+    })
+    if (res.data.success) {
+      customDomainData.value = res.data.data
+      Swal.fire({
+        icon: res.data.data.domain_status === 'active' ? 'success' : 'warning',
+        title: res.data.data.domain_status === 'active' ? 'Domain Verified & Active!' : 'DNS Verification In Progress',
+        text: res.data.message
+      })
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Verification Failed',
+      text: err.response?.data?.message || 'DNS verification failed'
+    })
+  } finally {
+    verifyingDomain.value = false
+  }
+}
+
+async function removeCustomDomain() {
+  const result = await Swal.fire({
+    title: 'Disconnect Personal Domain?',
+    text: 'This will remove the custom domain. The school will immediately revert to the default system URL without any downtime.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    confirmButtonText: 'Yes, disconnect domain'
+  })
+  if (!result.isConfirmed) return
+
+  removingDomain.value = true
+  try {
+    const sid = selectedSchoolId.value || currentSchool.value?.id || null
+    const res = await api.delete('/school/custom-domain', {
+      params: sid ? { school_id: sid } : {}
+    })
+    if (res.data.success) {
+      customDomainData.value = res.data.data
+      domainInput.value = ''
+      Swal.fire({
+        icon: 'success',
+        title: 'Domain Disconnected',
+        text: 'School is now running exclusively on the default system ERP link.'
+      })
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: err.response?.data?.message || 'Could not disconnect domain'
+    })
+  } finally {
+    removingDomain.value = false
+  }
+}
+
+function copyToClipboard(text) {
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => {
+    Swal.fire({ icon: 'success', title: 'Copied to clipboard!', timer: 1200, showConfirmButton: false })
+  }).catch(() => {
+    // fallback
+  })
+}
+
 function handleTenantSwitched(e) {
   const sid = e.detail?.school_id
   if (sid && sid !== 'all' && Number(sid) !== Number(selectedSchoolId.value)) {
     selectedSchoolId.value = Number(sid)
     loadSettings(Number(sid))
     loadNotices(Number(sid))
+    fetchCustomDomain(Number(sid))
   }
 }
 
@@ -1089,6 +1454,7 @@ onMounted(async () => {
   const initialId = route.query.school_id || tenantStore.activeSchoolId || localStorage.getItem('active_school_id') || null
   await loadSettings(initialId)
   await loadNotices(initialId)
+  await fetchCustomDomain(initialId)
 })
 
 onUnmounted(() => {

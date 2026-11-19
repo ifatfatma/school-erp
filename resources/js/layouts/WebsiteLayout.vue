@@ -81,6 +81,11 @@
               </ul>
             </li>
             <li class="nav-item">
+              <router-link :to="schoolLink('/gallery')" class="nav-link px-3" active-class="text-primary active">
+                <i class="bi bi-camera me-1 d-none d-xl-inline"></i>Gallery
+              </router-link>
+            </li>
+            <li class="nav-item">
               <router-link :to="schoolLink('/contact')" class="nav-link px-3" active-class="text-primary active">Contact</router-link>
             </li>
           </ul>
@@ -154,6 +159,7 @@
               <li><router-link :to="schoolLink('/about')" class="text-white-50 text-decoration-none hover-white">About School</router-link></li>
               <li><router-link :to="schoolLink('/academics')" class="text-white-50 text-decoration-none hover-white">Academics</router-link></li>
               <li><router-link :to="schoolLink('/admissions')" class="text-white-50 text-decoration-none hover-white">Admissions</router-link></li>
+              <li><router-link :to="schoolLink('/gallery')" class="text-white-50 text-decoration-none hover-white">Photo Gallery</router-link></li>
               <li><router-link :to="schoolLink('/contact')" class="text-white-50 text-decoration-none hover-white">Contact Us</router-link></li>
             </ul>
           </div>
@@ -213,26 +219,59 @@ const currentSchoolCode = computed(() => {
   return route.params.schoolCode || route.query.school || websiteData.school?.code || ''
 })
 
+const isCustomDomain = computed(() => {
+  if (typeof window === 'undefined') return false
+  const host = window.location.host.toLowerCase().replace(/^www\./, '')
+  if (['localhost:8000', '127.0.0.1:8000', 'localhost', '127.0.0.1', 'localhost:5173'].includes(host)) {
+    return false
+  }
+  return !!websiteData.school?.custom_domain && (host === websiteData.school.custom_domain.toLowerCase())
+})
+
 /**
  * Generate a school-scoped URL link:
- * - If currently viewing /s/:schoolCode, generates /s/:schoolCode/path
+ * - If on school personal domain, returns clean direct path /about, /admissions, etc.
+ * - If currently viewing /s/:schoolCode on platform domain, generates /s/:schoolCode/path
  * - If on standard root /, returns clean path
  */
 function schoolLink(path) {
-  const clean = path.startsWith('/') ? path : '/' + path
+  if (!path) return '/'
+  let clean = path.startsWith('/') ? path : '/' + path
+
+  if (isCustomDomain.value) {
+    if (clean.startsWith('/s/')) {
+      clean = clean.replace(/^\/s\/[^\/]+/, '')
+      if (!clean) clean = '/'
+    }
+    return clean
+  }
+
   const code = currentSchoolCode.value
   if (code) {
+    if (clean.startsWith(`/s/${code}`)) {
+      return clean
+    }
+    if (clean.startsWith('/s/')) {
+      clean = clean.replace(/^\/s\/[^\/]+/, '')
+      if (!clean) clean = '/'
+    }
     return clean === '/' ? `/s/${code}` : `/s/${code}${clean}`
   }
   return clean
 }
 
 function portalLoginLink() {
+  if (isCustomDomain.value) {
+    return '/portal/login'
+  }
   const code = currentSchoolCode.value
   return code ? `/s/${code}/portal/login` : '/portal/login'
 }
 
 function staffLoginLink() {
+  if (isCustomDomain.value) {
+    return '/login'
+  }
   const code = currentSchoolCode.value
   return code ? `/s/${code}/login` : '/login'
 }

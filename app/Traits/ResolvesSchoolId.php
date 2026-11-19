@@ -31,17 +31,7 @@ trait ResolvesSchoolId
         $req = $request ?? (function_exists('request') ? request() : null);
         $user = $req ? $req->user() : auth()->user();
 
-        if ($user && !$this->isSuperAdmin($req) && !empty($user->school_id)) {
-            return (int) $user->school_id;
-        }
-
-        if ($req) {
-            $inputSchool = $req->input('school_id') ?? $req->query('school_id') ?? $req->header('X-School-Id');
-            if ($inputSchool !== null && $inputSchool !== '' && $inputSchool !== 'all' && $inputSchool !== '0') {
-                return (int) $inputSchool;
-            }
-        }
-
+        // 1. Check TenantManager active school (handles Super Admin & authorized multi-school admins)
         try {
             $tenantManager = app(TenantManager::class);
             $tenantId = $tenantManager->getTenantId();
@@ -50,6 +40,18 @@ trait ResolvesSchoolId
             }
         } catch (\Throwable $e) {}
 
+        // 2. Explicit request parameter or header if authorized
+        if ($req) {
+            $inputSchool = $req->input('school_id') ?? $req->query('school_id') ?? $req->header('X-School-Id');
+            if ($inputSchool !== null && $inputSchool !== '' && $inputSchool !== 'all' && $inputSchool !== '0') {
+                $targetId = (int) $inputSchool;
+                if ($this->isSuperAdmin($req) || ($user && $user->canAccessSchool($targetId))) {
+                    return $targetId;
+                }
+            }
+        }
+
+        // 3. Fallback to user's assigned school
         if (!empty($user?->school_id)) {
             return (int) $user->school_id;
         }

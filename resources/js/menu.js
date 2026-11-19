@@ -21,6 +21,11 @@ export default [
                 route: "/academic-sessions",
                 permission: "academic_session.view",
             },
+            {
+                title: "Subscription & Billing",
+                icon: "bi bi-credit-card-2-front",
+                route: "/subscription/billing",
+            },
         ],
     },
 
@@ -128,6 +133,12 @@ export default [
                 permission: "website_settings.view",
                 feature: "website_cms",
             },
+            {
+                title: "Photo Gallery",
+                route: "/admin/website/manager?tab=gallery",
+                permission: "website_settings.view",
+                feature: "website_cms",
+            },
         ],
     },
 
@@ -187,6 +198,12 @@ export default [
                 route: "/biometrics?tab=logs",
             },
         ],
+    },
+
+    {
+        title: "AI Bot & WhatsApp Desk",
+        icon: "bi bi-robot",
+        route: "/ai-bot",
     },
 
     {
@@ -619,6 +636,11 @@ export default [
                 title: "Permissions",
                 route: "/administrator/permissions",
                 permission: "permission.view",
+            },
+            {
+                title: "Tenant Billing & Upgrades",
+                route: "/admin/tenant-billing",
+                superAdminOnly: true,
             },
         ],
     },

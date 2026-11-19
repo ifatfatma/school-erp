@@ -22,25 +22,33 @@ trait BelongsToSchool
             $user = auth()->user();
             $tenantManager = app(TenantManager::class);
 
+            // If school_id was already explicitly provided on model, preserve it!
+            if (!empty($model->school_id)) {
+                return;
+            }
+
             if ($user && !$tenantManager->isSuperAdmin($user)) {
-                // Non-Super Admins are strictly bound to their assigned school
-                $model->school_id = (int) $user->school_id;
+                // If user is operating under an active school they can access, use it
+                $activeTenantId = $tenantManager->getTenantId();
+                if ($activeTenantId && $user->canAccessSchool($activeTenantId)) {
+                    $model->school_id = $activeTenantId;
+                } else {
+                    $model->school_id = (int) $user->school_id;
+                }
             } else {
+                $tenantId = $tenantManager->getTenantId();
+                if ($tenantId) {
+                    $model->school_id = $tenantId;
+                } elseif (!empty($model->class_id)) {
+                    $class = \App\Models\SchoolClass::withoutGlobalScopes()->find($model->class_id);
+                    if ($class && $class->school_id) {
+                        $model->school_id = $class->school_id;
+                    }
+                } elseif ($user && $user->school_id) {
+                    $model->school_id = (int) $user->school_id;
+                }
                 if (empty($model->school_id)) {
-                    $tenantId = $tenantManager->getTenantId();
-                    if ($tenantId) {
-                        $model->school_id = $tenantId;
-                    } elseif (!empty($model->class_id)) {
-                        $class = \App\Models\SchoolClass::withoutGlobalScopes()->find($model->class_id);
-                        if ($class && $class->school_id) {
-                            $model->school_id = $class->school_id;
-                        }
-                    } elseif ($user && $user->school_id) {
-                        $model->school_id = (int) $user->school_id;
-                    }
-                    if (empty($model->school_id)) {
-                        $model->school_id = \App\Models\School::first()?->id ?? 1;
-                    }
+                    $model->school_id = \App\Models\School::first()?->id ?? 1;
                 }
             }
         });
@@ -51,8 +59,11 @@ trait BelongsToSchool
             $tenantManager = app(TenantManager::class);
 
             if ($user && !$tenantManager->isSuperAdmin($user)) {
-                if ($model->isDirty('school_id') && (string) $model->school_id !== (string) $user->school_id) {
-                    abort(403, 'Unauthorized school modification.');
+                if ($model->isDirty('school_id')) {
+                    $targetSchoolId = (int) $model->school_id;
+                    if (!$user->canAccessSchool($targetSchoolId)) {
+                        abort(403, 'Unauthorized school modification.');
+                    }
                 }
             }
         });

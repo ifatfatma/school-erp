@@ -63,7 +63,20 @@ class TenantManager
                 return null;
             }
 
-            // Normal users (School Admin, Teacher, Student, Parent): ALWAYS strictly their assigned school_id
+            // Users with school access (School Admin, etc.)
+            // Check if user requested an active school they are authorized to access
+            $requested = request()->header('X-School-Id') 
+                ?? request()->query('tenant_school_id')
+                ?? session('active_school_id');
+
+            if ($requested !== null && $requested !== '' && is_numeric($requested)) {
+                $requestedId = (int) $requested;
+                if ($user->canAccessSchool($requestedId)) {
+                    return $requestedId;
+                }
+            }
+
+            // Default to assigned primary school_id
             return $user->school_id ? (int) $user->school_id : null;
         }
 

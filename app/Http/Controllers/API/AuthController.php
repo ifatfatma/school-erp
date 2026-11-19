@@ -246,6 +246,18 @@ class AuthController extends Controller
                 'permissions' =>
                 $permissions,
 
+                'can_manage_multiple_schools' =>
+                $user->isSuperAdmin() || $user->canManageMultipleSchools(),
+
+                'can_add_more_schools' =>
+                $user->isSuperAdmin() || $user->canAddMoreSchools(),
+
+                'max_allowed_schools' =>
+                $user->maxAllowedSchools(),
+
+                'owned_schools_count' =>
+                $user->ownedSchools()->count(),
+
             ],
 
         ]);
@@ -436,6 +448,18 @@ class AuthController extends Controller
 
                     'permissions' =>
                     $permissions,
+
+                    'can_manage_multiple_schools' =>
+                    $user->isSuperAdmin() || $user->canManageMultipleSchools(),
+
+                    'can_add_more_schools' =>
+                    $user->isSuperAdmin() || $user->canAddMoreSchools(),
+
+                    'max_allowed_schools' =>
+                    $user->maxAllowedSchools(),
+
+                    'owned_schools_count' =>
+                    $user->ownedSchools()->count(),
 
                 ],
 

@@ -21,9 +21,13 @@ class SchoolResource extends JsonResource
         $logoUrl = null;
 
         if ($rawLogo && $rawLogo !== '' && $rawLogo !== '[]' && $rawLogo !== 'null' && $rawLogo !== '{}') {
-            $logoUrl = str_starts_with($rawLogo, 'http')
-                ? $rawLogo
-                : asset('storage/' . ltrim($rawLogo, '/'));
+            if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?/(storage/.*)$#', $rawLogo, $matches)) {
+                $logoUrl = '/' . $matches[3];
+            } elseif (str_starts_with($rawLogo, 'http://') || str_starts_with($rawLogo, 'https://')) {
+                $logoUrl = $rawLogo;
+            } else {
+                $logoUrl = '/storage/' . ltrim($rawLogo, '/');
+            }
         }
 
         return [
@@ -42,6 +46,12 @@ class SchoolResource extends JsonResource
             'login_background'      => $this->login_background_url,
             'login_background_path' => $this->login_background,
             'status'        => (bool) $this->status,
+            'custom_domain'           => $this->custom_domain,
+            'domain_status'           => $this->domain_status ?? 'none',
+            'domain_verified_at'      => $this->domain_verified_at,
+            'dns_cname_target'        => $this->dns_cname_target,
+            'website_url'             => $this->website_url,
+            'has_custom_domain'       => (bool) $this->has_custom_domain,
             'subscription_plan'       => $this->subscription_plan ?? 'starter',
             'subscription_plan_label' => \App\Services\SubscriptionPlanService::getPlanLabel($this->subscription_plan ?? 'starter'),
             'subscription_status'     => $this->subscription_status ?? 'active',

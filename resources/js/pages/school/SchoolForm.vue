@@ -265,10 +265,13 @@
 import { ref, reactive, computed } from 'vue';
 import { useSchoolStore } from '@/stores/school';
 import { useAuthStore } from '@/stores/auth';
+import { useTenantStore } from '@/stores/tenant';
 import { Modal } from 'bootstrap';
+import Swal from 'sweetalert2';
 
 const store = useSchoolStore();
 const authStore = useAuthStore();
+const tenantStore = useTenantStore();
 
 const isSuperAdmin = computed(() => {
   const u = authStore.user;
@@ -463,6 +466,12 @@ const submit = async () => {
     formData.append('postal_code', form.postal_code || '');
     formData.append('status', form.status ? '1' : '0');
 
+    if (isSuperAdmin.value) {
+      formData.append('subscription_plan', form.subscription_plan || 'starter');
+    } else if (!isEdit.value) {
+      formData.append('subscription_plan', 'starter');
+    }
+
     if (selectedFile.value) {
       formData.append('logo', selectedFile.value);
     } else if (isLogoRemoved.value) {
@@ -485,13 +494,28 @@ const submit = async () => {
       }
     }
 
+    let saveResult = null;
     if (isEdit.value) {
-      await store.updateSchool(currentId.value, formData);
+      saveResult = await store.updateSchool(currentId.value, formData);
     } else {
-      await store.createSchool(formData);
+      saveResult = await store.createSchool(formData);
     }
 
-    // Refresh auth user so sidebar, navbar, and layouts instantly get the new logo
+    // Refresh tenant list & current tenant
+    await tenantStore.fetchTenants();
+
+    // If new school was created, automatically switch to it for immediate management
+    if (!isEdit.value && saveResult?.data?.id) {
+      try {
+        await tenantStore.switchTenant(saveResult.data.id);
+      } catch (switchErr) {
+        console.warn('Auto-switch after creation skipped:', switchErr);
+      }
+    } else {
+      await tenantStore.fetchCurrent();
+    }
+
+    // Refresh auth user so sidebar, navbar, and layouts instantly get the new logo & profile
     await authStore.loadProfile();
 
     // Dispatch global event for other components to reload branding
@@ -506,6 +530,14 @@ const submit = async () => {
     emit('saved');
   } catch (err) {
     console.error('Failed saving school:', err);
+    const msg = err.response?.data?.message || 'Failed saving school. Please check your inputs and try again.';
+    Swal.fire({
+      icon: 'error',
+      title: err.response?.status === 403 ? 'Subscription Limit' : 'Error',
+      text: msg,
+      confirmButtonText: 'Understood',
+      confirmButtonColor: '#0d6efd',
+    });
   }
 };
 

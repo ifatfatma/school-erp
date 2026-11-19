@@ -19,12 +19,16 @@ class SchoolController extends Controller
 
         $query = School::query();
 
-        // Non-Super Admins can only view their own school
+        // Super Admin sees all schools; other users only see their assigned schools
         if (!$isSuperAdmin) {
-            if (!$user || !$user->school_id) {
+            if (!$user) {
                 return response()->json(['data' => []]);
             }
-            $query->where('id', $user->school_id);
+            $assignedIds = $user->schools()->pluck('schools.id')->push($user->school_id)->filter()->unique()->toArray();
+            if (empty($assignedIds)) {
+                return response()->json(['data' => []]);
+            }
+            $query->whereIn('id', $assignedIds);
         }
 
         // Optional search
@@ -41,11 +45,27 @@ class SchoolController extends Controller
 
     public function store(SchoolRequest $request)
     {
-        if (!app(\App\Services\TenantManager::class)->isSuperAdmin($request->user())) {
-            abort(403, 'Unauthorized. Only Super Admin can create schools.');
+        $user = $request->user();
+        $tenantManager = app(\App\Services\TenantManager::class);
+        $isSuperAdmin = $tenantManager->isSuperAdmin($user);
+
+        if (!$isSuperAdmin) {
+            if (!$user || !$user->canManageMultipleSchools() || !$user->canAddMoreSchools()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'School limit reached for your current subscription plan. Please contact Super Admin to upgrade.',
+                ], 403);
+            }
         }
 
         $data = $request->validated();
+
+        // Non-super admins inherit their subscription plan on newly created schools
+        if (!$isSuperAdmin && $user) {
+            $userSub = $user->subscription;
+            $data['subscription_plan'] = $userSub?->plan?->slug ?? strtolower($user->school?->subscription_plan ?? 'starter');
+            $data['subscription_status'] = 'active';
+        }
 
         if ($request->hasFile('logo') || ($request->file('logo') instanceof \Illuminate\Http\UploadedFile)) {
             $file = $request->file('logo');
@@ -79,9 +99,29 @@ class SchoolController extends Controller
 
         if (isset($data['status'])) {
             $data['status'] = filter_var($data['status'], FILTER_VALIDATE_BOOLEAN);
+        } else {
+            $data['status'] = true;
+        }
+
+        if (!isset($data['subscription_plan'])) {
+            $data['subscription_plan'] = 'starter';
+        }
+        if (!isset($data['subscription_status'])) {
+            $data['subscription_status'] = 'active';
         }
 
         $school = School::create($data);
+
+        // Associate this school with the creating user in school_user
+        if ($user) {
+            $user->schools()->syncWithoutDetaching([
+                $school->id => ['role' => 'admin', 'is_primary' => empty($user->school_id)]
+            ]);
+
+            if (empty($user->school_id)) {
+                $user->update(['school_id' => $school->id]);
+            }
+        }
 
         // Auto-create current academic session for the newly registered school
         \App\Models\AcademicSession::create([
@@ -96,11 +136,18 @@ class SchoolController extends Controller
         // Sync with WebsiteSettings if active or primary
         $this->syncWebsiteSettings($school);
 
-        return new SchoolResource($school);
+        return (new SchoolResource($school))->additional([
+            'success' => true,
+            'message' => "School '{$school->name}' created and assigned to your account successfully."
+        ]);
     }
 
-    public function show(School $school)
+    public function show(School $school, Request $request)
     {
+        $user = $request->user();
+        if ($user && !app(\App\Services\TenantManager::class)->isSuperAdmin($user) && !$user->canAccessSchool($school->id)) {
+            abort(403, 'Unauthorized. You cannot view another school.');
+        }
         return new SchoolResource($school);
     }
 
@@ -109,7 +156,7 @@ class SchoolController extends Controller
         $user = $request->user();
         $isSuperAdmin = app(\App\Services\TenantManager::class)->isSuperAdmin($user);
 
-        if (!$isSuperAdmin && (int) ($user?->school_id) !== (int) $school->id) {
+        if (!$isSuperAdmin && !$user->canAccessSchool($school->id)) {
             abort(403, 'Unauthorized. You cannot modify another school.');
         }
 
@@ -202,8 +249,13 @@ class SchoolController extends Controller
 
     public function current(Request $request)
     {
-        $schoolId = $request->user()?->school_id;
-        $school = $schoolId ? School::find($schoolId) : School::first();
+        $tenantManager = app(\App\Services\TenantManager::class);
+        $school = $tenantManager->getTenant();
+
+        if (!$school) {
+            $schoolId = $request->user()?->school_id;
+            $school = $schoolId ? School::find($schoolId) : School::first();
+        }
 
         if (!$school) {
             return response()->json([

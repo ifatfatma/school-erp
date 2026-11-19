@@ -8,17 +8,32 @@
         ]"
     />
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div>
-        <h3 class="mb-0 fw-bold">{{ isSuperAdmin ? 'Schools' : 'School Profile & Branding' }}</h3>
-        <small class="text-muted" v-if="!isSuperAdmin">Manage your institution's official details, contact info, school logo, and login page picture.</small>
+        <h3 class="mb-0 fw-bold">
+          {{ isSuperAdmin ? 'Schools' : (canAddSchool || store.schools.length > 1 ? 'My Managed Schools' : 'School Profile & Branding') }}
+        </h3>
+        <small class="text-muted" v-if="!isSuperAdmin">
+          {{ canAddSchool || store.schools.length > 1
+            ? 'Manage and switch between your assigned schools, or add a new school institution.'
+            : 'Manage your institution\'s official details, contact info, school logo, and login page picture.'
+          }}
+        </small>
       </div>
-      <div>
-        <button v-if="isSuperAdmin" class="btn btn-primary" @click="openCreateModal">
-          <i class="bi bi-plus-circle me-1"></i> Add School
+      <div class="d-flex align-items-center gap-2">
+        <button v-if="canAddSchool" class="btn btn-primary" @click="openCreateModal">
+          <i class="bi bi-plus-circle me-1"></i> Add School <span v-if="!isSuperAdmin" class="badge bg-white text-primary ms-1">{{ store.schools.length }}/{{ tenantStore.maxSchools }}</span>
         </button>
-        <button v-else-if="store.schools.length > 0" class="btn btn-primary" @click="openEditModal(store.schools[0])">
-          <i class="bi bi-pencil-square me-1"></i> Edit School, Logo & Login Backdrop
+        <router-link
+          v-else-if="!isSuperAdmin"
+          to="/subscription/billing"
+          class="btn btn-warning text-dark fw-semibold"
+          title="Upgrade plan to register more schools"
+        >
+          <i class="bi bi-arrow-up-circle-fill me-1"></i> Upgrade Plan to Add More Schools ({{ store.schools.length }}/{{ tenantStore.maxSchools }})
+        </router-link>
+        <button v-if="!isSuperAdmin && store.schools.length > 0" class="btn btn-outline-secondary" @click="openEditModal(store.schools[0])">
+          <i class="bi bi-pencil-square me-1"></i> Edit School Branding
         </button>
       </div>
     </div>
@@ -66,6 +81,7 @@
               <th>Phone</th>
               <th width="120">Plan</th>
               <th width="90">Status</th>
+              <th width="130" class="text-center" v-if="canSwitch || isSuperAdmin">Active Context</th>
               <th width="140" class="text-center">Actions</th>
             </tr>
           </thead>
@@ -124,6 +140,25 @@
                 <span :class="school.status ? 'badge bg-success' : 'badge bg-secondary'">
                   {{ school.status ? 'Active' : 'Inactive' }}
                 </span>
+              </td>
+              <td class="text-center" v-if="canSwitch || isSuperAdmin">
+                <span
+                  v-if="String(school.id) === String(tenantStore.activeSchoolId)"
+                  class="badge bg-success-subtle text-success border border-success px-2 py-1"
+                >
+                  <i class="bi bi-check-circle-fill me-1"></i> Active
+                </span>
+                <button
+                  v-else
+                  class="btn btn-sm btn-outline-primary"
+                  @click="handleSwitch(school)"
+                  :disabled="switchingId === school.id"
+                  title="Switch to this school"
+                >
+                  <span v-if="switchingId === school.id" class="spinner-border spinner-border-sm me-1"></span>
+                  <i v-else class="bi bi-arrow-repeat me-1"></i>
+                  Switch
+                </button>
               </td>
               <td class="text-center">
                 <div class="btn-group btn-group-sm">
@@ -193,13 +228,16 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import { useSchoolStore } from '@/stores/school';
 import { useAuthStore } from '@/stores/auth';
+import { useTenantStore } from '@/stores/tenant';
 import SchoolForm from '@/pages/school/SchoolForm.vue';
 
 const store = useSchoolStore();
 const authStore = useAuthStore();
+const tenantStore = useTenantStore();
 const search = ref('');
 const formModal = ref(null);
 const failedLogos = reactive({});
+const switchingId = ref(null);
 
 const isSuperAdmin = computed(() => {
   const u = authStore.user;
@@ -208,6 +246,41 @@ const isSuperAdmin = computed(() => {
     return roleName.toLowerCase() === 'super admin' || roleName.toLowerCase() === 'super_admin';
   });
 });
+
+const canAddSchool = computed(() => {
+  if (isSuperAdmin.value) return true;
+  return !!tenantStore.canCreateSchool && (store.schools.length < tenantStore.maxSchools);
+});
+
+const canSwitch = computed(() => {
+  return isSuperAdmin.value || (tenantStore.maxSchools > 1 && store.schools.length > 1);
+});
+
+const handleSwitch = async (school) => {
+  if (String(school.id) === String(tenantStore.activeSchoolId)) return;
+  switchingId.value = school.id;
+  try {
+    await tenantStore.switchTenant(school.id);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: `Switched to ${school.name}`,
+      showConfirmButton: false,
+      timer: 2000
+    });
+    // Refresh school data for new context
+    await store.fetchSchools({ page: store.pagination.current_page, search: search.value });
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Failed to switch school',
+      text: err.response?.data?.message || 'Error occurred while switching schools.'
+    });
+  } finally {
+    switchingId.value = null;
+  }
+};
 
 function onLogoError(id) {
   if (id) {
@@ -277,5 +350,6 @@ const confirmDelete = async (id) => {
 
 const onSaved = () => {
   loadSchools();
+  tenantStore.fetchTenants();
 };
 </script>

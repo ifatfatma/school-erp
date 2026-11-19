@@ -308,6 +308,97 @@
       </div>
     </section>
 
+    <!-- Campus Life & Photo Gallery Highlights Section -->
+    <section class="py-5 bg-white border-top border-bottom">
+      <div class="container py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+          <div>
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-2">
+              <i class="bi bi-camera-fill me-1"></i> Campus Exploration & Media
+            </span>
+            <h2 class="fw-bold mb-1">Life at Our Campus</h2>
+            <p class="text-muted mb-0 small" style="max-width: 600px;">
+              Take a visual tour through modern classrooms, energetic sports events, cultural festivals, and science fairs.
+            </p>
+          </div>
+
+          <router-link :to="schoolLink('/gallery')" class="btn btn-outline-primary rounded-pill px-4 fw-semibold flex-shrink-0">
+            View All Photos <i class="bi bi-arrow-right ms-1"></i>
+          </router-link>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-4">
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-semibold transition-all"
+            :class="homeGalleryCategory === 'all' ? 'btn-primary shadow-sm' : 'btn-light text-secondary border'"
+            @click="homeGalleryCategory = 'all'"
+          >
+            All Highlights
+          </button>
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-semibold transition-all"
+            :class="homeGalleryCategory === 'campus' ? 'btn-primary shadow-sm' : 'btn-light text-secondary border'"
+            @click="homeGalleryCategory = 'campus'"
+          >
+            <i class="bi bi-building me-1"></i> Campus & Classrooms
+          </button>
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-semibold transition-all"
+            :class="homeGalleryCategory === 'sports' ? 'btn-primary shadow-sm' : 'btn-light text-secondary border'"
+            @click="homeGalleryCategory = 'sports'"
+          >
+            <i class="bi bi-trophy me-1"></i> Sports Events
+          </button>
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-semibold transition-all"
+            :class="homeGalleryCategory === 'annual_function' ? 'btn-primary shadow-sm' : 'btn-light text-secondary border'"
+            @click="homeGalleryCategory = 'annual_function'"
+          >
+            <i class="bi bi-music-note-beamed me-1"></i> Annual Function
+          </button>
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-semibold transition-all"
+            :class="homeGalleryCategory === 'academic' ? 'btn-primary shadow-sm' : 'btn-light text-secondary border'"
+            @click="homeGalleryCategory = 'academic'"
+          >
+            <i class="bi bi-lightbulb me-1"></i> Science & Academic
+          </button>
+        </div>
+
+        <!-- Highlights Grid -->
+        <div class="row g-4">
+          <div v-for="album in homeFeaturedAlbums" :key="album.id" class="col-md-6 col-lg-3">
+            <router-link :to="schoolLink('/gallery')" class="text-decoration-none">
+              <div class="card h-100 border-0 rounded-4 overflow-hidden shadow-sm transition-hover bg-light">
+                <div class="position-relative overflow-hidden" style="height: 190px; background: #0f172a;">
+                  <img
+                    :src="formatAssetUrl(album.cover_image || (album.images && album.images[0]?.url) || '/images/no-image.png')"
+                    :alt="album.title"
+                    class="w-100 h-100 object-fit-cover"
+                    loading="lazy"
+                  />
+                  <span class="badge position-absolute top-0 start-0 m-2 px-2 py-1 rounded-pill" :class="getBadgeClass(album.category)" style="font-size: 0.7rem;">
+                    {{ getCatName(album.category) }}
+                  </span>
+                  <span class="badge bg-dark bg-opacity-75 text-white position-absolute bottom-0 end-0 m-2 px-2 py-1 rounded-pill font-monospace" style="font-size: 0.68rem;">
+                    <i class="bi bi-images me-1"></i>{{ album.images ? album.images.length : 1 }} Photos
+                  </span>
+                </div>
+                <div class="card-body p-3">
+                  <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">
+                    <i class="bi bi-calendar3 me-1 text-primary"></i>{{ album.event_date || 'Campus Life' }}
+                  </small>
+                  <h6 class="fw-bold text-dark mb-1 text-truncate">{{ album.title }}</h6>
+                  <p class="text-muted small mb-0 text-truncate" style="font-size: 0.78rem;">{{ album.description }}</p>
+                </div>
+              </div>
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Admission CTA Banner -->
     <section class="py-5 text-white text-center" style="background: linear-gradient(135deg, #0a48a3 0%, #0d6efd 100%);">
       <div class="container py-4">
@@ -329,7 +420,7 @@
 </template>
 
 <script setup>
-import { inject, computed } from 'vue'
+import { inject, computed, ref } from 'vue'
 
 const websiteData = inject('websiteData', { content: {}, notices: [] })
 const schoolLink = inject('schoolLink', (p) => p)
@@ -337,6 +428,8 @@ const schoolLink = inject('schoolLink', (p) => p)
 const hero = computed(() => websiteData.content?.hero || {})
 const stats = computed(() => websiteData.content?.stats || {})
 const notices = computed(() => websiteData.notices || [])
+
+const homeGalleryCategory = ref('all')
 
 const defaultFacilities = [
   { title: 'Rich Library', icon: 'bi-book', color: 'primary', description: 'Over 10,000+ reference books, journals, and quiet reading spaces managed digitally.' },
@@ -352,6 +445,106 @@ const facilities = computed(() => {
     ? websiteData.content.facilities.items
     : defaultFacilities
 })
+
+const defaultAlbums = [
+  {
+    id: 'alb_campus_tour',
+    category: 'campus',
+    title: 'Modern Campus & Smart Classrooms',
+    description: 'High-tech smart interactive panels, robotics lab, and well-equipped libraries.',
+    cover_image: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80',
+    event_date: 'Academic Year 2026',
+    images: [
+      { id: 'c1', url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80', caption: 'Interactive Smart Classroom' },
+      { id: 'c2', url: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80', caption: 'Main Academic Block & Gardens' },
+      { id: 'c3', url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80', caption: 'Central Digital Library' },
+      { id: 'c4', url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80', caption: 'Science & Robotics Laboratory' }
+    ]
+  },
+  {
+    id: 'alb_sports_2026',
+    category: 'sports',
+    title: 'Inter-House Sports Meet & Athletics',
+    description: 'Annual track & field events, football championship, and trophy distribution.',
+    cover_image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80',
+    event_date: 'January 2026',
+    images: [
+      { id: 's1', url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80', caption: '100m Sprint Finals' },
+      { id: 's2', url: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=1200&q=80', caption: 'Inter-School Football Trophy' }
+    ]
+  },
+  {
+    id: 'alb_annual_2025',
+    category: 'annual_function',
+    title: 'Tarang 2025: Grand Annual Cultural Gala',
+    description: 'An evening of dramatic arts, musical orchestra, choreography, and awards.',
+    cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80',
+    event_date: 'December 2025',
+    images: [
+      { id: 'af1', url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80', caption: 'Annual Day Musical Ensemble' },
+      { id: 'af2', url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80', caption: 'Award Ceremony on Main Stage' }
+    ]
+  },
+  {
+    id: 'alb_science_expo',
+    category: 'academic',
+    title: 'InnovateX: STEM & Science Fair',
+    description: 'Students presenting working models in renewable energy and artificial intelligence.',
+    cover_image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80',
+    event_date: 'November 2025',
+    images: [
+      { id: 'sc1', url: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80', caption: 'Robotics & Automation Project' }
+    ]
+  }
+]
+
+const galleryAlbums = computed(() => {
+  const g = websiteData.content?.gallery
+  if (g && Array.isArray(g.albums) && g.albums.length > 0) {
+    return g.albums
+  }
+  return defaultAlbums
+})
+
+const homeFeaturedAlbums = computed(() => {
+  let list = galleryAlbums.value
+  if (homeGalleryCategory.value !== 'all') {
+    list = list.filter(a => a.category === homeGalleryCategory.value)
+  }
+  return list.slice(0, 8)
+})
+
+function getCatName(catId) {
+  switch (catId) {
+    case 'campus': return 'Campus & Exploration'
+    case 'sports': return 'Sports & Athletics'
+    case 'annual_function': return 'Annual Function'
+    case 'academic': return 'Science & Academic'
+    case 'celebrations': return 'Celebrations'
+    default: return 'Campus Life'
+  }
+}
+
+function getBadgeClass(catId) {
+  switch (catId) {
+    case 'campus': return 'bg-info text-dark'
+    case 'sports': return 'bg-success text-white'
+    case 'annual_function': return 'bg-warning text-dark'
+    case 'academic': return 'bg-primary text-white'
+    case 'celebrations': return 'bg-danger text-white'
+    default: return 'bg-secondary text-white'
+  }
+}
+
+function formatAssetUrl(url) {
+  if (!url) return '/images/no-image.png'
+  if (typeof url !== 'string') return '/images/no-image.png'
+  const match = url.match(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/(storage\/.*)$/)
+  if (match) {
+    return '/' + match[3]
+  }
+  return url
+}
 </script>
 
 <style scoped>

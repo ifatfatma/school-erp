@@ -73,6 +73,11 @@ const routes = [
                 name: "tenant.website.contact",
                 component: () => import("@/pages/website/Contact.vue"),
             },
+            {
+                path: "gallery",
+                name: "tenant.website.gallery",
+                component: () => import("@/pages/website/Gallery.vue"),
+            },
         ],
     },
 
@@ -107,6 +112,10 @@ const routes = [
         redirect: "/admissions/apply",
     },
     {
+        path: "/apply-admission",
+        redirect: "/admissions/apply",
+    },
+    {
         path: "/track",
         redirect: "/admissions/track",
     },
@@ -128,6 +137,11 @@ const routes = [
                 path: "contact",
                 name: "public.website.contact",
                 component: () => import("@/pages/website/Contact.vue"),
+            },
+            {
+                path: "gallery",
+                name: "public.website.gallery",
+                component: () => import("@/pages/website/Gallery.vue"),
             },
         ],
     },
@@ -172,8 +186,25 @@ const routes = [
             },
             {
                 path: "/school",
+                alias: "/schools",
                 name: "school",
                 component: School,
+                meta: {
+                    requiresAuth: true,
+                },
+            },
+            {
+                path: "/subscription/billing",
+                name: "subscription-billing",
+                component: () => import("@/pages/subscription/Billing.vue"),
+                meta: {
+                    requiresAuth: true,
+                },
+            },
+            {
+                path: "/admin/tenant-billing",
+                name: "admin-tenant-billing",
+                component: () => import("@/pages/administrator/billing/TenantBilling.vue"),
                 meta: {
                     requiresAuth: true,
                 },
@@ -548,6 +579,15 @@ const routes = [
                 component: () => import("@/pages/biometrics/Logs.vue"),
                 meta: {
                     title: "Biometric Attendance Logs",
+                },
+            },
+            {
+                path: "/ai-bot",
+                name: "ai-bot.index",
+                component: () => import("@/pages/ai-bot/Index.vue"),
+                meta: {
+                    title: "AI Support Bot & WhatsApp Desk",
+                    requiresAuth: true,
                 },
             },
             {

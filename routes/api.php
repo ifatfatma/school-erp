@@ -22,6 +22,7 @@ use App\Http\Controllers\API\StudentImportExportController;
 use App\Http\Controllers\API\IdCardController;
 use App\Http\Controllers\Api\StudentAttendanceController;
 use App\Http\Controllers\API\BiometricAttendanceController;
+use App\Http\Controllers\API\AiBotController;
 use App\Http\Controllers\Api\GuardianController;
 use App\Http\Controllers\Api\StudentPromotionController;
 use App\Http\Controllers\Api\ExamTypeController;
@@ -130,6 +131,16 @@ Route::prefix('public')->group(function () {
                 ->where(function ($q) use ($identifier) {
                     $q->where('code', $identifier)->orWhere('id', $identifier);
                 })->first();
+        } else {
+            // Check custom domain
+            $host = strtolower($request->getHost());
+            $cleanHost = preg_replace('/^www\./i', '', $host);
+            $school = \App\Models\School::where('status', 1)
+                ->whereNotNull('custom_domain')
+                ->where(function ($q) use ($host, $cleanHost) {
+                    $q->where('custom_domain', $cleanHost)
+                      ->orWhere('custom_domain', $host);
+                })->first();
         }
         $school = $school ?? \App\Models\School::where('status', 1)->first() ?? \App\Models\School::first();
         if (!$school) {
@@ -137,7 +148,7 @@ Route::prefix('public')->group(function () {
         }
         return new \App\Http\Resources\SchoolResource($school);
     });
-    Route::get('/schools', function () {
+    Route::get('/public-schools', function () {
         $schools = \App\Models\School::where('status', 1)->get(['id', 'name', 'code', 'city', 'state', 'logo']);
         return response()->json(['success' => true, 'data' => $schools]);
     });
@@ -148,6 +159,13 @@ Route::prefix('public')->group(function () {
     Route::get('/admissions/track', [PublicAdmissionController::class, 'track']);
     Route::post('/contact-inquiries', [PublicAdmissionController::class, 'submitInquiry']);
     Route::get('/stats', [PublicAdmissionController::class, 'stats']);
+});
+
+// AI Bot & WhatsApp Customer Support (Public / Visitor / Student / Parent)
+Route::prefix('ai-bot')->group(function () {
+    Route::get('/init', [AiBotController::class, 'init']);
+    Route::post('/chat', [AiBotController::class, 'chat']);
+    Route::post('/feedback', [AiBotController::class, 'feedback']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -161,6 +179,36 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/tenants/current', [TenantController::class, 'current']);
     Route::post('/tenants/switch', [TenantController::class, 'switch']);
     Route::get('/tenants/overview', [TenantController::class, 'systemOverview']);
+
+    // Subscription & Plan Upgrade Invoicing System
+    Route::prefix('billing')->group(function () {
+        Route::get('/plans', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'plans']);
+        Route::get('/tenants', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'tenants']);
+        Route::post('/upgrade-invoice/calculate', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'calculateUpgrade']);
+        Route::post('/upgrade-invoice/generate', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'generateUpgradeInvoice']);
+        Route::get('/invoices', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'allInvoices']);
+        Route::get('/my-subscription', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'mySubscription']);
+        Route::post('/request-upgrade', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'requestUpgrade']);
+        Route::post('/invoices/{id}/pay', [\App\Http\Controllers\API\Billing\SubscriptionBillingController::class, 'payInvoice']);
+    });
+
+    // AI Bot & WhatsApp Support Admin Management
+    Route::prefix('ai-bot/admin')->group(function () {
+        Route::get('/settings', [AiBotController::class, 'getSettings']);
+        Route::post('/settings', [AiBotController::class, 'saveSettings']);
+        Route::get('/faqs', [AiBotController::class, 'listFaqs']);
+        Route::post('/faqs', [AiBotController::class, 'saveFaq']);
+        Route::delete('/faqs/{id}', [AiBotController::class, 'deleteFaq'])->whereNumber('id');
+        Route::get('/logs', [AiBotController::class, 'logs']);
+    });
+
+    // School Personal Domain & DNS Configuration
+    Route::prefix('school/custom-domain')->group(function () {
+        Route::get('/', [\App\Http\Controllers\API\CustomDomainController::class, 'show']);
+        Route::post('/', [\App\Http\Controllers\API\CustomDomainController::class, 'update']);
+        Route::post('/verify', [\App\Http\Controllers\API\CustomDomainController::class, 'verify']);
+        Route::delete('/', [\App\Http\Controllers\API\CustomDomainController::class, 'destroy']);
+    });
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::get('/dashboard', [DashboardController::class, 'index']);

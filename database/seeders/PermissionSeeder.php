@@ -47,6 +47,7 @@ class PermissionSeeder extends Seeder
 
             'school.view',
             'school.create',
+            'school.manage_multiple',
             'school.update',
             'school.delete',
 
